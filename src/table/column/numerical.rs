@@ -9,17 +9,31 @@ pub enum Numerical {
     Float(FloatVec),
 }
 
+// ---
+
 impl From<FloatVec> for Numerical {
     fn from(fv: FloatVec) -> Self {
         Numerical::Float(fv)
     }
 }
+impl From<Vec<f32>> for Numerical {
+    fn from(v: Vec<f32>) -> Self {
+        Numerical::Float(v.into())
+    }
+}
+impl From<Vec<f64>> for Numerical {
+    fn from(v: Vec<f64>) -> Self {
+        Numerical::Float(v.into())
+    }
+}
+
+// ---
+
 impl From<IntVec> for Numerical {
     fn from(iv: IntVec) -> Self {
         Numerical::Int(iv)
     }
 }
-
 impl From<Vec<i8>> for Numerical {
     fn from(v: Vec<i8>) -> Self {
         Numerical::Int(v.into())
@@ -71,7 +85,7 @@ impl From<Vec<u128>> for Numerical {
     }
 }
 
-///
+/// An abstraction over all the possible vectors of floats.
 #[derive(Debug)]
 pub enum FloatVec {
     F32(Vec<f32>),
@@ -88,7 +102,7 @@ impl From<Vec<f64>> for FloatVec {
     }
 }
 
-///
+/// An abstraction over all the possible vector of integers.
 #[derive(Debug)]
 pub enum IntVec {
     I8(Vec<i8>),

@@ -14,6 +14,9 @@ pub use column::{Categorical, Column, FloatVec, IntVec, Numerical};
 
 // use num::{PrimInt, Float};
 
+///
+///
+///
 #[derive(Debug, Default)]
 pub struct Table {
     cols: Vec<Column>,
@@ -34,9 +37,15 @@ impl Table {
         self.cols.len()
     }
 
-    // TODO:
-    // pub fn add_col(&mut self, header: &str, col: Into<Column>) {
-
+    /// Adds a column to the table.
+    ///
+    /// # Example
+    /// ```
+    /// # use ladata::Table;
+    /// let mut t = Table::new();
+    /// t.add_col("bytes", vec![23_u8, 53, 32]);
+    /// t.add_col("floats", vec![23., 32.3, 0.]);
+    /// ```
     // TODO: return the index
     pub fn add_col<C: Into<Column>>(&mut self, header: &str, col: C) {
         self.cols.push(col.into());

@@ -2,6 +2,8 @@
 //!
 // TODO: Any dynamic type, any user-provided enum.
 
+use std::any::Any;
+
 /// A categorical data type is one that can not be measured (AKA *qualitative*).
 ///
 /// Examples: Gender, Opinion, Rating…
@@ -11,18 +13,26 @@
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Categorical {
+    /// A Vec of boolean values.
     Bool(Vec<bool>),
+    /// A Vec of string values.
     String(Vec<String>),
-    // Other(Vec<_>),
+    /// A Vec of boxed dynamic values.
+    AnyBoxed(Vec<Box<dyn Any>>),
 }
 
 impl From<Vec<String>> for Categorical {
-    fn from(vs: Vec<String>) -> Self {
-        Categorical::String(vs)
+    fn from(v: Vec<String>) -> Self {
+        Categorical::String(v)
     }
 }
 impl From<Vec<bool>> for Categorical {
-    fn from(vb: Vec<bool>) -> Self {
-        Categorical::Bool(vb)
+    fn from(v: Vec<bool>) -> Self {
+        Categorical::Bool(v)
+    }
+}
+impl From<Vec<Box<dyn Any>>> for Categorical {
+    fn from(v: Vec<Box<dyn Any>>) -> Self {
+        Categorical::AnyBoxed(v)
     }
 }
