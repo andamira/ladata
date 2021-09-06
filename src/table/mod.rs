@@ -1,21 +1,12 @@
 //!
 //!
-//!
-//!
-
-// TODO:
-// - sync the rows on operations
-//   - support non-existing indices when retrieving/printing a row.
 
 #![allow(unused_variables, dead_code)]
 
 mod column;
-pub use column::{Categorical, Column, FloatVec, IntVec, Numerical};
+pub use column::{Categorical, Column, FloatVec, HandleVec, IntVec, Numerical};
 
-// use num::{PrimInt, Float};
-
-///
-///
+/// A data table, or data frame.
 ///
 #[derive(Debug, Default)]
 pub struct Table {
@@ -24,10 +15,8 @@ pub struct Table {
     rows: Option<usize>,
 }
 
-// impl Default for Table {
-// }
-//
 impl Table {
+    /// New empty table.
     pub fn new() -> Self {
         Self::default()
     }
@@ -52,6 +41,8 @@ impl Table {
         self.header.push(header.into());
     }
 
-    // TODO: result
-    pub fn del_col(&mut self, col: usize) {}
+    /// Delete the column.
+    pub fn del_col(&mut self, col: usize) {
+        todo![];
+    }
 }

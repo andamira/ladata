@@ -18,8 +18,10 @@ keywords = []
 publish = false
 
 [dependencies]
+paste = "1.0.5"
 
 [dev-dependencies]
+float_eq = "0.6.1"
 
 [build-dependencies]
 # docima = "0.9.1"
