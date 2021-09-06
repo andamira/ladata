@@ -6,7 +6,7 @@ mod numerical;
 pub use numerical::{FloatVec, IntVec, Numerical};
 
 mod categorical;
-pub use categorical::Categorical;
+pub use categorical::{Categorical, HandleVec};
 
 /// A column of data in the [`Table`][super::Table] can be of two basic data types:
 /// [`Numerical`] and [`Categorical`].
@@ -116,6 +116,11 @@ impl From<Vec<bool>> for Column {
 }
 impl From<Vec<Box<dyn Any>>> for Column {
     fn from(v: Vec<Box<dyn Any>>) -> Self {
+        Column::Categorical(v.into())
+    }
+}
+impl From<HandleVec> for Column {
+    fn from(v: HandleVec) -> Self {
         Column::Categorical(v.into())
     }
 }
