@@ -3,8 +3,13 @@
 
 #![allow(unused_variables, dead_code)]
 
+mod item;
+pub use item::DataItem;
+
 mod column;
 pub use column::{Categorical, Column, FloatVec, HandleVec, IntVec, Numerical};
+
+mod display;
 
 /// A data table, or data frame.
 ///

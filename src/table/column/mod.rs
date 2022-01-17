@@ -124,3 +124,21 @@ impl From<HandleVec> for Column {
         Column::Categorical(v.into())
     }
 }
+
+/// The
+// pub struct ColumnReceived {
+// }
+pub enum ColumnIterator {
+    // ←
+// numeric: bool,
+// float: bool,
+// type_: T,
+}
+
+// pub impl ColumnReceived {
+// }
+
+impl ColumnIterator {}
+
+// TODO: this must have any type
+pub struct RowResult {}
