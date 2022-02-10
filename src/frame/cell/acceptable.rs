@@ -10,7 +10,7 @@ use crate::frame::{
 };
 
 /// A trait that all inner underlying cell data types must implement.
-pub trait InnerCellDataType {
+pub trait AcceptableData {
     /// Returns the [`CellType`] variant that can contain this type of data.
     fn cell_type(&self) -> CellType;
 
@@ -24,6 +24,7 @@ pub trait InnerCellDataType {
     fn to_cell_data_nested(&self) -> CellDataNested {
         self.to_cell_data().into()
     }
+
     fn into_cell_data_nested(self) -> CellDataNested
     where
         Self: Sized,
@@ -33,9 +34,16 @@ pub trait InnerCellDataType {
 
 }
 
+//
 macro_rules! inner_impl_cell_data_type {
     ($type:ty, $cell_type:expr, $cell_data:expr) => {
-        impl InnerCellDataType for $type {
+        inner_impl_cell_data_type![owned; $type, $cell_type, $cell_data];
+        inner_impl_cell_data_type![refs; &$type, $cell_type, $cell_data];
+        inner_impl_cell_data_type![refs; &mut $type, $cell_type, $cell_data];
+    };
+
+    (owned; $type:ty, $cell_type:expr, $cell_data:expr) => {
+        impl AcceptableData for $type {
             fn cell_type(&self) -> CellType {
                 $cell_type
             }
@@ -49,14 +57,28 @@ macro_rules! inner_impl_cell_data_type {
             }
         }
     };
+    (refs; $type:ty, $cell_type:expr, $cell_data:expr) => {
+        impl AcceptableData for $type {
+            fn cell_type(&self) -> CellType {
+                $cell_type
+            }
+
+            fn to_cell_data(&self) -> CellData {
+                $cell_data(**self)
+            }
+
+            fn into_cell_data(self) -> CellData {
+                $cell_data(*self)
+            }
+        }
+    };
 }
 
 // Categorical
 
 inner_impl_cell_data_type![bool, CellType::Bool, CellData::Bool];
-
 // inner_impl_cell_data_type![CStrPtr<'_>, CellType::String];
-// inner_impl_cell_data_type![Vec<u8>, CellType::Bytes]; // WIP
+// inner_impl_cell_data_type![Vec<u8>, CellType::Bytes];
 
 // inner_impl_cell_data_type![Uuid, CellType::Uuid];
 inner_impl_cell_data_type![Handle8, CellType::Handle8, CellData::Handle8];
@@ -79,7 +101,7 @@ inner_impl_cell_data_type![u64, CellType::U64, CellData::U64];
 inner_impl_cell_data_type![i128, CellType::I128, CellData::I128];
 inner_impl_cell_data_type![u128, CellType::U128, CellData::U128];
 
-// impl InnerCellDataType for bool {
+// impl AcceptableData for bool {
 //     // fn needs_conversion(&self) -> bool { true }
 //
 //     fn cell_type(&self) -> CellType {

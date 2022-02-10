@@ -10,12 +10,8 @@ pub use data::{
     CategoricalData, CellData, CellDataNested, ContinuousData, DiscreteData, IdData, NumericalData,
 };
 
-// common cell interface
-mod format;
-pub use format::CellFormat;
-
-mod inner;
-pub use inner::InnerCellDataType;
+mod acceptable;
+pub use acceptable::AcceptableData;
 
 // enums without data, for cell type information
 mod r#type;

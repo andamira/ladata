@@ -5,7 +5,7 @@
 //
 
 use crate::frame::{
-    cell::{CellType, CellTypeNested, InnerCellDataType},
+    cell::{CellType, CellTypeNested},
     handle::{Handle128, Handle16, Handle32, Handle64, Handle8},
 };
 

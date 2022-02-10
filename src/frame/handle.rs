@@ -1,6 +1,6 @@
 // src/frame/handle
 //!
-//! Handles for relationships between [`DataFrame`][crate::frame::DataFrame]s.
+//! Handles for referencing [`DataFrame`][crate::frame::DataFrame] rows.
 //
 
 /// An 8-bit handle.
@@ -37,7 +37,7 @@ macro_rules! impl_handle {
                 Self(value)
             }
         }
-    }
+    };
 }
 impl_handle![Handle8, u8];
 impl_handle![Handle16, u16];
