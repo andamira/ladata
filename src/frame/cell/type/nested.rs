@@ -1,7 +1,10 @@
-// src/dataframe/cell/type/nested
+// src/frame/cell/type/nested
+//
 //!
+//!
+//
 
-use crate::dataframe::cell::CellType;
+use crate::frame::cell::CellType;
 
 /// A nested representation of cell types (3 bytes).
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -24,14 +27,13 @@ pub enum CategoricalType {
     /// Boolean value.
     Bool,
 
-    /// String value.
-    String,
-
+    // /// String value.
+    // String,
+    //
+    // /// A collection of bytes.
+    // Bytes,
     /// A handle ID for relational operations.
     Id(IdType),
-
-    /// A collection of bytes.
-    Bytes,
 }
 
 ///
@@ -40,9 +42,8 @@ pub enum CategoricalType {
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum IdType {
-    /// A UUID.
-    Uuid,
-
+    // /// A UUID.
+    // Uuid,
     /// An 8-bit handle.
     Handle8,
 
@@ -104,6 +105,53 @@ impl CellTypeNested {
     /// Returns the `CellType` equivalent to the current `CellTypeNested`.
     pub fn flat(&self) -> CellType {
         self.into()
+    }
+}
+
+mod std_impls {
+    use super::CellTypeNested::{self, *};
+    use crate::frame::cell::{
+        CategoricalType::*, ContinuousType::*, DiscreteType::*, IdType::*, NumericalType::*,
+    };
+    use std::fmt;
+
+    impl fmt::Display for CellTypeNested {
+        fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+            let s = match self {
+                Categorical(c) => match c {
+                    Bool => "Categorical::Bool",
+                    // String => "Categorical::String",
+                    // Bytes => "Categorical::Bytes",
+                    Id(i) => match i {
+                        Handle8 => "Categorical::Id::Handle8",
+                        Handle16 => "Categorical::Id::Handle16",
+                        Handle32 => "Categorical::Id::Handle32",
+                        Handle64 => "Categorical::Id::Handle64",
+                        Handle128 => "Categorical::Id::Handle128",
+                        // IdType::Uuid => "Categorical::Id::Uuid",
+                    },
+                },
+                Numerical(n) => match n {
+                    Continuous(f) => match f {
+                        F32 => "Numerical::Continuous::F32",
+                        F64 => "Numerical::Continuous::F64",
+                    },
+                    Discrete(i) => match i {
+                        I8 => "Numerical::Discrete::I8",
+                        U8 => "Numerical::Discrete::U8",
+                        I16 => "Numerical::Discrete::I16",
+                        U16 => "Numerical::Discrete::U16",
+                        I32 => "Numerical::Discrete::I32",
+                        U32 => "Numerical::Discrete::U32",
+                        I64 => "Numerical::Discrete::I64",
+                        U64 => "Numerical::Discrete::U64",
+                        I128 => "Numerical::Discrete::I128",
+                        U128 => "Numerical::Discrete::U128",
+                    },
+                },
+            };
+            write!(f, "{}", &s)
+        }
     }
 }
 

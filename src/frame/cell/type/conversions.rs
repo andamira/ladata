@@ -1,7 +1,10 @@
-// src/dataframe/cell/impls
+// src/frame/cell/type/conversions
+//
 //!
+//!
+//
 
-use crate::dataframe::cell::{
+use crate::frame::cell::{
     CategoricalType, CellData, CellType, CellTypeNested, ContinuousType, DiscreteType, IdType,
     NumericalType,
 };
@@ -19,14 +22,14 @@ macro_rules! impl_from_cell_type_to_nested {
                 use CellType::*;
                 match cell_type {
                     Bool => Self::Categorical(CategoricalType::Bool),
-                    String => Self::Categorical(CategoricalType::String),
-                    Bytes => Self::Categorical(CategoricalType::Bytes),
+                    // String => Self::Categorical(CategoricalType::String),
+                    // Bytes => Self::Categorical(CategoricalType::Bytes),
                     Handle8 => Self::Categorical(CategoricalType::Id(IdType::Handle8)),
                     Handle16 => Self::Categorical(CategoricalType::Id(IdType::Handle16)),
                     Handle32 => Self::Categorical(CategoricalType::Id(IdType::Handle32)),
                     Handle64 => Self::Categorical(CategoricalType::Id(IdType::Handle64)),
                     Handle128 => Self::Categorical(CategoricalType::Id(IdType::Handle128)),
-                    Uuid => Self::Categorical(CategoricalType::Id(IdType::Uuid)),
+                    // Uuid => Self::Categorical(CategoricalType::Id(IdType::Uuid)),
                     F32 => Self::Numerical(NumericalType::Continuous(ContinuousType::F32)),
                     F64 => Self::Numerical(NumericalType::Continuous(ContinuousType::F64)),
                     I8 => Self::Numerical(NumericalType::Discrete(DiscreteType::I8)),
@@ -56,23 +59,18 @@ macro_rules! impl_from_cell_type_nested_to_flat {
     (from: $t1:ty) => {
         impl From<$t1> for CellType {
             fn from(cell_type_nested: $t1) -> CellType {
-                // use {
-                //     CategoricalType::*, CellTypeNested::*, ContinuousType::*, IdType::*, DiscreteType::*,
-                //     // NumericalType::*,
-                // };
-
                 match cell_type_nested {
                     CellTypeNested::Categorical(c) => match c {
                         CategoricalType::Bool => Self::Bool,
-                        CategoricalType::String => Self::String,
-                        CategoricalType::Bytes => Self::Bytes,
+                        // CategoricalType::String => Self::String,
+                        // CategoricalType::Bytes => Self::Bytes,
                         CategoricalType::Id(i) => match i {
                             IdType::Handle8 => Self::Handle8,
                             IdType::Handle16 => Self::Handle16,
                             IdType::Handle32 => Self::Handle32,
                             IdType::Handle64 => Self::Handle64,
                             IdType::Handle128 => Self::Handle128,
-                            IdType::Uuid => Self::Uuid,
+                            // IdType::Uuid => Self::Uuid,
                         },
                     },
                     CellTypeNested::Numerical(n) => match n {
@@ -113,14 +111,14 @@ macro_rules! impl_from_cell_data_to_type {
                 use CellData::*;
                 match cell_data {
                     Bool(_) => Self::Bool,
-                    String(_) => Self::String,
-                    Bytes(_) => Self::Bytes,
+                    // String(_) => Self::String,
+                    // Bytes(_) => Self::Bytes,
                     Handle8(_) => Self::Handle8,
                     Handle16(_) => Self::Handle16,
                     Handle32(_) => Self::Handle32,
                     Handle64(_) => Self::Handle64,
                     Handle128(_) => Self::Handle128,
-                    Uuid(_) => Self::Uuid,
+                    // Uuid(_) => Self::Uuid,
                     F32(_) => Self::F32,
                     F64(_) => Self::F64,
                     I8(_) => Self::I8,
@@ -143,24 +141,21 @@ impl_from_cell_data_to_type![];
 #[cfg(test)]
 mod tests {
     use super::{
-        CategoricalType::{Bool, String},
-        CellData, CellType, CellTypeNested,
-        ContinuousType::*,
-        DiscreteType::*,
-        NumericalType::*,
+        CategoricalType::Bool, CellData, CellType, CellTypeNested, ContinuousType::*,
+        DiscreteType::*, NumericalType::*,
     };
 
     #[test]
     fn conversions() {
         // CellData to CellType
         assert_eq![CellType::Bool, CellData::Bool(true).into()];
-        assert_eq![CellType::String, CellData::String("hi".into()).into()];
+        // assert_eq![CellType::String, CellData::String("hi".into()).into()];
         assert_eq![CellType::I8, CellData::I8(127).into()];
         assert_eq![CellType::F64, CellData::F64(0.04).into()];
 
         // CellType to CellTypeNested
         assert_eq![CellType::Bool, CellTypeNested::Categorical(Bool).into()];
-        assert_eq![CellType::String, CellTypeNested::Categorical(String).into()];
+        // assert_eq![CellType::String, CellTypeNested::Categorical(String).into()];
         assert_eq![
             CellType::I16,
             CellTypeNested::Numerical(Discrete(I16)).into()
@@ -178,7 +173,7 @@ mod tests {
 
         // CellTypeNested to CellType
         assert_eq![CellTypeNested::Categorical(Bool), CellType::Bool.into()];
-        assert_eq![CellTypeNested::Categorical(String), CellType::String.into()];
+        // assert_eq![CellTypeNested::Categorical(String), CellType::String.into()];
         assert_eq![
             CellTypeNested::Numerical(Discrete(I16)),
             CellType::I16.into()

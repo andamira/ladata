@@ -1,9 +1,10 @@
-// src/dataframe/cell/data/nested
+// src/frame/cell/data/nested
+//
 //!
+//!
+//
 
-use uuid::Uuid;
-
-use crate::dataframe::handle::{Handle128, Handle16, Handle32, Handle64, Handle8};
+use crate::frame::handle::{Handle128, Handle16, Handle32, Handle64, Handle8};
 
 /// A nested representation of cell data (40 bytes).
 #[derive(Clone, Debug, PartialEq)]
@@ -12,30 +13,28 @@ pub enum CellDataNested {
     Numerical(NumericalData),
 }
 
-/// Categorical types, with data (32 bytes).
+/// Categorical data (32 bytes).
 #[non_exhaustive]
 #[derive(Clone, Debug, PartialEq)]
 pub enum CategoricalData {
     /// Boolean value.
     Bool(bool),
 
-    /// String value.
-    String(String),
+    // /// String value.
+    // String(String),
 
+    // /// A collection of bytes.
+    // Bytes(Vec<u8>),
     /// A handle ID for relational operations.
     Id(IdData),
-
-    /// A collection of bytes.
-    Bytes(Vec<u8>),
 }
 
 /// Identifier data (24 bytes).
 #[non_exhaustive]
 #[derive(Clone, Debug, PartialEq)] // MAYBE Hash, Copy
 pub enum IdData {
-    /// A UUID.
-    Uuid(Uuid),
-
+    // /// A UUID.
+    // Uuid(Uuid),
     Handle8(Handle8),
 
     Handle16(Handle16),

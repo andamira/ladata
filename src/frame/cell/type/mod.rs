@@ -1,17 +1,24 @@
-// src/dataframe/cell/type
+// src/frame/cell/type
+//
 //!
+//!
+//
 
 use core::{
     any::TypeId,
     mem::{align_of, size_of},
 };
 
+use crate::frame::handle;
+
+mod conversions;
+
 mod nested;
 pub use nested::{
     CategoricalType, CellTypeNested, ContinuousType, DiscreteType, IdType, NumericalType,
 };
 
-/// A flat representation of all cell types (1 byte).
+/// A flat representation of cell types (1 byte).
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CellType {
@@ -19,14 +26,14 @@ pub enum CellType {
     // -----------
     /// Boolean value.
     Bool,
-    /// String value.
-    String,
-    /// A collection of bytes.
-    Bytes,
+    // /// String value.
+    // String,
+    // /// A collection of bytes.
+    // Bytes,
 
     // Id
-    /// UUID
-    Uuid,
+    // /// UUID
+    // Uuid,
     // Handles
     Handle8,
     Handle16,
@@ -65,14 +72,14 @@ impl CellType {
         use CellType::*;
         match self {
             Bool => TypeId::of::<bool>(),
-            String => TypeId::of::<std::string::String>(),
-            Bytes => TypeId::of::<Vec<u8>>(),
-            Handle8 => TypeId::of::<super::Handle8>(),
-            Handle16 => TypeId::of::<super::Handle16>(),
-            Handle32 => TypeId::of::<super::Handle32>(),
-            Handle64 => TypeId::of::<super::Handle64>(),
-            Handle128 => TypeId::of::<super::Handle128>(),
-            Uuid => TypeId::of::<super::Uuid>(),
+            // String => TypeId::of::<std::string::String>(),
+            // Bytes => TypeId::of::<Vec<u8>>(),
+            Handle8 => TypeId::of::<handle::Handle8>(),
+            Handle16 => TypeId::of::<handle::Handle16>(),
+            Handle32 => TypeId::of::<handle::Handle32>(),
+            Handle64 => TypeId::of::<handle::Handle64>(),
+            Handle128 => TypeId::of::<handle::Handle128>(),
+            // Uuid => TypeId::of::<handle::Uuid>(),
             F32 => TypeId::of::<f32>(),
             F64 => TypeId::of::<f64>(),
             I8 => TypeId::of::<i8>(),
@@ -93,14 +100,14 @@ impl CellType {
         use CellType::*;
         match self {
             Bool => size_of::<bool>(),
-            String => size_of::<std::string::String>(),
-            Bytes => size_of::<Vec<u8>>(),
-            Handle8 => size_of::<super::Handle8>(),
-            Handle16 => size_of::<super::Handle16>(),
-            Handle32 => size_of::<super::Handle32>(),
-            Handle64 => size_of::<super::Handle64>(),
-            Handle128 => size_of::<super::Handle128>(),
-            Uuid => size_of::<super::Uuid>(),
+            // String => size_of::<std::string::String>(),
+            // Bytes => size_of::<Vec<u8>>(),
+            Handle8 => size_of::<handle::Handle8>(),
+            Handle16 => size_of::<handle::Handle16>(),
+            Handle32 => size_of::<handle::Handle32>(),
+            Handle64 => size_of::<handle::Handle64>(),
+            Handle128 => size_of::<handle::Handle128>(),
+            // Uuid => size_of::<handle::Uuid>(),
             F32 => size_of::<f32>(),
             F64 => size_of::<f64>(),
             I8 => size_of::<i8>(),
@@ -121,14 +128,14 @@ impl CellType {
         use CellType::*;
         match self {
             Bool => align_of::<bool>(),
-            String => align_of::<std::string::String>(),
-            Bytes => align_of::<Vec<u8>>(),
-            Handle8 => align_of::<super::Handle8>(),
-            Handle16 => align_of::<super::Handle16>(),
-            Handle32 => align_of::<super::Handle32>(),
-            Handle64 => align_of::<super::Handle64>(),
-            Handle128 => align_of::<super::Handle128>(),
-            Uuid => align_of::<super::Uuid>(),
+            // String => align_of::<std::string::String>(),
+            // Bytes => align_of::<Vec<u8>>(),
+            Handle8 => align_of::<handle::Handle8>(),
+            Handle16 => align_of::<handle::Handle16>(),
+            Handle32 => align_of::<handle::Handle32>(),
+            Handle64 => align_of::<handle::Handle64>(),
+            Handle128 => align_of::<handle::Handle128>(),
+            // Uuid => align_of::<handle::Uuid>(),
             F32 => align_of::<f32>(),
             F64 => align_of::<f64>(),
             I8 => align_of::<i8>(),
@@ -141,6 +148,41 @@ impl CellType {
             U64 => align_of::<u64>(),
             I128 => align_of::<i128>(),
             U128 => align_of::<u128>(),
+        }
+    }
+}
+
+mod std_impls {
+    use super::CellType;
+    use std::fmt;
+
+    impl fmt::Display for CellType {
+        fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+            use CellType::*;
+            let s = match self {
+                Bool => "Bool",
+                // String => "String",
+                // Bytes => "Bytes",
+                Handle8 => "Handle8",
+                Handle16 => "Handle16",
+                Handle32 => "Handle32",
+                Handle64 => "Handle64",
+                Handle128 => "Handle128",
+                // Uuid => "Uuid",
+                F32 => "F32",
+                F64 => "F64",
+                I8 => "I8",
+                U8 => "U8",
+                I16 => "I16",
+                U16 => "U16",
+                I32 => "I32",
+                U32 => "U32",
+                I64 => "I64",
+                U64 => "U64",
+                I128 => "I128",
+                U128 => "U128",
+            };
+            write!(f, "{}", &s)
         }
     }
 }

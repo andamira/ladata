@@ -5,10 +5,10 @@
 
 use core::result;
 
-/// The result type for `DataFrame`.
+/// The result type for [`DataFrame`][crate::frame::DataFrame].
 pub type Result<T> = result::Result<T, DataFrameError>;
 
-/// The error type for `DataFrame`.
+/// The error type for [`DataFrame`][crate::frame::DataFrame].
 #[derive(Debug, Clone)]
 pub enum DataFrameError {
     Generic(String), // WIP TEMP

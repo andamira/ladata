@@ -5,4 +5,4 @@
 //! data structures
 //!
 
-pub mod dataframe;
+pub mod frame;
