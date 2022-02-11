@@ -5,9 +5,9 @@
 //
 
 use crate::frame::{
-    cell::{AcceptableData, CellData, CellType},
+    cell::{CellAble, CellData, CellType},
     error::{DataFrameError, Result},
-    format::Format,
+    format::CellStorage,
 };
 
 /// A heterogeneous collection of *cells*.
@@ -19,22 +19,22 @@ use crate::frame::{
 ///
 /// [`Column`]: crate::frame::Column
 #[derive(Debug, Clone)]
-pub struct Row<F: Format> {
+pub struct Row<S: CellStorage> {
     cell_types: Vec<CellType>,
-    vec: Vec<F>,
+    vec: Vec<S>,
 }
 
-/// A [`Row`] using [`Bytes`] to store *cells*.
-///
-/// [`Bytes`]: crate::frame::FormatType::Bytes
+/// A `Row` using *bytes* as storage.
+//
+// [`Bytes`]: crate::frame::FormatType::Bytes
 pub type BytesRow = Row<u8>;
 
-/// A [`Row`] using [`CellData`] to store *cells*.
-///
-/// [`CellData`]: crate::frame::FormatType::CellData
+/// A `Row` using `CellData` as storage.
+//
+// [`CellData`]: crate::frame::FormatType::CellData
 pub type CellsRow = Row<CellData>;
 
-impl<F: Format> Row<F> {
+impl<S: CellStorage> Row<S> {
     // WIP
     /// Returns a new empty row.
     ///

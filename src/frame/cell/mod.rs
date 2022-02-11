@@ -1,6 +1,6 @@
 // src/frame/cell
 //
-//! A cell in a `DataFrame`, part of a `Column` and/or a `Row`.
+//! An individual data unit, categorized by data type and size.
 //!
 //
 
@@ -10,8 +10,8 @@ pub use data::{
     CategoricalData, CellData, CellDataNested, ContinuousData, DiscreteData, IdData, NumericalData,
 };
 
-mod acceptable;
-pub use acceptable::AcceptableData;
+mod able;
+pub use able::CellAble;
 
 // enums without data, for cell type information
 mod r#type;

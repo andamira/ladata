@@ -4,9 +4,9 @@
 //
 
 use crate::frame::{
-    cell::{AcceptableData, CellData, CellType},
+    cell::{CellAble, CellData, CellType},
     error::{DataFrameError, Result},
-    format::Format,
+    format::CellStorage,
 };
 
 /// A homogeneous collection of *cells*. Orthogonal to a [`Row`].
@@ -17,22 +17,22 @@ use crate::frame::{
 ///
 /// [`Row`]: crate::frame::Row
 #[derive(Debug, Clone)]
-pub struct Column<F: Format> {
+pub struct Column<S: CellStorage> {
     cell_type: CellType,
-    vec: Vec<F>,
+    vec: Vec<S>,
 }
 
-/// A [`Column`] using [`Bytes`] to store *cells*.
-///
-/// [`Bytes`]: crate::frame::FormatType::Bytes
+/// A `Column` using *bytes* as storage.
+//
+// [`Bytes`]: crate::frame::FormatType::Bytes
 pub type BytesColumn = Column<u8>;
 
-/// A [`Column`] using [`CellData`] to store *cells*.
-///
-/// [`CellData`]: crate::frame::FormatType::CellData
+/// A `Column` using `CellData` as storage.
+//
+// [`CellData`]: crate::frame::FormatType::CellData
 pub type CellsColumn = Column<CellData>;
 
-impl<F: Format> Column<F> {
+impl<S: CellStorage> Column<S> {
     /// Returns a new empty column.
     pub fn new_empty(cell_type: CellType) -> Self {
         Self {
@@ -46,10 +46,10 @@ impl Column<CellData> {
     /// Returns a new `Column<CellData>` from an iterable.
     //
     // FIX: rename
-    pub fn from_iter<I, AD>(i: I) -> Result<Self>
+    pub fn from_iter<I, CA>(i: I) -> Result<Self>
     where
-        I: IntoIterator<Item = AD>,
-        AD: AcceptableData,
+        I: IntoIterator<Item = CA>,
+        CA: CellAble,
     {
         let vec: Vec<CellData> = i.into_iter().map(|d| d.to_cell_data()).collect();
 
@@ -62,7 +62,7 @@ impl Column<CellData> {
     }
 }
 
-impl<F: Format> Column<F> {
+impl<S: CellStorage> Column<S> {
     /// The type of the cells of this `Column`.
     #[inline]
     pub fn cell_type(&self) -> CellType {

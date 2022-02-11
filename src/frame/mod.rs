@@ -8,14 +8,14 @@
 use std::collections::HashMap;
 
 pub mod cell;
-pub use cell::{AcceptableData, CellData, CellType};
+pub use cell::{CellAble, CellData, CellType};
 
 mod column;
 #[doc(inline)]
 pub use column::{BytesColumn, CellsColumn, Column};
 
 mod format;
-pub use format::Format; // FormatType
+pub use format::CellStorage;
 
 mod error;
 
@@ -24,36 +24,30 @@ pub mod handle;
 mod row;
 pub use row::{BytesRow, CellsRow, Row};
 
-/// A [`DataFrame`] using [`Bytes`] to store *cells*.
-///
-/// [`Bytes`]: crate::frame::FormatType::Bytes
+/// A `DataFrame` using *bytes* as storage.
+//
+// [`Bytes`]: crate::frame::FormatType::Bytes
 pub type BytesDataFrame = DataFrame<u8>;
 
-/// A [`DataFrame`] using [`CellData`] to store *cells*.
-///
-/// [`CellData`]: crate::frame::FormatType::CellData
+/// A `DataFrame` using `CellData` as storage.
+//
+// [`CellData`]: crate::frame::FormatType::CellData
 pub type CellsDataFrame = DataFrame<CellData>;
 
-/// A tabular collection of potentially heterogeneous data,
-/// stored in a series of [`Column`]s.
-//
-// - indexable by columns and by rows.
-// - optionally ordered columns and rows.
-//
-// A data frame is a mixture between a database and a matrix.
-//
-pub struct DataFrame<F: Format> {
+/// A tabular collection of potentially heterogeneous data
+/// stored [`Column`]-wise.
+pub struct DataFrame<S: CellStorage> {
     num_cols: usize,
     name_cols: Vec<String>,
     type_cols: Vec<CellType>,
-    columns: Vec<F>,
+    columns: Vec<S>,
     num_rows: usize,
 }
 
 /// # Constructors
-impl<F: Format> DataFrame<F> {
+impl<S: CellStorage> DataFrame<S> {
     /// Returns an empty `DataFrame`.
-    pub fn new_empty() -> DataFrame<F> {
+    pub fn new_empty() -> DataFrame<S> {
         Self {
             num_cols: 0,
             name_cols: vec![],
@@ -65,7 +59,7 @@ impl<F: Format> DataFrame<F> {
 }
 
 /// # Information
-impl<F: Format> DataFrame<F> {
+impl<S: CellStorage> DataFrame<S> {
     /// Returns the number of columns.
     pub fn num_cols(&self) -> usize {
         self.num_cols

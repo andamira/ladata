@@ -9,11 +9,11 @@ use crate::frame::{
     handle::{Handle128, Handle16, Handle32, Handle64, Handle8},
 };
 
-/// Allows a data type to be imported as a *cell* in a [`Column`] or [`Row`].
+/// Data types that can be converted into *cells*.
 ///
 /// [`Column`]: crate::frame::Column
 /// [`Row`]: crate::frame::Row
-pub trait AcceptableData {
+pub trait CellAble {
     /// Returns the [`CellType`] variant that can contain this type of data.
     fn cell_type(&self) -> CellType;
 
@@ -45,7 +45,7 @@ macro_rules! inner_impl_cell_data_type {
     };
 
     (owned; $type:ty, $cell_type:expr, $cell_data:expr) => {
-        impl AcceptableData for $type {
+        impl CellAble for $type {
             fn cell_type(&self) -> CellType {
                 $cell_type
             }
@@ -60,7 +60,7 @@ macro_rules! inner_impl_cell_data_type {
         }
     };
     (refs; $type:ty, $cell_type:expr, $cell_data:expr) => {
-        impl AcceptableData for $type {
+        impl CellAble for $type {
             fn cell_type(&self) -> CellType {
                 $cell_type
             }
@@ -103,7 +103,7 @@ inner_impl_cell_data_type![u64, CellType::U64, CellData::U64];
 inner_impl_cell_data_type![i128, CellType::I128, CellData::I128];
 inner_impl_cell_data_type![u128, CellType::U128, CellData::U128];
 
-// impl AcceptableData for bool {
+// impl CellAble for bool {
 //     // fn needs_conversion(&self) -> bool { true }
 //
 //     fn cell_type(&self) -> CellType {

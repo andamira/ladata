@@ -4,10 +4,11 @@
 //!
 //
 
-use crate::frame::{CellData, Column, Row};
+// use crate::frame::{CellData, Column, Row};
+use crate::frame::CellData;
 
 /*
-/// List of types implementing [`Format`].
+/// List of types implementing [`CellStorage`].
 pub enum FormatType {
     /// Data is stored as a collection of [`CellData`]s.
     CellData,
@@ -17,20 +18,23 @@ pub enum FormatType {
 }
 */
 
-// Implemented by data types used as *cell* storage by [`Column`]s and [`Row`]s.
-/// Data types usable as inner *cell* storage format by [`Column`]s and [`Row`]s.
-pub trait Format {
+/// Data types that can be used as internal *cell* storage by
+/// [`Column`]s and [`Row`]s.
+///
+/// [`Column`]: crate::frame::Column
+/// [`Row`]: crate::frame::Row
+pub trait CellStorage {
     // /// Returns the current [`FormatType`].
     // fn format_type(&self) -> FormatType;
 }
 
-impl Format for CellData {
+impl CellStorage for CellData {
     // fn format_type(&self) -> FormatType {
     //     FormatType::CellData
     // }
 }
 
-impl Format for u8 {
+impl CellStorage for u8 {
     // fn format_type(&self) -> FormatType {
     //     FormatType::Bytes
     // }
