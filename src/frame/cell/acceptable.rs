@@ -9,7 +9,10 @@ use crate::frame::{
     handle::{Handle128, Handle16, Handle32, Handle64, Handle8},
 };
 
-/// A trait that all inner underlying cell data types must implement.
+/// Allows a data type to be imported as a *cell* in a [`Column`] or [`Row`].
+///
+/// [`Column`]: crate::frame::Column
+/// [`Row`]: crate::frame::Row
 pub trait AcceptableData {
     /// Returns the [`CellType`] variant that can contain this type of data.
     fn cell_type(&self) -> CellType;
@@ -31,7 +34,6 @@ pub trait AcceptableData {
     {
         self.into_cell_data().into()
     }
-
 }
 
 //

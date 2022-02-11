@@ -4,25 +4,33 @@
 //
 
 use crate::frame::{
-    cell::{AcceptableData, CellData, CellDataNested, CellType},
+    cell::{AcceptableData, CellData, CellType},
     error::{DataFrameError, Result},
+    format::Format,
 };
 
-mod format;
-pub use format::{Format, FormatType};
-
-/// A homogeneous, indexable collection of cells. Orthogonal to a *row*.
+/// A homogeneous collection of *cells*. Orthogonal to a [`Row`].
+///
+/// All *cell*s has to have the same [`CellType`].
+///
+// indexable
+///
+/// [`Row`]: crate::frame::Row
 #[derive(Debug, Clone)]
 pub struct Column<F: Format> {
     cell_type: CellType,
     vec: Vec<F>,
 }
 
-/// A `Column` that stores its cell data as bytes.
-pub type ColumnB = Column<u8>;
+/// A [`Column`] using [`Bytes`] to store *cells*.
+///
+/// [`Bytes`]: crate::frame::FormatType::Bytes
+pub type BytesColumn = Column<u8>;
 
-/// A `Column` that stores its cell data as [`CellData.`]
-pub type ColumnC = Column<CellData>;
+/// A [`Column`] using [`CellData`] to store *cells*.
+///
+/// [`CellData`]: crate::frame::FormatType::CellData
+pub type CellsColumn = Column<CellData>;
 
 impl<F: Format> Column<F> {
     /// Returns a new empty column.
@@ -35,12 +43,13 @@ impl<F: Format> Column<F> {
 }
 
 impl Column<CellData> {
-    /// Returns a new `Column<CellDatCellDataa>` from an iterable.
-    ///
-    pub fn from_iter<I, T>(i: I) -> Result<Self>
+    /// Returns a new `Column<CellData>` from an iterable.
+    //
+    // FIX: rename
+    pub fn from_iter<I, AD>(i: I) -> Result<Self>
     where
-        I: IntoIterator<Item = T>,
-        T: AcceptableData,
+        I: IntoIterator<Item = AD>,
+        AD: AcceptableData,
     {
         let vec: Vec<CellData> = i.into_iter().map(|d| d.to_cell_data()).collect();
 
@@ -61,6 +70,7 @@ impl<F: Format> Column<F> {
     }
 
     /// Returns the size of the cell in bytes.
+    #[inline]
     pub fn cell_size(&self) -> usize {
         self.cell_type.size()
     }
@@ -72,34 +82,21 @@ impl<F: Format> Column<F> {
     }
 
     /// Returns `true` if this Column has no cells, or `false` otherwise.
+    #[inline]
     pub fn is_empty(&self) -> bool {
         self.vec.is_empty()
     }
 
     /// Returns the current size of the column, in bytes.
+    #[inline]
     pub fn size(&self) -> usize {
         1 + self.cell_type.size() * self.vec.len()
     }
 }
 
-macro_rules! impl_format {
-    ($f:ty, $ftype:expr) => {
-        impl Column<$f> {
-            /// Returns the format type of the column.
-            pub const fn format(&self) -> FormatType {
-                $ftype
-            }
-        }
-    };
-}
-impl_format![CellDataNested, FormatType::CellDataNested];
-impl_format![CellData, FormatType::CellData];
-impl_format![u8, FormatType::Bytes];
-
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::frame::cell::CellDataNested;
 
     #[test]
     fn new_empty() -> Result<()> {
@@ -108,8 +105,6 @@ mod tests {
         assert_eq![empty_u8.len(), 0];
         assert![empty_u8.is_empty()];
 
-        let empty_f32_nested = Column::<CellDataNested>::new_empty(CellType::F32);
-        assert_eq![empty_f32_nested.cell_type(), CellType::F32];
         Ok(())
     }
 

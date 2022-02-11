@@ -12,25 +12,36 @@ pub use cell::{AcceptableData, CellData, CellType};
 
 mod column;
 #[doc(inline)]
-pub use column::{Column, ColumnB, ColumnC, Format, FormatType};
+pub use column::{BytesColumn, CellsColumn, Column};
+
+mod format;
+pub use format::Format; // FormatType
 
 mod error;
 
 pub mod handle;
 
 mod row;
-pub use row::Row;
+pub use row::{BytesRow, CellsRow, Row};
 
-/// A 2 dimensional collection of potentially heterogeneous data,
-/// stored in a series of homogeneous columns.
+/// A [`DataFrame`] using [`Bytes`] to store *cells*.
 ///
-/// A collection of columns of data with homogeneous underlying [`Format`].
+/// [`Bytes`]: crate::frame::FormatType::Bytes
+pub type BytesDataFrame = DataFrame<u8>;
+
+/// A [`DataFrame`] using [`CellData`] to store *cells*.
 ///
-/// - indexable by columns and by rows.
-/// - optionally ordered columns and rows.
-///
-/// A data frame is a mixture between a database and a matrix.
-///
+/// [`CellData`]: crate::frame::FormatType::CellData
+pub type CellsDataFrame = DataFrame<CellData>;
+
+/// A tabular collection of potentially heterogeneous data,
+/// stored in a series of [`Column`]s.
+//
+// - indexable by columns and by rows.
+// - optionally ordered columns and rows.
+//
+// A data frame is a mixture between a database and a matrix.
+//
 pub struct DataFrame<F: Format> {
     num_cols: usize,
     name_cols: Vec<String>,
@@ -42,7 +53,7 @@ pub struct DataFrame<F: Format> {
 /// # Constructors
 impl<F: Format> DataFrame<F> {
     /// Returns an empty `DataFrame`.
-    fn new_empty() -> DataFrame<F> {
+    pub fn new_empty() -> DataFrame<F> {
         Self {
             num_cols: 0,
             name_cols: vec![],
