@@ -8,8 +8,7 @@
 mod tests;
 
 // use crate::error::{DataError, DataResult};
-use crate::cell::{CellData, CellType};
-use crate::frame::format::CellStorage;
+use crate::cell::{CellData, CellStorage, CellType};
 
 /// A heterogeneous collection of *cells*.
 /// Orthogonal to a [`Column`].

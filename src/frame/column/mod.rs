@@ -6,9 +6,8 @@
 
 mod tests;
 
-use crate::cell::{CellAble, CellData, CellType};
+use crate::cell::{CellAble, CellData, CellStorage, CellType};
 use crate::error::{DataError, DataResult};
-use crate::frame::format::CellStorage;
 
 /// A homogeneous collection of *cells*. Orthogonal to a [`Row`].
 ///

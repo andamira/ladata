@@ -3,13 +3,11 @@
 //
 //! `ladata`
 //!
-//! data structures
+//! Handy data structures.
 //!
 
 pub mod cell;
-
-pub mod frame;
-
 pub mod error;
-
-pub mod handle;
+pub mod frame;
+pub mod ids;
+pub mod series;

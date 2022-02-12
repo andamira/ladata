@@ -1,20 +1,22 @@
 // ladata::cell
 // pub
 //
-//! Abstrations over individual data units.
+//! Data units.
 //!
-//! Mainly categorized by data type and size.
+//! Abstractions over minimal practical data units that can be used as a
+//! building block by more complex data structures.
 //!
 //
 
-// enums with data, for cell data storage
 mod data;
 pub use data::CellData;
 
 mod able;
 pub use able::CellAble;
 
-// enums without data, for cell type information
+mod storage;
+pub use storage::CellStorage;
+
 mod r#type;
 pub use r#type::CellType;
 

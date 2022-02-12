@@ -13,7 +13,7 @@ pub use nested::{
 };
 
 use crate::cell::{nested::CellTypeNested, CellType};
-use crate::handle::{Handle128, Handle16, Handle32, Handle64, Handle8};
+use crate::ids::{Handle128, Handle16, Handle32, Handle64, Handle8};
 
 /// A flat representation of cell data (32 bytes).
 #[non_exhaustive]

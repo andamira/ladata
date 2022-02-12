@@ -1,8 +1,8 @@
-// src/frame/handle
+// ladata::ids
 // pub
 //
+//! Data identifiers.
 //!
-//! Handles for referencing [`DataFrame`][crate::frame::DataFrame] rows.
 //
 
 /// An 8-bit handle.

@@ -10,15 +10,12 @@ mod column;
 #[doc(inline)]
 pub use column::{BytesColumn, CellsColumn, Column};
 
-mod format;
-pub use format::CellStorage;
-
 mod row;
 pub use row::{BytesRow, CellsRow, Row};
 
 mod tests;
 
-use crate::cell::{CellAble, CellData, CellType};
+use crate::cell::{CellAble, CellData, CellStorage, CellType};
 use std::collections::HashMap;
 
 /// A `DataFrame` using *bytes* as storage.

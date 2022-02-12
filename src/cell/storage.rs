@@ -1,4 +1,4 @@
-// src/frame/format
+// ladata::cell::storage
 //
 //!
 //!
@@ -32,6 +32,9 @@ impl CellStorage for CellData {
     // fn format_type(&self) -> FormatType {
     //     FormatType::CellData
     // }
+}
+
+impl CellStorage for Option<CellData> {
 }
 
 impl CellStorage for u8 {

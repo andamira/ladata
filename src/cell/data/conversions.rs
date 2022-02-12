@@ -196,7 +196,7 @@ mod tests {
         CategoricalData::*, CellData, CellDataNested::*, ContinuousData::*, DiscreteData::*,
         IdData::*, NumericalData::*,
     };
-    use crate::handle;
+    use crate::ids;
 
     #[test]
     fn conversions() {
@@ -205,8 +205,8 @@ mod tests {
         assert_eq![Categorical(Bool(true)), CellData::Bool(true).into()];
         // assert_eq![CellData::String, CellData::String("hi".into()).into()];
         assert_eq![
-            Categorical(Id(Handle8(handle::Handle8::new(7)))),
-            CellData::Handle8(handle::Handle8::new(7)).into()
+            Categorical(Id(Handle8(ids::Handle8::new(7)))),
+            CellData::Handle8(ids::Handle8::new(7)).into()
         ];
         assert_eq![Numerical(Discrete(I8(127))), CellData::I8(127).into()];
         assert_eq![Numerical(Continuous(F64(0.04))), CellData::F64(0.04).into()];
@@ -216,8 +216,8 @@ mod tests {
         assert_eq![CellData::Bool(true), Categorical(Bool(true)).into()];
         // assert_eq![CellData::String("hi".into()), CellData::String.into()];
         assert_eq![
-            CellData::Handle8(handle::Handle8::new(7)),
-            Categorical(Id(Handle8(handle::Handle8::new(7)))).into()
+            CellData::Handle8(ids::Handle8::new(7)),
+            Categorical(Id(Handle8(ids::Handle8::new(7)))).into()
         ];
         assert_eq![CellData::I8(127), Numerical(Discrete(I8(127))).into()];
         assert_eq![CellData::F64(0.04), Numerical(Continuous(F64(0.04))).into()];
