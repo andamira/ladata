@@ -1,10 +1,11 @@
-// src/frame/cell/type/nested
+// ladata::cell::type::nested
+//
 //
 //!
 //!
 //
 
-use crate::frame::cell::CellType;
+use crate::cell::CellType;
 
 /// A nested representation of cell types (3 bytes).
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -110,7 +111,7 @@ impl CellTypeNested {
 
 mod std_impls {
     use super::CellTypeNested::{self, *};
-    use crate::frame::cell::{
+    use crate::cell::nested::{
         CategoricalType::*, ContinuousType::*, DiscreteType::*, IdType::*, NumericalType::*,
     };
     use std::fmt;

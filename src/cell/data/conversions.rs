@@ -1,11 +1,15 @@
-// src/frame/cell/data/conversions
+// ladata::cell::data::conversions
+//
 //
 //!
 //!
 //
 
-use crate::frame::cell::{
-    CategoricalData, CellData, CellDataNested, ContinuousData, DiscreteData, IdData, NumericalData,
+use crate::cell::{
+    nested::{
+        CategoricalData, CellDataNested, ContinuousData, DiscreteData, IdData, NumericalData,
+    },
+    CellData,
 };
 
 /// impl From<[&|mut]CellData> for CellDataNested
@@ -192,7 +196,7 @@ mod tests {
         CategoricalData::*, CellData, CellDataNested::*, ContinuousData::*, DiscreteData::*,
         IdData::*, NumericalData::*,
     };
-    use crate::frame::handle;
+    use crate::handle;
 
     #[test]
     fn conversions() {

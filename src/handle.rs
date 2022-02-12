@@ -1,4 +1,6 @@
 // src/frame/handle
+// pub
+//
 //!
 //! Handles for referencing [`DataFrame`][crate::frame::DataFrame] rows.
 //

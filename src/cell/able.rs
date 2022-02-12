@@ -1,13 +1,15 @@
-// src/frame/cell/inner
+// ladata::cell::able
+//
 //
 //!
 //!
 //
 
-use crate::frame::{
-    cell::{CellData, CellDataNested, CellType, CellTypeNested},
-    handle::{Handle128, Handle16, Handle32, Handle64, Handle8},
+use crate::cell::{
+    nested::{CellDataNested, CellTypeNested},
+    CellData, CellType,
 };
+use crate::handle::{Handle128, Handle16, Handle32, Handle64, Handle8};
 
 /// Data types that can be converted into *cells*.
 ///

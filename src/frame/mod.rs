@@ -1,14 +1,10 @@
-// src/frame
+// ladata::frame
+//
 //
 //! A DataFrame could be regarded as a mixture between a Matrix and Table.
 //!
 //
 #![allow(unused_mut, dead_code)] // TEMP
-
-use std::collections::HashMap;
-
-pub mod cell;
-pub use cell::{CellAble, CellData, CellType};
 
 mod column;
 #[doc(inline)]
@@ -17,12 +13,13 @@ pub use column::{BytesColumn, CellsColumn, Column};
 mod format;
 pub use format::CellStorage;
 
-mod error;
-
-pub mod handle;
-
 mod row;
 pub use row::{BytesRow, CellsRow, Row};
+
+mod tests;
+
+use crate::cell::{CellAble, CellData, CellType};
+use std::collections::HashMap;
 
 /// A `DataFrame` using *bytes* as storage.
 //
@@ -98,8 +95,4 @@ impl<S: CellStorage> DataFrame<S> {
         }
         s
     }
-}
-
-#[cfg(test)]
-mod tests {
 }

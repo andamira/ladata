@@ -4,8 +4,8 @@
 //!
 //
 
-// use crate::frame::{CellData, Column, Row};
-use crate::frame::CellData;
+// use crate::frame::{Column, Row};
+use crate::cell::CellData;
 
 /*
 /// List of types implementing [`CellStorage`].

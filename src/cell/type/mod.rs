@@ -1,15 +1,9 @@
-// src/frame/cell/type
+// ladata::cell::type
+//
 //
 //!
 //!
 //
-
-use core::{
-    any::TypeId,
-    mem::{align_of, size_of},
-};
-
-use crate::frame::handle;
 
 mod conversions;
 
@@ -17,6 +11,13 @@ mod nested;
 pub use nested::{
     CategoricalType, CellTypeNested, ContinuousType, DiscreteType, IdType, NumericalType,
 };
+
+use core::{
+    any::TypeId,
+    mem::{align_of, size_of},
+};
+
+use crate::handle;
 
 /// A flat representation of cell types (1 byte).
 #[non_exhaustive]

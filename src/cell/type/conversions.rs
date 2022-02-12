@@ -1,12 +1,15 @@
 // src/frame/cell/type/conversions
 //
+//
 //!
 //!
 //
 
-use crate::frame::cell::{
-    CategoricalType, CellData, CellType, CellTypeNested, ContinuousType, DiscreteType, IdType,
-    NumericalType,
+use crate::cell::{
+    nested::{
+        CategoricalType, CellTypeNested, ContinuousType, DiscreteType, IdType, NumericalType,
+    },
+    CellData, CellType,
 };
 
 /// impl From<[&|mut]CellType> for CellTypeNested

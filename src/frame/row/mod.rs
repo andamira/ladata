@@ -1,14 +1,15 @@
-// src/frame/row
+// ladata::frame::row
+//
 //
 //!
 //!
 //
 
-use crate::frame::{
-    cell::{CellAble, CellData, CellType},
-    error::{DataFrameError, Result},
-    format::CellStorage,
-};
+mod tests;
+
+// use crate::error::{DataError, DataResult};
+use crate::cell::{CellData, CellType};
+use crate::frame::format::CellStorage;
 
 /// A heterogeneous collection of *cells*.
 /// Orthogonal to a [`Column`].

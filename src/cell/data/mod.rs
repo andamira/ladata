@@ -1,13 +1,9 @@
-// src/frame/cell/data
+// ladata::cell::data
+//
 //
 //!
 //!
 //
-
-use crate::frame::{
-    cell::{CellType, CellTypeNested},
-    handle::{Handle128, Handle16, Handle32, Handle64, Handle8},
-};
 
 mod conversions;
 
@@ -15,6 +11,9 @@ mod nested;
 pub use nested::{
     CategoricalData, CellDataNested, ContinuousData, DiscreteData, IdData, NumericalData,
 };
+
+use crate::cell::{nested::CellTypeNested, CellType};
+use crate::handle::{Handle128, Handle16, Handle32, Handle64, Handle8};
 
 /// A flat representation of cell data (32 bytes).
 #[non_exhaustive]
