@@ -28,6 +28,7 @@ macro_rules! impl_from_cell_data_to_nested {
                     IdData::*, NumericalData::*,
                 };
                 match cell_data {
+                    CellData::None => None,
                     CellData::Bool(d) => Categorical(Bool(d)),
                     // CellData::String(d) => Categorical(String(d)),
                     // CellData::Bytes(d) => Categorical(Bytes(d)),
@@ -63,6 +64,7 @@ macro_rules! impl_from_cell_data_to_nested {
                 };
 
                 match cell_data {
+                    CellData::None => None,
                     CellData::Bool(d) => Categorical(Bool(*d)),
                     // CellData::String(d) => Categorical(String(*d)),
                     // CellData::Bytes(d) => Categorical(Bytes(*d)),
@@ -107,6 +109,7 @@ macro_rules! impl_from_cell_data_nested_to_flat {
                 };
 
                 match cell_data_nested {
+                    None => CellData::None,
                     Categorical(c) => match c {
                         Bool(d) => Self::Bool(d),
                         // String(d) => Self::String(d),
@@ -152,6 +155,7 @@ macro_rules! impl_from_cell_data_nested_to_flat {
                 };
 
                 match cell_data_nested {
+                    None => CellData::None,
                     Categorical(c) => match c {
                         Bool(d) => Self::Bool(*d),
                         // String(d) => Self::String(*d),

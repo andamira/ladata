@@ -19,6 +19,9 @@ use crate::ids::{Handle128, Handle16, Handle32, Handle64, Handle8};
 #[non_exhaustive]
 #[derive(Clone, Debug, PartialEq)]
 pub enum CellData {
+    /// Represents the absence of data.
+    None,
+
     // Categorical
     // -----------
     /// Boolean value.

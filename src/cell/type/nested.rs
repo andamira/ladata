@@ -10,6 +10,7 @@ use crate::cell::CellType;
 /// A nested representation of cell types (3 bytes).
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CellTypeNested {
+    None,
     Categorical(CategoricalType),
     Numerical(NumericalType),
 }
@@ -119,6 +120,7 @@ mod std_impls {
     impl fmt::Display for CellTypeNested {
         fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
             let s = match self {
+                None => "None",
                 Categorical(c) => match c {
                     Bool => "Categorical::Bool",
                     // String => "Categorical::String",

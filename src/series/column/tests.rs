@@ -8,7 +8,7 @@
 
 use crate::cell::{CellData, CellType};
 use crate::error::DataResult;
-use crate::frame::Column;
+use super::Column;
 
 #[test]
 fn new_empty() -> DataResult<()> {

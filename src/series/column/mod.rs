@@ -15,22 +15,22 @@ use crate::error::{DataError, DataResult};
 ///
 // indexable
 ///
-/// [`Row`]: crate::frame::Row
+/// [`Row`]: crate::series::Row
 #[derive(Debug, Clone)]
 pub struct Column<S: CellStorage> {
     cell_type: CellType,
     vec: Vec<S>,
 }
 
-/// A `Column` using *bytes* as storage.
+// /// A `Column` using *bytes* as storage.
+// //
+// // [`Bytes`]: crate::frame::FormatType::Bytes
+// pub type BytesColumn = Column<u8>;
 //
-// [`Bytes`]: crate::frame::FormatType::Bytes
-pub type BytesColumn = Column<u8>;
-
-/// A `Column` using `CellData` as storage.
-//
-// [`CellData`]: crate::frame::FormatType::CellData
-pub type CellsColumn = Column<CellData>;
+// /// A `Column` using `CellData` as storage.
+// //
+// // [`CellData`]: crate::frame::FormatType::CellData
+// pub type CellsColumn = Column<CellData>;
 
 impl<S: CellStorage> Column<S> {
     /// Returns a new empty column.

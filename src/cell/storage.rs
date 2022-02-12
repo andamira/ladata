@@ -18,12 +18,9 @@ pub enum FormatType {
 }
 */
 
-/// Data types that can be used as internal *cell* storage by
-/// [`Column`]s and [`Row`]s.
+/// Data types that can be used as internal *cell* storage.
 ///
-/// [`Column`]: crate::frame::Column
-/// [`Row`]: crate::frame::Row
-pub trait CellStorage {
+pub trait CellStorage: Default {
     // /// Returns the current [`FormatType`].
     // fn format_type(&self) -> FormatType;
 }

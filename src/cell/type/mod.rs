@@ -12,6 +12,8 @@ pub use nested::{
     CategoricalType, CellTypeNested, ContinuousType, DiscreteType, IdType, NumericalType,
 };
 
+use super::NoCell;
+
 use core::{
     any::TypeId,
     mem::{align_of, size_of},
@@ -23,6 +25,8 @@ use crate::ids;
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CellType {
+    None,
+
     // Categorical
     // -----------
     /// Boolean value.
@@ -72,6 +76,7 @@ impl CellType {
     pub fn type_id(&self) -> TypeId {
         use CellType::*;
         match self {
+            None => TypeId::of::<NoCell>(),
             Bool => TypeId::of::<bool>(),
             // String => TypeId::of::<std::string::String>(),
             // Bytes => TypeId::of::<Vec<u8>>(),
@@ -100,6 +105,7 @@ impl CellType {
     pub const fn size(&self) -> usize {
         use CellType::*;
         match self {
+            None => size_of::<NoCell>(),
             Bool => size_of::<bool>(),
             // String => size_of::<std::string::String>(),
             // Bytes => size_of::<Vec<u8>>(),
@@ -128,6 +134,7 @@ impl CellType {
     pub const fn alignment(&self) -> usize {
         use CellType::*;
         match self {
+            None => align_of::<NoCell>(),
             Bool => align_of::<bool>(),
             // String => align_of::<std::string::String>(),
             // Bytes => align_of::<Vec<u8>>(),
@@ -161,6 +168,7 @@ mod std_impls {
         fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
             use CellType::*;
             let s = match self {
+                None => "None",
                 Bool => "Bool",
                 // String => "String",
                 // Bytes => "Bytes",

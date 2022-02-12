@@ -1,7 +1,9 @@
 // ladata::frame
 //
 //
-//! A DataFrame could be regarded as a mixture between a Matrix and Table.
+//! Data frames.
+//!
+//! A `DataFrame` could be regarded as a mixture between a Matrix and Table.
 //!
 //
 #![allow(unused_mut, dead_code)] // TEMP
@@ -18,15 +20,15 @@ mod tests;
 use crate::cell::{CellAble, CellData, CellStorage, CellType};
 use std::collections::HashMap;
 
-/// A `DataFrame` using *bytes* as storage.
+// /// A `DataFrame` using *bytes* as storage.
+// //
+// // [`Bytes`]: crate::frame::FormatType::Bytes
+// pub type BytesDataFrame = DataFrame<u8>;
 //
-// [`Bytes`]: crate::frame::FormatType::Bytes
-pub type BytesDataFrame = DataFrame<u8>;
-
-/// A `DataFrame` using `CellData` as storage.
-//
-// [`CellData`]: crate::frame::FormatType::CellData
-pub type CellsDataFrame = DataFrame<CellData>;
+// /// A `DataFrame` using `CellData` as storage.
+// //
+// // [`CellData`]: crate::frame::FormatType::CellData
+// pub type CellsDataFrame = DataFrame<CellData>;
 
 /// A tabular collection of potentially heterogeneous data
 /// stored [`Column`]-wise.

@@ -10,6 +10,7 @@ use crate::ids::{Handle128, Handle16, Handle32, Handle64, Handle8};
 /// A nested representation of cell data (40 bytes).
 #[derive(Clone, Debug, PartialEq)]
 pub enum CellDataNested {
+    None,
     Categorical(CategoricalData),
     Numerical(NumericalData),
 }

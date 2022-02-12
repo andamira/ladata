@@ -24,6 +24,7 @@ macro_rules! impl_from_cell_type_to_nested {
             fn from(cell_type: $t1) -> CellTypeNested {
                 use CellType::*;
                 match cell_type {
+                    None => Self::None,
                     Bool => Self::Categorical(CategoricalType::Bool),
                     // String => Self::Categorical(CategoricalType::String),
                     // Bytes => Self::Categorical(CategoricalType::Bytes),
@@ -63,6 +64,7 @@ macro_rules! impl_from_cell_type_nested_to_flat {
         impl From<$t1> for CellType {
             fn from(cell_type_nested: $t1) -> CellType {
                 match cell_type_nested {
+                    CellTypeNested::None => Self::None,
                     CellTypeNested::Categorical(c) => match c {
                         CategoricalType::Bool => Self::Bool,
                         // CategoricalType::String => Self::String,
@@ -113,6 +115,7 @@ macro_rules! impl_from_cell_data_to_type {
             fn from(cell_data: $t1) -> CellType {
                 use CellData::*;
                 match cell_data {
+                    None => Self::None,
                     Bool(_) => Self::Bool,
                     // String(_) => Self::String,
                     // Bytes(_) => Self::Bytes,

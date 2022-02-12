@@ -8,11 +8,13 @@
 //!
 //
 
+mod able;
+pub use able::CellAble;
+
 mod data;
 pub use data::CellData;
 
-mod able;
-pub use able::CellAble;
+mod impls;
 
 mod storage;
 pub use storage::CellStorage;
@@ -31,3 +33,6 @@ pub mod nested {
         NumericalType,
     };
 }
+
+/// Represents the absence of a cell.
+pub struct NoCell;
