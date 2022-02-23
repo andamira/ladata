@@ -8,6 +8,9 @@
 //! - Optionally labeled.
 //! - Optionally enforcing homogeneous data.
 //
+// TODO:
+// - labeled vs unlabeled series (associated vec)
+// - optionally homogeneous enforced (by type or by Apitrait)?
 
 mod api;
 pub use api::SeriesApi;
@@ -23,6 +26,8 @@ pub use row::Row;
 mod tests;
 
 use crate::cell::{CellStorage, CellType};
+// use crate::cell::{CellAble, CellData, CellStorage, CellType};
+// use crate::error::{DataError, DataResult};
 
 /// A one dimensional collection of *cells*.
 #[derive(Clone, Debug, Default)]

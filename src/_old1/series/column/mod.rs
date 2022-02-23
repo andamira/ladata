@@ -8,6 +8,7 @@ mod tests;
 
 use crate::cell::{CellAble, CellData, CellStorage, CellType};
 use crate::error::{DataError, DataResult};
+// use crate::series::Series;
 
 /// A homogeneous collection of *cells*. Orthogonal to a [`Row`].
 ///
@@ -52,6 +53,8 @@ impl Column<CellData> {
         CA: CellAble,
     {
         let vec: Vec<CellData> = i.into_iter().map(|d| d.to_cell_data()).collect();
+        // WIP
+        // let series: Series<CellData> = Series::i.into_iter().map(|d| d.to_cell_data()).collect();
 
         if vec.is_empty() {
             return Err(DataError::Generic("empty iterator".into()));
@@ -91,5 +94,29 @@ impl<S: CellStorage> Column<S> {
     #[inline]
     pub fn size(&self) -> usize {
         1 + self.cell_type.size() * self.vec.len()
+    }
+}
+
+impl<S: CellStorage> Column<S> {
+    /// Adds a new cell to the Column.
+    ///
+    /// the Data must be
+    ///
+    // MAYBE:1 Returns the current index of the new Cell
+    ///
+    /// Returns an error if:
+    /// - the type of the data doesn't correspond with the type of the column.
+    // IMPROVE
+    //
+    // NAME: add | push | insert |
+    //
+    // pub fn add<A>(&mut self, cell: A) -> DataResult<usize, DataError> // MAYBE:1
+    // where A: CellAble { // 1.2
+    // where A: Into<CellType> { // 1.3
+    pub fn add<A: CellAble>(&mut self, data: A) -> DataResult<()> {
+        if self.cell_type() != data.cell_type() {
+            return Err(DataError::Generic("different cell types".into()));
+        }
+        Ok(())
     }
 }

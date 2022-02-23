@@ -38,8 +38,6 @@ pub enum CategoricalType {
     Id(IdType),
 }
 
-///
-
 /// Identifier types (1 byte).
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, PartialEq)]

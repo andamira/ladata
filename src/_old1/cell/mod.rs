@@ -36,3 +36,6 @@ pub mod nested {
 
 /// Represents the absence of a cell.
 pub struct NoCell;
+
+// pub struct Cell<S: CellStorage> {
+// }
