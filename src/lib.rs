@@ -131,8 +131,7 @@ pub(crate) mod traits;
 
 mod builder;
 
-// Public re-exports:
-
+#[doc(inline)]
 pub use nodata::NoData;
 #[doc(inline)]
 pub use traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
@@ -145,12 +144,5 @@ pub mod all {
 
 /// Re-export of data *cells* & *types* of specific sizes.
 pub mod size {
-    crate::reexport![mod_size super::builder; 1, 8];
-    crate::reexport![mod_size super::builder; 2, 16];
-    crate::reexport![mod_size super::builder; 4, 32];
-    crate::reexport![mod_size super::builder; 8, 64];
-    crate::reexport![mod_size super::builder; 16, 128];
-    crate::reexport![mod_size super::builder; 32, 256];
-    crate::reexport![mod_size super::builder; 64, 512];
-    crate::reexport![mod_size super::builder; 128, 1024];
+    crate::reexport![mod_size super::builder; all_sizes];
 }

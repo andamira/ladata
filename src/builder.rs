@@ -26,13 +26,27 @@ use core::{
 use super::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 use super::NoData;
 
-/// macro useful for re-exporting types
+/// for re-exporting types from public modules
 //
 // WIP
 #[macro_export]
 #[doc(hidden)]
 macro_rules! reexport {
-    // Generates `super::size` sub-modules
+    // Generates `::size` sub-modules for all sizes.
+    (mod_size $path:path; all_sizes) => {
+        use crate::reexport;
+        reexport![mod_size $path; 1, 8];
+        reexport![mod_size $path; 2, 16];
+        reexport![mod_size $path; 4, 32];
+        reexport![mod_size $path; 8, 64];
+        reexport![mod_size $path; 16, 128];
+        reexport![mod_size $path; 32, 256];
+        reexport![mod_size $path; 64, 512];
+        reexport![mod_size $path; 128, 1024];
+    };
+
+    // Generates `::size` sub-modules for the pair of (Byte, bit) sizes.
+    // - Each module is referenced as a submodule of each other.
     (mod_size $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             #[doc = $B " Byte data (== " $b " bit)" ]
