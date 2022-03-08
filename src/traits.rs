@@ -3,7 +3,7 @@
 //!
 //
 
-use core::any::TypeId;
+use core::fmt::Debug;
 
 // TRAITS
 // -------------------------------------------------------------------------
@@ -21,15 +21,17 @@ use core::any::TypeId;
 /// - [`DataTypesCopy`]
 /// - [`DataCellsCopy`]
 /// - [`DataCells`]
-pub trait DataTypes: Copy {
+//
+// TODO: define the contract
+pub trait DataTypes: Copy + Debug {
     /// Returns the alignment of the data represented by the current type.
-    fn type_align(&self) -> usize;
+    fn data_align(&self) -> usize;
 
     /// Returns the size of the data represented by this type.
-    fn type_size(&self) -> usize;
+    fn data_size(&self) -> usize;
 
-    /// Returns the `TypeId` of the data represented by this type.
-    fn type_id(&self) -> TypeId;
+    // /// Returns the `TypeId` of the data represented by this type.
+    // fn type_id(&self) -> TypeId;
 
     /// Returns true if the data represented by this type is [`Copy`].
     fn is_copy(&self) -> bool;
@@ -58,7 +60,7 @@ pub trait DataTypesCopy: DataTypes {}
 /// - [`DataCellsCopy`]
 /// - [`DataTypesCopy`]
 /// - [`DataTypes`]
-pub trait DataCells {
+pub trait DataCells: Debug {
     /// Whether the data type in the current variant is [`Copy`].
     fn is_copy(&self) -> bool;
 }

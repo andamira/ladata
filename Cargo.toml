@@ -21,6 +21,16 @@ publish = false
 [dependencies]
 paste = "1"
 
+half = "1.8.2" # F16 BF16
+softposit = "0.3.9" # P8, P16, P32, Q8, Q16, Q32
+twofloat = "0.4.1" # F128
+
+num-rational = "0.4.0"
+num-bigint = "0.4.3"
+rust_decimal = "1.22.0"
+
+[features]
+
 [dev-dependencies]
 
 [badges]

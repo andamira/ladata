@@ -38,7 +38,7 @@
 //! 5. `[With]` allows to extend the type with a custom implementation of
 //!     [`DataTypes`]|[`DataCells`] via the `With` variant.
 //!
-//! 
+//!
 //! ## Longer explanation
 //!
 //! ### `<Type|Cell>`
@@ -136,10 +136,11 @@ pub use nodata::NoData;
 #[doc(inline)]
 pub use traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 
-/// Every type is re-exported here.
+/// Every type and trait is re-exported here.
 pub mod all {
     #[doc(inline)]
     pub use super::builder::*;
+    pub use super::traits::*;
 }
 
 /// Re-export of data *cells* & *types* of specific sizes.
