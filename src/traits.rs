@@ -85,5 +85,5 @@ pub trait DataCellsCopy: DataCells + Copy {}
 /// # Safety
 /// TODO
 ///
-pub unsafe trait DataUnsafeCells: DataCellsCopy {
+pub unsafe trait DataUnsafeCells {
 }

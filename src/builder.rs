@@ -14,6 +14,7 @@
 //   - type_aliases
 //   - impl_data_types
 //   - impl_data_cells
+//   - impl_data_unsafe_cells
 //
 // - DEFINITIONS:
 //   - DataType, DataCell, DataUnsafeCell @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
@@ -21,10 +22,11 @@
 use core::{
     // any::TypeId,
     convert::TryFrom,
+    fmt,
     mem::{align_of, size_of},
 };
 
-use super::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 use super::NoData;
 
 /// for re-exporting types from public modules
@@ -294,7 +296,7 @@ macro_rules! define_single_size {
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
         }
         define_cell!{
-            c: $cname, t:$tname, size: $B, $b,
+            c: $cname, t:$tname, u:$ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
         }
@@ -399,7 +401,7 @@ macro_rules! impl_From_variants {
 
 /// for defining enum DataCell*
 macro_rules! define_cell {
-    ( c: $cname:ident, t: $tname:ident,
+    ( c: $cname:ident, t: $tname:ident, u: $ucname:ident,
       size: $B:literal, $b:literal,
       copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
       noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
@@ -471,11 +473,11 @@ macro_rules! define_cell {
 
             // From DataCell to contained value
             $( // Copy
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype {
+                impl<C: DataCellsCopy> TryFrom<[<$cname $B Byte Copy With>]<C>> for $cvtype {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
+                    fn try_from(c: [<$cname $B Byte Copy With>]<C>) -> Result<Self, Self::Error> {
                         match c {
-                            [<$cname $B Byte With>]::$cvname(c) => Ok(c),
+                            [<$cname $B Byte Copy With>]::$cvname(c) => Ok(c),
                             _ => Err(()),
                         }
                     }
@@ -496,9 +498,9 @@ macro_rules! define_cell {
             )*
             // from to-be-contained value to DataCell
             $( // Copy
-                impl<C: DataCells> From<$cvtype> for [<$cname $B Byte With>]<C> {
+                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $B Byte Copy With>]<C> {
                     fn from(v: $cvtype) -> Self {
-                        [<$cname $B Byte With>]::$cvname(v)
+                        [<$cname $B Byte Copy With>]::$cvname(v)
                     }
 
                 }
@@ -512,20 +514,26 @@ macro_rules! define_cell {
                 }
             )*
 
+            // from DataCell to DataUnsafeCell
+            impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$ucname $B Byte Copy>] {
+                fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
+                    match cell {
+                        [<$cname $B Byte Copy With>]::None => Self { None: NoData },
+                        [<$cname $B Byte Copy With>]::With(_) => Self { None: NoData },
+                        $(
+                        [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v }
+                        ),*
+                    }
+                }
+
+            }
         }
     };
 }
 /// for defining union DataUnsafeCell*
-//
-// pros:
-// - doesn't use more size than required
-// cons:
-// - unsafe read (current `variant` is not stored)
-// - can only be Copy (no drop managment)
-// - there's no `With` variant. (MAYBE IMPROVE)
 macro_rules! define_unsafe_cell {
     // # receive only Copy variants (DataUnsafeCell)
-    ( $cname:ident,
+    ( $ucname:ident,
       size: $B:literal, $b:literal,
       copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
       // noncopy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ;
@@ -534,9 +542,9 @@ macro_rules! define_unsafe_cell {
             #[repr(C)]
             #[doc = $B "Byte/" $b "bit " "data *unsafe* **Cell**"]
             #[derive(Copy, Clone)]
-            pub union [<$cname $B Byte Copy>] {
+            pub union [<$ucname $B Byte Copy>] {
                 /// Represents the abscence of *data*.
-                pub none: NoData,
+                pub None: NoData,
                 $(
                     #[doc = $cvdoc]
                     pub $cvname: $cvtype,
@@ -544,9 +552,20 @@ macro_rules! define_unsafe_cell {
             }
             // type aliases:
             #[doc = $B "Byte / " $b "bit " "data *unsafe* **Cell**"]
-            pub type [< $cname $b bit Copy >] = [< $cname $B Byte Copy >];
+            pub type [< $ucname $b bit Copy >] = [< $ucname $B Byte Copy >];
             // TODO: unify with type_aliases
-            // type_aliases![c: $cname, size: $B, $b, "Copy", "data cell", "(Copy)"];
+            // type_aliases![c: $ucname, size: $B, $b, "Copy", "data cell", "(Copy)"];
+
+            // Debug
+            impl fmt::Debug for [<$ucname $B Byte Copy>] {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    write!(f, "{} {{...}}", stringify!{[< $ucname $B Byte Copy >]})
+                }
+            }
+
+            impl_data_unsafe_cells![
+                u: [< $ucname $B Byte Copy >],
+            ];
         }
     };
 }
@@ -746,6 +765,7 @@ define_all_sizes! {
     "32-bit signed integer", I32, i32,
     "32-bit floating-point number", F32, f32,
     "4-byte array of bytes", ByteArray4, [u8; 4],
+    "4-byte char ", Char, char,
     noncopy_variants_4B:
     "8-bit [softposit](https://crates.io/crates/softposit) quire without exponent bits", Q8, softposit::Q8,
 
