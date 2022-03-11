@@ -1,12 +1,13 @@
-// ladata::macro_builder
+// ladata::builder
 //
-//! Types are generated here and re-exported multiple times from public modules.
+//! Types are generated here and re-exported from several modules.
 //
 // # TOC
 //
 // - MACROS (exported & private):
 //   - reexport
 //   &
+//   - define_all_sizes
 //   - define_single_size
 //   - define_type
 //   - define_cell
@@ -29,9 +30,7 @@ use core::{
 use super::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 use super::NoData;
 
-/// for re-exporting types from public modules
-//
-// WIP
+/// used for re-exporting types from public modules.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! reexport {
@@ -39,14 +38,13 @@ macro_rules! reexport {
     (mod_size $path:path; all_sizes) => {
         use crate::reexport;
         reexport![mod_size $path; 1, 8];
-        // WIP
         reexport![mod_size $path; 2, 16];
         reexport![mod_size $path; 4, 32];
         reexport![mod_size $path; 8, 64];
         reexport![mod_size $path; 16, 128];
         reexport![mod_size $path; 32, 256];
-        // reexport![mod_size $path; 64, 512]; // WIP
-        // reexport![mod_size $path; 128, 1024]; // WIP
+        reexport![mod_size $path; 64, 512];
+        reexport![mod_size $path; 128, 1024];
     };
 
     // Generates `::size` sub-modules for the pair of (Byte, bit) sizes.
@@ -58,30 +56,16 @@ macro_rules! reexport {
                 #[doc(inline)]
                 pub use super::[< b $b >];
                 crate::reexport![@cell_type super::$path; size: $B; Byte ByteCopy ByteCopyWith ];
+                crate::reexport![@unsafecell super::$path; size: $B; ByteCopy ];
             }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
                 #[doc(inline)]
                 pub use super::[< B $B >];
                 crate::reexport![@cell_type super::$path; size: $b; bit bitCopy bitCopyWith ];
+                crate::reexport![@unsafecell super::$path; size: $b; bitCopy ];
             }
         }
-    };
-
-    //
-    // TODO:WIP: single-type in all the Byte/bit sizes
-    // ::reexport![DataType, super::builder; all_sizes];
-    // ($tu$path
-
-    // TODO: export Types of the given sizes in bits
-    // ($path:path; bit: $( $b:literal )+ ) => {
-    // };
-
-    ($type:ty, $path:path; bits: $( $b:literal )+ ) => {
-        reexport![@gentype $path; $type; bit: $( $b )+ ];
-    };
-    ($type:ty, $path:path; Bytes: $( $B:literal )+ ) => {
-        reexport![@gentype $path; $type; Byte: $( $B )+ ];
     };
 
     // export Types of the given sizes in Bytes
@@ -99,26 +83,16 @@ macro_rules! reexport {
             pub use $path::[< $type $B Byte >];
         } )+
     };
-    // unused (unify?)
-    // (@gentype_copy $path:path; $type:ty; Byte: $( $B:literal )+ ) => {
-    //     $( paste::paste!{
-    //         pub use $path::[< $type $B Byte Copy With >];
-    //         pub use $path::[< $type $B Byte Copy >];
-    //     } )+
-    // };
-
 
     (@cell_type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
         crate::reexport![@multisuf $path; DataCell; size: $size ; $( $suf )+ ];
         crate::reexport![@multisuf $path; DataType; size: $size ; $( $suf )+ ];
-        // crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ];
+        // crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ]; //↓FIX
     };
-    // DataUnsafeCell can't accept non-copy (for now) so must be treated separately:
-    // (@unsafe_cell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-    //     crate::reexport![@multisuf $path; DataCell; size: $size ; $( $suf )+ ];
-    //     crate::reexport![@multisuf $path; DataType; size: $size ; $( $suf )+ ];
-    //     // crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ];
-    // };
+    // TEMP: DataUnsafeCell can't accept non-copy (for now) so must be treated separately:
+    (@unsafecell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ];
+    };
 
     // 1 size, multiple suffixes (must include the Byte|bit part)
     (@multisuf $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
@@ -126,13 +100,6 @@ macro_rules! reexport {
             pub use $path::[< $type $size $suf >];
         } )+
     };
-
-    // MAYBE: multiple sizes, 1 suffix
-    // (@multisize $path:path; $type:ty; size: $( $size:literal )+ ; $suffix:ident ) => {
-    //     $( paste::paste!{
-    //         pub use $path::[< $type $size $suffix >];
-    //     } )+
-    // };
 }
 
 /// defines all sizes at the same time
@@ -142,24 +109,34 @@ macro_rules! define_all_sizes {
         // 1-Byte / 8-bit
         copy_variants_1B: $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
         // noncopy_variants_1B: $( $vdoc_1B:literal, $vname_1B:ident, $vtype_1B:ty ),* ,
+
         // 2-Byte / 16-bit
         copy_variants_2B: $( $cvdoc_2B:literal, $cvname_2B:ident, $cvtype_2B:ty ),* ,
         // noncopy_variants_2B: $( $vdoc_2B:literal, $vname_2B:ident, $vtype_2B:ty ),* ,
+        iusize_2B: $iusize_2B:meta,
+
         // 4-Byte / 32-bit
         copy_variants_4B: $( $cvdoc_4B:literal, $cvname_4B:ident, $cvtype_4B:ty ),* ,
         noncopy_variants_4B: $( $vdoc_4B:literal, $vname_4B:ident, $vtype_4B:ty ),* ,
+        iusize_4B: $iusize_4B:meta,
+
         // 8-Byte / 64-bit
         copy_variants_8B: $( $cvdoc_8B:literal, $cvname_8B:ident, $cvtype_8B:ty ),* ,
         noncopy_variants_8B: $( $vdoc_8B:literal, $vname_8B:ident, $vtype_8B:ty ),* ,
+        iusize_8B: $iusize_8B:meta,
+
         // 16-Byte / 128-bit
         copy_variants_16B: $( $cvdoc_16B:literal, $cvname_16B:ident, $cvtype_16B:ty ),* ,
         // noncopy_variants_16B: $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
+
         // 32-Byte / 256-bit
         copy_variants_32B: $( $cvdoc_32B:literal, $cvname_32B:ident, $cvtype_32B:ty ),* ,
         noncopy_variants_32B: $( $vdoc_32B:literal, $vname_32B:ident, $vtype_32B:ty ),* ,
+
         // 64-Byte / 512-bit
         copy_variants_64B: $( $cvdoc_64B:literal, $cvname_64B:ident, $cvtype_64B:ty ),* ,
         // noncopy_variants_64B: $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
+
         // 128-Byte / 1024-bit
         copy_variants_128B: $( $cvdoc_128B:literal, $cvname_128B:ident, $cvtype_128B:ty ),* ,
         noncopy_variants_128B: $( $vdoc_128B:literal, $vname_128B:ident, $vtype_128B:ty ),* ,
@@ -171,6 +148,7 @@ macro_rules! define_all_sizes {
             size: 1, 8,
             copy_variants: $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
             noncopy_variants: ; // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
+            pointer:
         }
         // 2-Byte / 16-bit
         define_single_size! {
@@ -182,6 +160,7 @@ macro_rules! define_all_sizes {
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
+            pointer: $iusize_2B
         }
         // 4-Byte / 32-bit
         define_single_size! {
@@ -193,6 +172,7 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_4B, $cvname_4B, $cvtype_4B ),* ,
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ;
+            pointer: $iusize_2B, $iusize_4B
         }
         // 8-Byte / 32-bit
         define_single_size! {
@@ -206,8 +186,9 @@ macro_rules! define_all_sizes {
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
+            pointer: $iusize_2B, $iusize_4B, $iusize_8B
         }
-        // 16-Byte / 128-bit
+        // 16-Byte / 64-bit
         define_single_size! {
             $tname, $cname, $ucname,
             size: 16, 128,
@@ -221,6 +202,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ;
+            pointer: $iusize_2B, $iusize_4B, $iusize_8B
         }
         // 32-Byte / 128-bit
         define_single_size! {
@@ -238,6 +220,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ,
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ,
                 $( $vdoc_32B, $vname_32B, $vtype_32B ),* ;
+            pointer: $iusize_2B, $iusize_4B, $iusize_8B
         }
         // 64-Byte / 512-bit
         define_single_size! {
@@ -257,6 +240,7 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ,
                 $( $vdoc_32B, $vname_32B, $vtype_32B ),* ;
                 // $( $vdoc_64B, $vname_64B, $vtype_64B ),* ;
+            pointer: $iusize_2B, $iusize_4B, $iusize_8B
         }
         // 128-Byte / 1024-bit
         define_single_size! {
@@ -278,6 +262,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_32B, $vname_32B, $vtype_32B ),* ,
                 // $( $vdoc_64B, $vname_64B, $vtype_64B ),* ,
                 $( $vdoc_128B, $vname_128B, $vtype_128B ),* ;
+            pointer: $iusize_2B, $iusize_4B, $iusize_8B
         }
     };
 }
@@ -285,25 +270,29 @@ macro_rules! define_all_sizes {
 /// for defining in one pass: DataType*, DataCell* & DataUnsafeCell*
 macro_rules! define_single_size {
     (
-        $tname:ident, $cname:ident, $ucname:ident,
-        size: $B:literal, $b:literal,
-        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-        noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+    $tname:ident, $cname:ident, $ucname:ident,
+    size: $B:literal, $b:literal,
+    copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+    noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+    pointer: $( $iusize:meta ),*
     ) => {
         define_type!{
             $tname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
+            pointer: $( $iusize ),* ;
         }
         define_cell!{
             c: $cname, t:$tname, u:$ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
+            pointer: $( $iusize ),* ;
         }
         define_unsafe_cell!{
             $ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             // noncopy_variants: $( $vdoc, $vname, $vtype ),* ; // NOTE: only copy variants, for now
+            pointer: $( $iusize ),* ;
         }
     };
 }
@@ -314,6 +303,7 @@ macro_rules! define_type {
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+        pointer: $( $iusize:meta ),* ;
     ) =>  {
         paste::paste!{
             // ## copy version (DataType)
@@ -325,10 +315,16 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
             pub enum [< $tname $B Byte Copy With >]<T: DataTypesCopy> {
-                /// Represents the abscence of *data type*.
+                /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
                 With(T),
+
+                #[cfg(any( $( $iusize ),* ))]
+                Usize,
+                #[cfg(any( $( $iusize ),* ))]
+                Isize,
+
                 $(
                     #[doc = $cvdoc ]
                     $cvname,
@@ -338,7 +334,9 @@ macro_rules! define_type {
             impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
-                noncopy_variants: ];
+                noncopy_variants: ;
+                pointer: $( $iusize ),* ;
+            ];
             impl<T: DataTypesCopy> DataTypesCopy for [< $tname $B Byte Copy With >]<T> { }
 
             // ## non-copy version (DataType)
@@ -350,10 +348,18 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -With" ]
             #[derive(Clone, Copy, Debug)]
             pub enum [< $tname $B Byte With >]<T: DataTypes> {
-                /// Represents the abscence of *data type*.
+                /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
                 With(T),
+
+                #[cfg(any( $( $iusize ),* ))]
+                #[doc = $b "-bit usize"]
+                Usize,
+                #[cfg(any( $( $iusize ),* ))]
+                #[doc = $b "-bit isize"]
+                Isize,
+
                 $(
                     #[doc = $cvdoc ]
                     $cvname,
@@ -367,35 +373,10 @@ macro_rules! define_type {
             impl_data_types![ [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
-                noncopy_variants: $($vname, $vtype ),* ];
+                noncopy_variants: $($vname, $vtype ),* ;
+                pointer: $( $iusize ),* ;
+            ];
         }
-    };
-}
-//WIP: From<current type> for bigger types (loop1)
-//  - (loops) current type variant_names => bigger type variant_names
-//
-// this is a WIP from one size to bigger sizes. this will always work
-// since bigger cell sizes include all smaller's variants
-//
-// ($forBlist arg is received as a list of bigger bytes at callsite) // TO
-//
-macro_rules! impl_From_variants {
-    ( from:$from:ident,
-      for_:$for:ident,
-        )
-        => {
-            impl From<$from> for  {
-                fn from(t: $from) -> Self {
-                    match t {
-                        $(
-                            [< $tname $B Byte With >]::$cvname == Self::$cvname,
-                        )*
-                        $(
-                            [< $tname $B Byte With >]::$vname == Self::$vname,
-                        )*
-                    }
-                }
-            }
     };
 }
 
@@ -405,6 +386,7 @@ macro_rules! define_cell {
       size: $B:literal, $b:literal,
       copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
       noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+      pointer: $( $iusize:meta ),* ;
     ) => {
         paste::paste!{
             // ## copy version (DataCell)
@@ -417,11 +399,17 @@ macro_rules! define_cell {
             #[derive(Clone, Copy, Debug)]
             // pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy, T: DataTypesCopy> {
             pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy> {
-                /// Represents the abscence of *data*.
+                /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
                 With(C),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
+
+                #[cfg(any($($iusize),*))]
+                Usize(usize),
+                #[cfg(any($($iusize),*))]
+                Isize(isize),
+
                 $(
                     #[doc = $cvdoc]
                     $cvname($cvtype),
@@ -433,7 +421,8 @@ macro_rules! define_cell {
                 t: [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
-                noncopy_variants:
+                noncopy_variants: ;
+                pointer: $( $iusize:meta ),* ;
             ];
             // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C, T> { }
             impl<C: DataCellsCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C> { }
@@ -448,11 +437,17 @@ macro_rules! define_cell {
             #[derive(Debug)]
             // pub enum [<$cname $B Byte With>]<C: DataCells, T: DataTypes> {
             pub enum [<$cname $B Byte With>]<C: DataCells> {
-                /// Represents the abscence of *data*.
+                /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
                 With(C),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
+
+                #[cfg(any($($iusize),*))]
+                Usize(usize),
+                #[cfg(any($($iusize),*))]
+                Isize(isize),
+
                 $(
                     #[doc = $cvdoc]
                     $cvname($cvtype),
@@ -468,7 +463,8 @@ macro_rules! define_cell {
                 t: [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
-                noncopy_variants: $($vname, $vtype ),*
+                noncopy_variants: $($vname, $vtype ),* ;
+                pointer: $( $iusize:meta ),* ;
             ];
 
             // From DataCell to contained value
@@ -520,9 +516,16 @@ macro_rules! define_cell {
                     match cell {
                         [<$cname $B Byte Copy With>]::None => Self { None: NoData },
                         [<$cname $B Byte Copy With>]::With(_) => Self { None: NoData },
+
+                        #[cfg(any($($iusize),*))]
+                        [<$cname $B Byte Copy With>]::Usize(u) => Self { Usize: u },
+                        #[cfg(any($($iusize),*))]
+                        [<$cname $B Byte Copy With>]::Isize(i) => Self { Isize: i },
+
                         $(
-                        [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v }
+                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v }
                         ),*
+
                     }
                 }
 
@@ -533,18 +536,26 @@ macro_rules! define_cell {
 /// for defining union DataUnsafeCell*
 macro_rules! define_unsafe_cell {
     // # receive only Copy variants (DataUnsafeCell)
-    ( $ucname:ident,
-      size: $B:literal, $b:literal,
-      copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-      // noncopy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ;
+    (
+        $ucname:ident,
+        size: $B:literal, $b:literal,
+        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        // noncopy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ;
+        pointer: $( $iusize:meta ),* ;
     ) => {
         paste::paste!{
             #[repr(C)]
             #[doc = $B "Byte/" $b "bit " "data *unsafe* **Cell**"]
             #[derive(Copy, Clone)]
             pub union [<$ucname $B Byte Copy>] {
-                /// Represents the abscence of *data*.
+                /// Represents the absence of *data*.
                 pub None: NoData,
+
+                #[cfg(any($($iusize),*))]
+                pub Usize: usize,
+                #[cfg(any($($iusize),*))]
+                pub Isize: isize,
+
                 $(
                     #[doc = $cvdoc]
                     pub $cvname: $cvtype,
@@ -574,6 +585,7 @@ macro_rules! define_unsafe_cell {
 
 /// define: types aliases
 macro_rules! type_aliases {
+    // DataCell aliases
     ( c: $name:ident, size: $B:literal, $b:literal,
       $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
     ) => {
@@ -609,6 +621,7 @@ macro_rules! type_aliases {
             pub type [< $name $b bit $nsuf With >]<C> = [< $name $B Byte $nsuf With >]<C>;
         }
     };
+    // DataType aliases
     ( t: $name:ident, size: $B:literal, $b:literal,
       $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
     ) => {
@@ -645,10 +658,12 @@ macro_rules! type_aliases {
 
 /// implement: DataTypes trait
 macro_rules! impl_data_types {
-    ( $tname:ident, $tbound:ident,
-      is_copy: $is_copy:stmt,
-      copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
-      noncopy_variants: $( $vname:ident, $vtype:ty ),*
+    (
+        $tname:ident, $tbound:ident,
+        is_copy: $is_copy:stmt,
+        copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
+        noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
+        pointer: $( $iusize:meta ),* ;
     ) => {
         paste::paste!{
             impl<T: $tbound> DataTypes for $tname<T> {
@@ -657,6 +672,12 @@ macro_rules! impl_data_types {
                     match self {
                         None => align_of::<NoData>(),
                         With(o) => o.data_align(),
+
+                        #[cfg(any( $( $iusize ),* ))]
+                        Usize => align_of::<usize>(),
+                        #[cfg(any( $( $iusize ),* ))]
+                        Isize => align_of::<isize>(),
+
                         $( $cvname => align_of::<$cvtype>(), )*
                         $( $vname => align_of::<$vtype>(), )*
                     }
@@ -666,6 +687,12 @@ macro_rules! impl_data_types {
                     match self {
                         None => size_of::<NoData>(),
                         With(o) => o.data_size(),
+
+                        #[cfg(any( $( $iusize ),* ))]
+                        Usize => size_of::<usize>(),
+                        #[cfg(any( $( $iusize ),* ))]
+                        Isize => size_of::<isize>(),
+
                         $( $cvname => align_of::<$cvtype>(), )*
                         $( $vname => size_of::<$vtype>(), )*
                     }
@@ -677,14 +704,14 @@ macro_rules! impl_data_types {
 }
 
 /// implement: DataCells trait
-// WIP
 macro_rules! impl_data_cells {
     (
-      c: $cname:ident, $cbound:ident,
-      t: $tname:ident, $tbound:ident,
-      is_copy: $is_copy:stmt,
-      copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
-      noncopy_variants: $( $vname:ident, $vtype:ty ),*
+        c: $cname:ident, $cbound:ident,
+        t: $tname:ident, $tbound:ident,
+        is_copy: $is_copy:stmt,
+        copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
+        noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
+        pointer: $( $iusize:meta ),* ;
     ) => {
         paste::paste! {
             // impl<C: $cbound, T: $tbound> DataCells for $cname<C, T> {
@@ -695,48 +722,21 @@ macro_rules! impl_data_cells {
         }
     };
 }
-
-/// implement From<DataCell*> for DataType*
-// WIP: RETHINK
-macro_rules! impl_from_cell_to_type {
-    (c: $datacell:ident, $withcell:ident
-     t: $datatype:ident, $withtype:ident
-     copy_variants: $( $vname:ident, $vtype:ty )+
-     ) => {
-        /*
-        impl<C: $withcell, T: $withtype> From< $datacell<C> >
-            for $datatype<T> {
-                fn from(cell: $cellname<C>) -> Self {
-                    match cell {
-                        $cname::None => Self::None,
-
-                        // WIP
-                        // $cname::With(c) => Self::With(c), // FIX
-                        // $cname::With(_) => Self::None, // TEMP OK
-                        //
-                        // FIX: need to convert from C to T
-                        // $cname::With(c) => Self::With(c.into()),
-                        //
-                        // TODO: implement a `map` method
-                        //
-
-                        $( $cname::$vname(_) => $tname::$vname, )+
-                    }
-                }
-        }
-        */
+/// implement: DataUnsafeCells trait
+macro_rules! impl_data_unsafe_cells {
+    (
+      u: $ucname:ident,
+    ) => {
+        // impl DataCells for $ucname {
+        //     fn is_copy(&self) -> bool { true }
+        // }
+        // impl DataCellsCopy for $ucname {}
+        unsafe impl DataUnsafeCells for $ucname {}
     };
 }
 
 // DEFINITIONS
 // -------------------------------------------------------------------------
-//
-// TODO:
-// - add usize
-//   target_pointer_width
-//   #[cfg(target_pointer_width = "16")]
-//   #[cfg(target_pointer_width = "32")]
-//   #[cfg(target_pointer_width = "64")]
 
 define_all_sizes! {
     DataType, DataCell, DataUnsafeCell,
@@ -746,8 +746,6 @@ define_all_sizes! {
     "8-bit [softposit](https://crates.io/crates/softposit) without exponent bits", P8, softposit::P8,
     "1-byte array of bytes", ByteArray1, [u8; 1],
     "Boolean value", Bool, bool,
-    // "8-bit [f8](https://crates.io/crates/f8) floating-point number constrained // MAYBE? (Debug)
-    //     to a value within the inclusive range of [0, 1]", F8, f8::f8,
     // noncopy_variants_1B:
 
     copy_variants_2B:
@@ -757,8 +755,8 @@ define_all_sizes! {
     "16-bit [half](https://crates.io/crates/half) floating-point number (bfloat16)", BF16, half::bf16,
     "16-bit [softposit](https://crates.io/crates/softposit) posit with exponent 1", P16, softposit::P16,
     "2-byte array of bytes", ByteArray2, [u8; 2],
-    // iusize_variants!(16) // TODO
     // noncopy_variants_2B:
+    iusize_2B: target_pointer_width = "16",
 
     copy_variants_4B:
     "32-bit unsigned integer ", U32, u32,
@@ -768,6 +766,7 @@ define_all_sizes! {
     "4-byte char ", Char, char,
     noncopy_variants_4B:
     "8-bit [softposit](https://crates.io/crates/softposit) quire without exponent bits", Q8, softposit::Q8,
+    iusize_4B: target_pointer_width = "32",
 
     copy_variants_8B:
     "64-bit unsigned integer ", U64, u64,
@@ -777,6 +776,7 @@ define_all_sizes! {
     "32-bit rational number", R32, num_rational::Ratio<i32>,
     noncopy_variants_8B:
     "16-bit [softposit](https://crates.io/crates/softposit) quire with exponent 1", Q16, softposit::Q16,
+    iusize_8B: target_pointer_width = "64",
 
     copy_variants_16B:
     "128-bit unsigned integer ", U128, u128,

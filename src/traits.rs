@@ -21,8 +21,6 @@ use core::fmt::Debug;
 /// - [`DataTypesCopy`]
 /// - [`DataCellsCopy`]
 /// - [`DataCells`]
-//
-// TODO: define the contract
 pub trait DataTypes: Copy + Debug {
     /// Returns the alignment of the data represented by the current type.
     fn data_align(&self) -> usize;

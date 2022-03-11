@@ -1,15 +1,13 @@
 // ladata::tests
 //
-// TODO
-// - check alignment
-// - check nesting (With)
-//   - add sizes of nested...
+//!
 
 use crate::all::*;
 use core::mem::{size_of, size_of_val};
 
+/// Checks the sizes of types without an active `With` variant.
 #[test]
-fn test_sizes() {
+fn test_sizes_without() {
     assert_eq![1, size_of::<DataType1Byte>()];
     assert_eq![2, size_of::<DataCell1Byte>()];
     assert_eq![2, size_of::<DataCell1ByteCopy>()];
@@ -49,8 +47,4 @@ fn test_sizes() {
     assert_eq![136, size_of::<DataCell128Byte>()];
     assert_eq![136, size_of::<DataCell128ByteCopy>()];
     assert_eq![128, size_of::<DataUnsafeCell128ByteCopy>()];
-
-    //mix WIP
-    // assert_eq![1, std::mem::size_of::<MyDataCell8bitWith<MyDataCell8bit>>()];
-    // assert_eq![1, std::mem::size_of::<MyDataCell8bitWith<MyDataUnsafeCell8bit>>()];
 }

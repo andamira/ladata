@@ -1,16 +1,18 @@
 //! **`ladata`**
 //!
-//! A simple model for working with heterogeneous data.
+//! A simple and versatile data model that helps working with heterogeneous data.
 //!
-//! # Overview
+//! # *Types* and *Cells*
 //!
-//! The main abstractions are:
+//! ## Overview
+//!
+//! The fundamental abstractions of this library are:
 //! - `DataType…` enums, which only contains type information.
 //! - `DataCell…` enums, which contains both data and type information.
-//! - `DataUnsafeCell…` unions, which only contains the data.
+//! - `DataUnsafeCell…` unions, which only contains data.
 //!
-//! Each one has multiple concrete implementations differing both in the
-//! data size and its `Copy` semantics.
+//! Each one has multiple concrete implementations that differ by the
+//! maximum **size** of the referred data, and its `Copy` semantics.
 //!
 //! For example, these are three inter-related implementations:
 //! - [`DataType2ByteCopy`][all::DataType2ByteCopy] represents a 2-byte sized
@@ -22,36 +24,39 @@
 //!
 //! `DataUnsafeCell…`s are more space-efficient than `DataCell…`s but not as
 //! convenient to use, and they are unsafe to read. They are mostly intended
-//! to be used from collections that store their corresponding `DataType…`s
+//! to be used from collections that can store their corresponding `DataType…`s
 //! separately. At the moment they only support `Copy` types, and they can't
-//! include custom types either (they lack a `With` field).
+//! include custom types either (lacking a `With` field).
 //!
-//! # Naming scheme
+//! ## Naming scheme
 //!
-//! The concrete type implementations employs the following naming scheme:
+//! The concrete implementations observes the following naming schemes:
 //! ```txt
-//! Data <Cell|Type>    <Size>    [Copy] [With]
-//!                 |   8b =   1B|
-//!                 |  16b =   2B|
-//!                 |  32b =   4B|
-//!                 |  64b =   8B|                 ·---------------·
-//!                 | 128b =  16B|                 |<> : required  |
-//!                 | 256b =  32B|                 |[] : optional  |
-//!                 | 512b =  64B|                 | | : either or |
-//!                 |1024b = 128B|                 | = : alias     |
+//! 1.    Data <Type|Cell>    <Size>     [Copy] [With]
+//!                              ↑                             ·---------------·
+//!                       |   8b =   1B|                       |<> : required  |
+//!                       |  16b =   2B|                       |[] : optional  |
+//!                       |  32b =   4B|                       | | : either or |
+//!                       |  64b =   8B|                       | = : alias     |
+//!                       | 128b =  16B|                       ·---------------·
+//!                       | 256b =  32B|
+//!                       | 512b =  64B|
+//!                       |1024b = 128B|
+//!                              ↓
+//! 2.    Data <UnsafeCell>   <Size>     <Copy>
+//! 3. No Data
 //! ```
+//! 0. `No`: a special prefix for the [`NoData`] type.
+//! 1. `Data`: everything revolves around this concept.
+//! 2. `<Type|Cell|UnsafeCell>`: encapsulates either just the data type,
+//!    both the data type and the data, or just the data.
+//! 3. `<Size>`: constrains the maximum size of the data represented by the type,
+//!    either in bits or Bytes (in powers of 2).
+//! 4. `[Copy]`: indicates that all the data types included are `Copy`.
+//! 5. `[With]`: allows to extend the data type or cell with a custom
+//!     implementation in the `With` variant.
 //!
-//! Special case: `DataUnsafeCell <Size:bits|Bytes> <Copy>`
-//!
-//! 1. `Data`
-//! 2. `<Cell|Type>` memory data plus type, or only the type information.
-//!    of the default flat representation.
-//! 3. `<Size>` constrains the maximum size of the data in memory (in bits or Bytes)
-//! 4. `[Copy]` indicates that all the types included are `Copy`.
-//! 5. `[With]` allows to extend the type with a custom implementation
-//!     in the `With` variant.
-//!
-//! ## `<Cell|Type|UnsafeCell>`
+//! ### `<Type|Cell|UnsafeCell>`
 //!
 //! - `Type` indicates just the categorization of data types.
 //! All *`DataType*`s* must implement the [`DataTypes`] trait, and
@@ -66,7 +71,7 @@
 //! - `UnsafeCell` indicates the encapsulation of data without type information.
 //! All *`DataUnsafeCell`s* implement the [`DataUnsafeCells`] trait.
 //!
-//! ## `[Copy]`
+//! ### `[Copy]`
 //!
 //! *`Copy`* indicates that the data represented by the *type*,
 //! (and|or encapsulated by the *cell*) is [`Copy`].
@@ -75,7 +80,7 @@
 //! leaving the source initialized, can be `Copy`.
 //! This leaves out types referencing the heap and other resources.
 //!
-//! ## *`<Size>`*
+//! ### *`<Size>`*
 //!
 //! Indicates the specific size of the data representation in memory. Can be
 //! written using either bytes (**`N`**`Bytes`) or bits (**`N`**`bits`).
@@ -89,7 +94,7 @@
 //!
 //! Types can be found classified by size in the [`size`] module.
 //!
-//! ## `[With]`
+//! ### `[With]`
 //!
 //! **`DataType*With`** enums can be extended generically by storing a type
 //! implementing [`DataTypes`] in its `With` variant (or [`DataTypesCopy`]
@@ -99,8 +104,10 @@
 //! storing a type implementing [`DataCells`] in its `With` variant
 //! (or [`DataCellsCopy`] in the case of `DataCell*CopyWith`.
 //!
-//! Internally, non-`With` versions are aliases to the corresponding `With`
-//! version with the zero-sized [`NoData`] type.
+//! Internally, all non-`With` versions are convenient type aliases to the
+//! corresponding `With` version (having the same size and `Copy` semantics),
+//! using the the zero-sized [`NoData`] type. E.g.:
+//! [`DataType32Byte`][all::DataType32Byte]
 
 #![allow(non_snake_case, non_camel_case_types)]
 
@@ -122,8 +129,8 @@ pub use traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeC
 pub mod all {
     #[doc(inline)]
     pub use super::builder::*;
-    pub use super::traits::*;
     pub use super::nodata::*;
+    pub use super::traits::*;
 }
 
 /// Re-export of data *cells* & *types* of specific sizes.
