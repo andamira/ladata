@@ -14,7 +14,7 @@ include = [
 	"LICENSE*",
 	"README.md",
 ]
-categories = [ "data-structures" ]
+categories = [ "no-std", "data-structures" ]
 keywords = [ "data", "dataframe" ]
 publish = false
 
@@ -28,6 +28,8 @@ twofloat = "0.4.1" # F128
 num-rational = "0.4.0"
 num-bigint = "0.4.3"
 rust_decimal = "1.22.0"
+
+arrayvec = "0.7.2" # ArrayString
 
 [features]
 default = [ "std" ]

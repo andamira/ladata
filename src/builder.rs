@@ -823,8 +823,8 @@ define_all_sizes! {
     copy_variants_1B:
     "8-bit unsigned integer ", U8, u8,
     "8-bit signed integer", I8, i8,
-    "8-bit [softposit](https://crates.io/crates/softposit) without exponent bits", P8, softposit::P8,
-    "1-byte array of bytes", ByteArray1, [u8; 1],
+    "8-bit [softposit](https://crates.io/crates/softposit)'s Posit without exponent", P8, softposit::P8,
+    "1-byte array of bytes", ArrayByte1, [u8; 1],
     "Boolean value", Bool, bool,
     // noncopy_variants_1B:
 
@@ -833,8 +833,8 @@ define_all_sizes! {
     "16-bit signed integer", I16, i16,
     "16-bit [half](https://crates.io/crates/half) floating-point number (binary16)", F16, half::f16,
     "16-bit [half](https://crates.io/crates/half) floating-point number (bfloat16)", BF16, half::bf16,
-    "16-bit [softposit](https://crates.io/crates/softposit) posit with exponent 1", P16, softposit::P16,
-    "2-byte array of bytes", ByteArray2, [u8; 2],
+    "16-bit [softposit](https://crates.io/crates/softposit)'s Posit with exp=1", P16, softposit::P16,
+    "2-byte array of bytes", ArrayByte2, [u8; 2],
     // noncopy_variants_2B:
     iusize_2B: target_pointer_width = "16",
 
@@ -842,33 +842,37 @@ define_all_sizes! {
     "32-bit unsigned integer ", U32, u32,
     "32-bit signed integer", I32, i32,
     "32-bit floating-point number", F32, f32,
-    "4-byte array of bytes", ByteArray4, [u8; 4],
+    "4-byte array of bytes", ArrayByte4, [u8; 4],
     "4-byte char ", Char, char,
     noncopy_variants_4B:
-    "8-bit [softposit](https://crates.io/crates/softposit) quire without exponent bits", Q8, softposit::Q8,
+    "8-bit [softposit](https://crates.io/crates/softposit)'s Quire without exponent", Q8, softposit::Q8,
     iusize_4B: target_pointer_width = "32",
 
     copy_variants_8B:
     "64-bit unsigned integer ", U64, u64,
     "64-bit signed integer", I64, i64,
     "64-bit floating-point number", F64, f64,
-    "8-byte array of bytes", ByteArray8, [u8; 8],
+    "8-byte array of bytes", ArrayByte8, [u8; 8],
     "32-bit rational number", R32, num_rational::Ratio<i32>,
+    "8-byte [arrayvec](https://crates.io/crates/arrayvec)'s ArrayString of len 4",
+        ArrayString4, arrayvec::ArrayString<4>,
     noncopy_variants_8B:
-    "16-bit [softposit](https://crates.io/crates/softposit) quire with exponent 1", Q16, softposit::Q16,
+    "16-bit [softposit](https://crates.io/crates/softposit)'s Quire with exp=1", Q16, softposit::Q16,
     iusize_8B: target_pointer_width = "64",
 
     copy_variants_16B:
     "128-bit unsigned integer ", U128, u128,
     "128-bit signed integer", I128, i128,
     "128-bit floating point number", F128, twofloat::TwoFloat,
-    "16-byte array of bytes", ByteArray16, [u8; 16],
+    "16-byte array of bytes", ArrayByte16, [u8; 16],
     "16-byte [rust_decimal] Decimal number", Decimal, rust_decimal::Decimal, //
     "64-bit rational number", R64, num_rational::Ratio<i64>, //
+    "16-byte [arrayvec](https://crates.io/crates/arrayvec)'s ArrayString of len 12",
+        ArrayString12, arrayvec::ArrayString<12>,
     // noncopy_variants_16B:
 
     copy_variants_32B:
-    "32-byte array of bytes", ByteArray32, [u8; 32],
+    "32-byte array of bytes", ArrayByte32, [u8; 32],
     "128-bit rational number", R128, num_rational::Ratio<i128>, //
     noncopy_variants_32B:
     "Big Integer", BigInt, num_bigint::BigInt,
@@ -882,6 +886,6 @@ define_all_sizes! {
     copy_variants_128B:
     "128-byte array", Array128B, [u8; 128],
     noncopy_variants_128B:
-    "32-bit [softposit](https://crates.io/crates/softposit) quire with exponent 2", Q32, softposit::Q32,
+    "32-bit [softposit](https://crates.io/crates/softposit)'s Quire with exp=2", Q32, softposit::Q32,
     //
 }
