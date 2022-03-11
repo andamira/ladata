@@ -1,16 +1,15 @@
 // ladata::nodata
 //
 //!
-//!
 
 use core::mem::{align_of, size_of};
 
 pub use crate::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 
-/// Represents the absence of data of any kind.
+/// A zero-sized type representing the absence of data.
 ///
-/// It's zero-sized, and it implements all traits so it can represent the
-/// absence of DataType, DataCell & DataUnsafeCell indistinctly.
+/// Since it implements all traits it can represent the absence of
+/// `DataType`, `DataCell` & `DataUnsafeCell` indistinctly.
 ///
 /// Mainly used for the non-`With` aliases of the
 /// [`DataTypes`]*[[`Copy`][DataTypesCopy]]* and

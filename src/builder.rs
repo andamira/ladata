@@ -885,6 +885,8 @@ macro_rules! impl_data_unsafe_cells {
 // DEFINITIONS
 // -------------------------------------------------------------------------
 
+use arraystring::{typenum, ArrayString};
+
 define_all_sizes! {
     DataType, DataCell, DataUnsafeCell,
     copy_variants_1B:
@@ -902,6 +904,8 @@ define_all_sizes! {
     "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number", BF16, half::bf16,
     "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1", P16, softposit::P16,
     "2-Byte array of bytes", ArrayBytes2, [u8; 2],
+    "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 1",
+        ArrayString1, ArrayString<typenum::U1>,
     // noncopy_variants_2B:
     iusize_2B: target_pointer_width = "16",
 
@@ -911,6 +915,8 @@ define_all_sizes! {
     "32-bit floating-point number", F32, f32,
     "4-Byte array of bytes", ArrayBytes4, [u8; 4],
     "4-Byte char ", Char, char,
+    "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 3",
+        ArrayString3, ArrayString<typenum::U3>,
     "32-bit [`time`](https://crates.io/crates/time)'s `Date`", TDate, time::Date,
     "32-bit [`time`](https://crates.io/crates/time)'s `UtcOffset`", TUtcOffset, time::UtcOffset,
     "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
@@ -942,10 +948,10 @@ define_all_sizes! {
     "64-bit signed integer", I64, i64,
     "64-bit floating-point number", F64, f64,
     "8-Byte array of bytes", ArrayBytes8, [u8; 8],
+    "8-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 7",
+        ArrayString7, ArrayString<typenum::U7>,
     "32-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
         R32, num_rational::Ratio<i32>,
-    "8-Byte [`arrayvec`](https://crates.io/crates/arrayvec)'s ArrayString of len 4",
-        ArrayString4, arrayvec::ArrayString<4>,
     "64-bit [`time`](https://crates.io/crates/time)'s `Time`", TTime, time::Time,
     "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
         FugitDuration64Hours, fugit::Duration<u64, 3_600, 1>,
@@ -977,10 +983,10 @@ define_all_sizes! {
     "128-bit floating point number", F128, twofloat::TwoFloat,
     "16-Byte array of bytes", ArrayBytes16, [u8; 16],
     "16-Byte [rust_decimal] Decimal number", Decimal, rust_decimal::Decimal, //
+    "16-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 15",
+        ArrayString15, ArrayString<typenum::U15>,
     "64-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
         R64, num_rational::Ratio<i64>, //
-    "16-Byte [`arrayvec`](https://crates.io/crates/arrayvec)'s `ArrayString` of len 12",
-        ArrayString12, arrayvec::ArrayString<12>,
     "128-bit Duration", Duration, core::time::Duration,
     "128-bit [`time`](https://crates.io/crates/time)'s `Duration`", TDuration, time::Duration,
     "128-bit [`time`](https://crates.io/crates/time)'s `PrimitiveDateTime`", TDateTime, time::PrimitiveDateTime,
@@ -993,6 +999,8 @@ define_all_sizes! {
 
     copy_variants_32B:
     "32-Byte array of bytes", ArrayBytes32, [u8; 32],
+    "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 31",
+        ArrayString31, ArrayString<typenum::U31>,
     "128-bit rational number", R128, num_rational::Ratio<i128>, //
     noncopy_variants_32B:
     "Big Integer", BigInt, num_bigint::BigInt,
@@ -1001,11 +1009,15 @@ define_all_sizes! {
 
     copy_variants_64B:
     "64-Byte array of bytes", ArrayBytes64, [u8; 64],
+    "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 63",
+        ArrayString63, ArrayString<typenum::U63>,
     noncopy_variants_64B:
     "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=2", Q32, softposit::Q32,
 
     copy_variants_128B:
     "128-Byte array of bytes", ArrayBytes128, [u8; 128],
+    "127-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 127",
+        ArrayString127, ArrayString<typenum::U127>,
     noncopy_variants_128B: ,
     //
 }
