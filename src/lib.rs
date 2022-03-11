@@ -111,6 +111,8 @@
 
 #![allow(non_snake_case, non_camel_case_types)]
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 #[cfg(test)]
 #[allow(unused_imports)]
 mod tests;

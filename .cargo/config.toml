@@ -39,5 +39,18 @@ rrqe = "run --release --quiet --example"
 t = "test -- --nocapture"
 t1 = "test -- --test-threads 1 --nocapture"
 
+# PUBLISH
+p = "publish --dry-run"
+pa = "publish --dry-run --allow-dirty"
+pp = "publish"
+ppa = "publish --allow-dirty"
+
+# Cargo subcommands:
+## cargo-expand
+E = "expand"
+Eb = "expand --bin"
+Ee = "expand --example"
+El = "expand --lib"
+
 [build]
-# rustdocflags = [ "--html-in-header", "./src/docs-header.html"]
+# rustdocflags = [ "--html-in-header", "./assets/docs-header.html"]
