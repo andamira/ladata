@@ -127,6 +127,7 @@ macro_rules! define_all_sizes {
 
         // 16-Byte / 128-bit
         copy_variants_16B: $( $cvdoc_16B:literal, $cvname_16B:ident, $cvtype_16B:ty ),* ,
+        copy_variants_16B_std: $( $cvdoc_16B_std:literal, $cvname_16B_std:ident, $cvtype_16B_std:ty ),* ,
         // noncopy_variants_16B: $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
 
         // 32-Byte / 256-bit
@@ -136,7 +137,7 @@ macro_rules! define_all_sizes {
 
         // 64-Byte / 512-bit
         copy_variants_64B: $( $cvdoc_64B:literal, $cvname_64B:ident, $cvtype_64B:ty ),* ,
-        // noncopy_variants_64B: $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
+        noncopy_variants_64B: $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
 
         // 128-Byte / 1024-bit
         copy_variants_128B: $( $cvdoc_128B:literal, $cvname_128B:ident, $cvtype_128B:ty ),* ,
@@ -148,6 +149,7 @@ macro_rules! define_all_sizes {
             $tname, $cname, $ucname,
             size: 1, 8,
             copy_variants: $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
+            copy_variants_std: ;
             noncopy_variants: ; // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
             noncopy_variants_std: ;
             pointer:
@@ -159,6 +161,7 @@ macro_rules! define_all_sizes {
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
                 $( $cvdoc_2B, $cvname_2B, $cvtype_2B ),* ,
+            copy_variants_std: ;
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -173,6 +176,7 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
                 $( $cvdoc_2B, $cvname_2B, $cvtype_2B ),* ,
                 $( $cvdoc_4B, $cvname_4B, $cvtype_4B ),* ,
+            copy_variants_std: ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ;
             noncopy_variants_std: ;
@@ -187,6 +191,7 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_2B, $cvname_2B, $cvtype_2B ),* ,
                 $( $cvdoc_4B, $cvname_4B, $cvtype_4B ),* ,
                 $( $cvdoc_8B, $cvname_8B, $cvtype_8B ),* ,
+            copy_variants_std: ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
@@ -203,6 +208,8 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_4B, $cvname_4B, $cvtype_4B ),* ,
                 $( $cvdoc_8B, $cvname_8B, $cvtype_8B ),* ,
                 $( $cvdoc_16B, $cvname_16B, $cvtype_16B ),* ,
+            copy_variants_std:
+                $( $cvdoc_16B_std, $cvname_16B_std, $cvtype_16B_std ),* ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
@@ -221,6 +228,8 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_8B, $cvname_8B, $cvtype_8B ),* ,
                 $( $cvdoc_16B, $cvname_16B, $cvtype_16B ),* ,
                 $( $cvdoc_32B, $cvname_32B, $cvtype_32B ),* ,
+            copy_variants_std:
+                $( $cvdoc_16B_std, $cvname_16B_std, $cvtype_16B_std ),* ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ,
@@ -242,12 +251,14 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_16B, $cvname_16B, $cvtype_16B ),* ,
                 $( $cvdoc_32B, $cvname_32B, $cvtype_32B ),* ,
                 $( $cvdoc_64B, $cvname_64B, $cvtype_64B ),* ,
+            copy_variants_std:
+                $( $cvdoc_16B_std, $cvname_16B_std, $cvtype_16B_std ),* ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ,
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ,
-                $( $vdoc_32B, $vname_32B, $vtype_32B ),* ;
-                // $( $vdoc_64B, $vname_64B, $vtype_64B ),* ;
+                $( $vdoc_32B, $vname_32B, $vtype_32B ),* ,
+                $( $vdoc_64B, $vname_64B, $vtype_64B ),* ;
             noncopy_variants_std:
                 $( $vdoc_32B_std, $vname_32B_std, $vtype_32B_std ),* ;
             pointer: $iusize_2B, $iusize_4B, $iusize_8B
@@ -265,13 +276,15 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_32B, $cvname_32B, $cvtype_32B ),* ,
                 $( $cvdoc_64B, $cvname_64B, $cvtype_64B ),* ,
                 $( $cvdoc_128B, $cvname_128B, $cvtype_128B ),* ,
+            copy_variants_std:
+                $( $cvdoc_16B_std, $cvname_16B_std, $cvtype_16B_std ),* ;
             noncopy_variants:
                 $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 $( $vdoc_8B, $vname_8B, $vtype_8B ),* ,
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ,
                 $( $vdoc_32B, $vname_32B, $vtype_32B ),* ,
-                // $( $vdoc_64B, $vname_64B, $vtype_64B ),* ,
-                $( $vdoc_128B, $vname_128B, $vtype_128B ),* ;
+                $( $vdoc_64B, $vname_64B, $vtype_64B ),* ;
+                // $( $vdoc_128B, $vname_128B, $vtype_128B ),*
             noncopy_variants_std:
                 $( $vdoc_32B_std, $vname_32B_std, $vtype_32B_std ),* ;
             pointer: $iusize_2B, $iusize_4B, $iusize_8B
@@ -285,6 +298,7 @@ macro_rules! define_single_size {
     $tname:ident, $cname:ident, $ucname:ident,
     size: $B:literal, $b:literal,
     copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+    copy_variants_std: $( $cvdoc_std:literal, $cvname_std:ident, $cvtype_std:ty ),* ;
     noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
     noncopy_variants_std: $( $vdoc_std:literal, $vname_std:ident, $vtype_std:ty ),* ;
     pointer: $( $iusize:meta ),*
@@ -292,6 +306,7 @@ macro_rules! define_single_size {
         define_type!{
             $tname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_std: $( $cvdoc_std, $cvname_std, $cvtype_std ),* ;
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
             noncopy_variants_std: $( $vdoc_std, $vname_std, $vtype_std ),* ;
             pointer: $( $iusize ),* ;
@@ -299,6 +314,7 @@ macro_rules! define_single_size {
         define_cell!{
             c: $cname, t:$tname, u:$ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_std: $( $cvdoc_std, $cvname_std, $cvtype_std ),* ;
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
             noncopy_variants_std: $( $vdoc_std, $vname_std, $vtype_std ),* ;
             pointer: $( $iusize ),* ;
@@ -306,6 +322,7 @@ macro_rules! define_single_size {
         define_unsafe_cell!{
             $ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_std: $( $cvdoc_std, $cvname_std, $cvtype_std ),* ;
             pointer: $( $iusize ),* ;
         }
     };
@@ -316,6 +333,7 @@ macro_rules! define_type {
         $tname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_std: $( $cvdoc_std:literal, $cvname_std:ident, $cvtype_std:ty ),* ;
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
         noncopy_variants_std: $( $vdoc_std:literal, $vname_std:ident, $vtype_std:ty ),* ;
         pointer: $( $iusize:meta ),* ;
@@ -343,6 +361,12 @@ macro_rules! define_type {
                 Isize,
 
                 $(
+                    #[cfg(feature = "std")]
+                    #[doc = $cvdoc_std]
+                    $cvname_std,
+                )*
+
+                $(
                     #[doc = $cvdoc ]
                     $cvname,
                 )*
@@ -351,6 +375,7 @@ macro_rules! define_type {
             impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
+                copy_variants_std: $( $cvname_std, $cvtype_std ),* ;
                 noncopy_variants: ;
                 noncopy_variants_std: ;
                 pointer: $( $iusize ),* ;
@@ -380,6 +405,11 @@ macro_rules! define_type {
 
                 $(
                     #[cfg(feature = "std")]
+                    #[doc = $cvdoc_std]
+                    $cvname_std,
+                )*
+                $(
+                    #[cfg(feature = "std")]
                     #[doc = $vdoc_std ]
                     $vname_std,
                 ),*
@@ -397,6 +427,7 @@ macro_rules! define_type {
             impl_data_types![ [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
+                copy_variants_std: $( $cvname_std, $cvtype_std ),* ;
                 noncopy_variants: $($vname, $vtype ),* ;
                 noncopy_variants_std: $($vname_std, $vtype_std ),* ;
                 pointer: $( $iusize ),* ;
@@ -420,6 +451,7 @@ macro_rules! define_cell {
         c: $cname:ident, t: $tname:ident, u: $ucname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_std: $( $cvdoc_std:literal, $cvname_std:ident, $cvtype_std:ty ),* ;
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
         noncopy_variants_std: $( $vdoc_std:literal, $vname_std:ident, $vtype_std:ty ),* ;
         pointer: $( $iusize:meta ),* ;
@@ -447,6 +479,12 @@ macro_rules! define_cell {
                 Isize(isize),
 
                 $(
+                    #[cfg(feature = "std")]
+                    #[doc = $cvdoc_std]
+                    $cvname_std($cvtype_std),
+                )*
+
+                $(
                     #[doc = $cvdoc]
                     $cvname($cvtype),
                 )*
@@ -457,6 +495,7 @@ macro_rules! define_cell {
                 t: [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
+                copy_variants_std: $( $cvname_std, $cvtype_std ),* ;
                 noncopy_variants: ;
                 noncopy_variants_std: ;
                 pointer: $( $iusize:meta ),* ;
@@ -487,6 +526,11 @@ macro_rules! define_cell {
 
                 $(
                     #[cfg(feature = "std")]
+                    #[doc = $cvdoc_std]
+                    $cvname_std($cvtype_std),
+                )*
+                $(
+                    #[cfg(feature = "std")]
                     #[doc = $vdoc_std ]
                     $vname_std($vtype_std),
                 ),*
@@ -506,6 +550,7 @@ macro_rules! define_cell {
                 t: [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
+                copy_variants_std: $( $cvname_std, $cvtype_std ),* ;
                 noncopy_variants: $($vname, $vtype ),* ;
                 noncopy_variants_std: $($vname_std, $vtype_std ),* ;
                 pointer: $( $iusize:meta ),* ;
@@ -590,8 +635,13 @@ macro_rules! define_cell {
                         [<$cname $B Byte Copy With>]::Isize(i) => Self { Isize: i },
 
                         $(
-                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v }
-                        ),*
+                            #[cfg(feature = "std")]
+                            [<$cname $B Byte Copy With>]::$cvname_std(v) => Self { $cvname_std: v },
+                        )*
+
+                        $(
+                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
+                        )*
 
                     }
                 }
@@ -608,6 +658,7 @@ macro_rules! define_unsafe_cell {
         $ucname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_std: $( $cvdoc_std:literal, $cvname_std:ident, $cvtype_std:ty ),* ;
         // noncopy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ;
         pointer: $( $iusize:meta ),* ;
     ) => {
@@ -623,6 +674,12 @@ macro_rules! define_unsafe_cell {
                 pub Usize: usize,
                 #[cfg(any($($iusize),*))]
                 pub Isize: isize,
+
+                $(
+                    #[cfg(feature = "std")]
+                    #[doc = $cvdoc_std]
+                    pub $cvname_std: $cvtype_std,
+                )*
 
                 $(
                     #[doc = $cvdoc]
@@ -730,6 +787,7 @@ macro_rules! impl_data_types {
         $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
         copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
+        copy_variants_std: $($cvname_std:ident, $cvtype_std:ty ),* ;
         noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
         noncopy_variants_std: $($vname_std:ident, $vtype_std:ty ),* ;
         pointer: $( $iusize:meta ),* ;
@@ -749,8 +807,12 @@ macro_rules! impl_data_types {
 
                         $(
                             #[cfg(feature = "std")]
+                            $cvname_std => align_of::<$cvtype_std>(),
+                        )*
+                        $(
+                            #[cfg(feature = "std")]
                             $vname_std => align_of::<$vtype_std>(),
-                        ),*
+                        )*
 
                         $( $cvname => align_of::<$cvtype>(), )*
                         $( $vname => align_of::<$vtype>(), )*
@@ -769,8 +831,12 @@ macro_rules! impl_data_types {
 
                         $(
                             #[cfg(feature = "std")]
+                            $cvname_std => size_of::<$cvtype_std>(),
+                        )*
+                        $(
+                            #[cfg(feature = "std")]
                             $vname_std => size_of::<$vtype_std>(),
-                        ),*
+                        )*
 
                         $( $cvname => align_of::<$cvtype>(), )*
                         $( $vname => size_of::<$vtype>(), )*
@@ -789,6 +855,7 @@ macro_rules! impl_data_cells {
         t: $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
         copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
+        copy_variants_std: $($cvname_std:ident, $cvtype_std:ty ),* ;
         noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
         noncopy_variants_std: $($vname_std:ident, $vtype_std:ty ),* ;
         pointer: $( $iusize:meta ),* ;
@@ -823,18 +890,18 @@ define_all_sizes! {
     copy_variants_1B:
     "8-bit unsigned integer ", U8, u8,
     "8-bit signed integer", I8, i8,
-    "8-bit [softposit](https://crates.io/crates/softposit)'s Posit without exponent", P8, softposit::P8,
-    "1-byte array of bytes", ArrayByte1, [u8; 1],
+    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` without exponent", P8, softposit::P8,
+    "1-Byte array of bytes", ArrayBytes1, [u8; 1],
     "Boolean value", Bool, bool,
     // noncopy_variants_1B:
 
     copy_variants_2B:
     "16-bit unsigned integer ", U16, u16,
     "16-bit signed integer", I16, i16,
-    "16-bit [half](https://crates.io/crates/half) floating-point number (binary16)", F16, half::f16,
-    "16-bit [half](https://crates.io/crates/half) floating-point number (bfloat16)", BF16, half::bf16,
-    "16-bit [softposit](https://crates.io/crates/softposit)'s Posit with exp=1", P16, softposit::P16,
-    "2-byte array of bytes", ArrayByte2, [u8; 2],
+    "16-bit [`half`](https://crates.io/crates/half)'s `binary16` floating-point number", F16, half::f16,
+    "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number", BF16, half::bf16,
+    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1", P16, softposit::P16,
+    "2-Byte array of bytes", ArrayBytes2, [u8; 2],
     // noncopy_variants_2B:
     iusize_2B: target_pointer_width = "16",
 
@@ -842,37 +909,90 @@ define_all_sizes! {
     "32-bit unsigned integer ", U32, u32,
     "32-bit signed integer", I32, i32,
     "32-bit floating-point number", F32, f32,
-    "4-byte array of bytes", ArrayByte4, [u8; 4],
-    "4-byte char ", Char, char,
+    "4-Byte array of bytes", ArrayBytes4, [u8; 4],
+    "4-Byte char ", Char, char,
+    "32-bit [`time`](https://crates.io/crates/time)'s `Date`", TDate, time::Date,
+    "32-bit [`time`](https://crates.io/crates/time)'s `UtcOffset`", TUtcOffset, time::UtcOffset,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
+        FugitDuration32Hours, fugit::Duration<u32, 3_600, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in minutes",
+        FugitDuration32Minutes, fugit::Duration<u32, 60, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in seconds",
+        FugitDuration32Seconds, fugit::Duration<u32, 1, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in milliseconds",
+        FugitDuration32Millis, fugit::Duration<u32, 1, 1_000>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in nanoseconds",
+        FugitDuration32Nanos, fugit::Duration<u32, 1, 1_000_000>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in hours",
+        FugitInstant32Hours, fugit::Instant<u32, 3_600, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in minutes",
+        FugitInstant32Minutes, fugit::Instant<u32, 60, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in seconds",
+        FugitInstant32Seconds, fugit::Instant<u32, 1, 1>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in milliseconds",
+        FugitInstant32Millis, fugit::Instant<u32, 1, 1_000>,
+    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
+        FugitInstant32Nanos, fugit::Instant<u32, 1, 1_000_000>,
     noncopy_variants_4B:
-    "8-bit [softposit](https://crates.io/crates/softposit)'s Quire without exponent", Q8, softposit::Q8,
+    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` without exponent", Q8, softposit::Q8,
     iusize_4B: target_pointer_width = "32",
 
     copy_variants_8B:
     "64-bit unsigned integer ", U64, u64,
     "64-bit signed integer", I64, i64,
     "64-bit floating-point number", F64, f64,
-    "8-byte array of bytes", ArrayByte8, [u8; 8],
-    "32-bit rational number", R32, num_rational::Ratio<i32>,
-    "8-byte [arrayvec](https://crates.io/crates/arrayvec)'s ArrayString of len 4",
+    "8-Byte array of bytes", ArrayBytes8, [u8; 8],
+    "32-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
+        R32, num_rational::Ratio<i32>,
+    "8-Byte [`arrayvec`](https://crates.io/crates/arrayvec)'s ArrayString of len 4",
         ArrayString4, arrayvec::ArrayString<4>,
+    "64-bit [`time`](https://crates.io/crates/time)'s `Time`", TTime, time::Time,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
+        FugitDuration64Hours, fugit::Duration<u64, 3_600, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in minutes",
+        FugitDuration64Minutes, fugit::Duration<u64, 60, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in seconds",
+        FugitDuration64Seconds, fugit::Duration<u64, 1, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in milliseconds",
+        FugitDuration64Millis, fugit::Duration<u64, 1, 1_000>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in nanoseconds",
+        FugitDuration64Nanos, fugit::Duration<u64, 1, 1_000_000>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in hours",
+        FugitInstant64Hours, fugit::Instant<u64, 3_600, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in minutes",
+        FugitInstant64Minutes, fugit::Instant<u64, 60, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in seconds",
+        FugitInstant64Seconds, fugit::Instant<u64, 1, 1>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in milliseconds",
+        FugitInstant64Millis, fugit::Instant<u64, 1, 1_000>,
+    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
+        FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>,
     noncopy_variants_8B:
-    "16-bit [softposit](https://crates.io/crates/softposit)'s Quire with exp=1", Q16, softposit::Q16,
+    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=1", Q16, softposit::Q16,
     iusize_8B: target_pointer_width = "64",
 
     copy_variants_16B:
     "128-bit unsigned integer ", U128, u128,
     "128-bit signed integer", I128, i128,
     "128-bit floating point number", F128, twofloat::TwoFloat,
-    "16-byte array of bytes", ArrayByte16, [u8; 16],
-    "16-byte [rust_decimal] Decimal number", Decimal, rust_decimal::Decimal, //
-    "64-bit rational number", R64, num_rational::Ratio<i64>, //
-    "16-byte [arrayvec](https://crates.io/crates/arrayvec)'s ArrayString of len 12",
+    "16-Byte array of bytes", ArrayBytes16, [u8; 16],
+    "16-Byte [rust_decimal] Decimal number", Decimal, rust_decimal::Decimal, //
+    "64-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
+        R64, num_rational::Ratio<i64>, //
+    "16-Byte [`arrayvec`](https://crates.io/crates/arrayvec)'s `ArrayString` of len 12",
         ArrayString12, arrayvec::ArrayString<12>,
+    "128-bit Duration", Duration, core::time::Duration,
+    "128-bit [`time`](https://crates.io/crates/time)'s `Duration`", TDuration, time::Duration,
+    "128-bit [`time`](https://crates.io/crates/time)'s `PrimitiveDateTime`", TDateTime, time::PrimitiveDateTime,
+    "128-bit [`time`](https://crates.io/crates/time)'s `OffsetDateTime`", TOffsetDateTime, time::OffsetDateTime,
+    copy_variants_16B_std:
+    "128-bit Instant", Instant, std::time::Instant,
+    "128-bit SystemTime", SystemTime, std::time::SystemTime,
+    "128-bit [`time`](https://crates.io/crates/time)'s `Instant`", TInstant, time::Instant,
     // noncopy_variants_16B:
 
     copy_variants_32B:
-    "32-byte array of bytes", ArrayByte32, [u8; 32],
+    "32-Byte array of bytes", ArrayBytes32, [u8; 32],
     "128-bit rational number", R128, num_rational::Ratio<i128>, //
     noncopy_variants_32B:
     "Big Integer", BigInt, num_bigint::BigInt,
@@ -880,12 +1000,12 @@ define_all_sizes! {
     "string", String, std::string::String,
 
     copy_variants_64B:
-    "64-byte array", Array64B, [u8; 64],
-    // noncopy_variants_64B:
+    "64-Byte array of bytes", ArrayBytes64, [u8; 64],
+    noncopy_variants_64B:
+    "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=2", Q32, softposit::Q32,
 
     copy_variants_128B:
-    "128-byte array", Array128B, [u8; 128],
-    noncopy_variants_128B:
-    "32-bit [softposit](https://crates.io/crates/softposit)'s Quire with exp=2", Q32, softposit::Q32,
+    "128-Byte array of bytes", ArrayBytes128, [u8; 128],
+    noncopy_variants_128B: ,
     //
 }
