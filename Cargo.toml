@@ -1,7 +1,7 @@
 [package]
 name = "ladata"
 description = "data model"
-version = "0.0.10"
+version = "0.0.11"
 edition = "2021"
 rust-version = "1.59"
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
@@ -22,25 +22,35 @@ publish = false
 paste = "1"
 
 # numbers: continuous
-half = "1.8.2" # F16 BF16
-softposit = "0.3.9" # P8, P16, P32, Q8, Q16, Q32
-twofloat = "0.4.1" # F128
+half = { version = "1.8.2", optional = true } # F16 BF16
+softposit = { version = "0.3.9", optional = true } # P8, P16, P32, Q8, Q16, Q32
+twofloat = { version = "0.4.1", optional = true } # F128
 
 # numbers: discrete
-num-rational = "0.4.0" # Ratio
-num-bigint = "0.4.3" # BitInt
-rust_decimal = "1.22.0" # Decimal
+num-rational = { version = "0.4.0", optional = true } # Ratio
+num-bigint = { version = "0.4.3", optional = true } # BitInt
+rust_decimal = { version = "1.22.0", optional = true } # Decimal
 
 # strings
-arraystring = "0.3.0" # ArrayString*
+arraystring = { version = "0.3.0", optional = true } # ArrayString*
 
 # time
-fugit = "0.3.5"
-time = "0.3.7"
+fugit = { version = "0.3.5", optional = true }
+time = { version = "0.3.7", optional = true }
 
 [features]
-default = [ "std" ]
+default = [ "std", "deps_all" ]
 std = [ ]
+deps_all = [
+	"deps_continuous",
+	"deps_discrete",
+	"deps_string",
+	"deps_time",
+]
+deps_continuous = [ "half", "softposit", "twofloat" ]
+deps_discrete = [ "num-rational", "num-bigint", "rust_decimal" ]
+deps_string =  [ "arraystring" ]
+deps_time = [ "fugit", "time" ]
 
 [dev-dependencies]
 
