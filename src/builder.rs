@@ -4,9 +4,11 @@
 //
 // # TOC
 //
-// - MACROS (exported & private):
+// - MACROS
+//
+//   exported:
 //   - reexport
-//   &
+//   private:
 //   - define_all_sizes
 //   - define_single_size
 //   - define_type
@@ -17,7 +19,10 @@
 //   - impl_data_cells
 //   - impl_data_unsafe_cells
 //
-// - DEFINITIONS:
+// - Mockup imports of optional external dependencies
+//
+// - DEFINITIONS
+//
 //   - DataType, DataCell, DataUnsafeCell @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
 
 use core::{
@@ -103,20 +108,57 @@ macro_rules! reexport {
 }
 
 /// defines all sizes at the same time
+///
+/// This single-branch macro receives all the types ordered by size,
+/// already classified according to the following grouping:
+///
+/// - copy_variants_nB:         (doc, name, type),*
+/// - copy_variants_nB_dep:     (doc, name, type, feature),*
+/// - copy_variants_nB_std:     (doc, name, type, feature),*
+/// - noncopy_variants_nB:      (doc, name, type),*
+/// - noncopy_variants_nB_dep:  (doc, name, type, feature),*
+/// - noncopy_variants_nB_std:  (doc, name, type, feature),*
+/// - iusize_nB:                 pointer_size,
+///
+/// where:
+/// - the `copy_` prefix indicates the types are `Copy`,
+///   otherwise the `noncopy` prefix is used.
+/// - `nB` indicates the number of bytes of the types in the current group.
+/// - the `_dep` suffix indicates a dependency on a feature (4th argument).
+/// - the `_std` suffix indicates a dependency on the standard library and an
+///   optional secondary feature (4th argument) (pass "std" to only require std).
+/// - the `iusize` is used to receive the `target_pointer_width = "n"` attribute.
+///
+/// The `define_single_size!` macro is called making sure each size contains
+/// all variants with a size less than or equal to the current size.
 macro_rules! define_all_sizes {
     (
         $tname:ident, $cname:ident, $ucname:ident,
+
         // 1-Byte / 8-bit
         copy_variants_1B: $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
         copy_variants_1B_dep:
         $( $cvdoc_1B_dep:literal, $cvname_1B_dep:ident, $cvtype_1B_dep:ty, $cvfeature_1B_dep:literal ),* ,
+        // copy_variants_1B_std:
+        // $( $cvdoc_1B_std:literal, $cvname_1B_std:ident, $cvtype_1B_std:ty, $cvfeature_1B_std:literal ),* ,
         // noncopy_variants_1B: $( $vdoc_1B:literal, $vname_1B:ident, $vtype_1B:ty ),* ,
+        // noncopy_variants_1B_dep:
+        // $( $vdoc_1B_dep:literal, $vname_1B_dep:ident, $vtype_1B_dep:ty, $vfeature_1B_dep:literal ),* ,
+        // noncopy_variants_1B_std:
+        // $( $vdoc_1B_std:literal, $vname_1B_std:ident, $vtype_1B_std:ty, $vfeature_1B_std:literal ),* ,
+        iusize_1B: $iusize_1B:meta,
 
         // 2-Byte / 16-bit
         copy_variants_2B: $( $cvdoc_2B:literal, $cvname_2B:ident, $cvtype_2B:ty ),* ,
         copy_variants_2B_dep:
         $( $cvdoc_2B_dep:literal, $cvname_2B_dep:ident, $cvtype_2B_dep:ty, $cvfeature_2B_dep:literal ),* ,
+        // copy_variants_2B_std:
+        // $( $cvdoc_2B_std:literal, $cvname_2B_std:ident, $cvtype_2B_std:ty, $cvfeature_2B_std:literal ),* ,
         // noncopy_variants_2B: $( $vdoc_2B:literal, $vname_2B:ident, $vtype_2B:ty ),* ,
+        // noncopy_variants_2B_dep:
+        // $( $vdoc_2B_dep:literal, $vname_2B_dep:ident, $vtype_2B_dep:ty, $vfeature_2B_dep:literal ),* ,
+        // noncopy_variants_2B_std:
+        // $( $vdoc_2B_std:literal, $vname_2B_std:ident, $vtype_2B_std:ty, $vfeature_2B_std:literal ),* ,
         iusize_2B: $iusize_2B:meta,
 
         // 4-Byte / 32-bit
@@ -144,6 +186,7 @@ macro_rules! define_all_sizes {
         copy_variants_16B_std:
         $( $cvdoc_16B_std:literal, $cvname_16B_std:ident, $cvtype_16B_std:ty, $cvfeature_16B_std:literal ),* ,
         // noncopy_variants_16B: $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
+        iusize_16B: $iusize_16B:meta,
 
         // 32-Byte / 256-bit
         copy_variants_32B: $( $cvdoc_32B:literal, $cvname_32B:ident, $cvtype_32B:ty ),* ,
@@ -185,7 +228,7 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vfeature_1B_dep ),* ;
             ;
             noncopy_variants_std: ;
-            pointer:
+            pointer: $iusize_1B
         }
 
         // 2-Byte / 16-bit
@@ -207,7 +250,7 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vfeature_2B_dep ),* ;
             ;
             noncopy_variants_std: ;
-            pointer: $iusize_2B
+            pointer: $iusize_1B, $iusize_2B
         }
 
         // 4-Byte / 32-bit
@@ -232,7 +275,7 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vfeature_2B_dep ),* ,
                 $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vfeature_4B_dep ),* ;
             noncopy_variants_std: ;
-            pointer: $iusize_2B, $iusize_4B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B
         }
 
         // 8-Byte / 32-bit
@@ -261,7 +304,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vfeature_4B_dep ),* ,
                 $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vfeature_8B_dep ),* ;
             noncopy_variants_std: ;
-            pointer: $iusize_2B, $iusize_4B, $iusize_8B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B
         }
 
         // 16-Byte / 64-bit
@@ -295,7 +338,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vfeature_8B_dep ),* ;
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vfeature_16B_dep ),* ;
             noncopy_variants_std: ;
-            pointer: $iusize_2B, $iusize_4B, $iusize_8B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
         }
 
         // 32-Byte / 128-bit
@@ -335,7 +378,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vfeature_32B_dep ),* ;
             noncopy_variants_std:
                 $( $vdoc_32B_std, $vname_32B_std, $vtype_32B_std, $vfeature_32B_std ),* ;
-            pointer: $iusize_2B, $iusize_4B, $iusize_8B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
         }
 
         // 64-Byte / 512-bit
@@ -379,7 +422,7 @@ macro_rules! define_all_sizes {
                 $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vfeature_64B_dep ),* ;
             noncopy_variants_std:
                 $( $vdoc_32B_std, $vname_32B_std, $vtype_32B_std, $vfeature_32B_std ),* ;
-            pointer: $iusize_2B, $iusize_4B, $iusize_8B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
         }
 
         // 128-Byte / 1024-bit
@@ -425,7 +468,7 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_128B_dep, $vname_128B_dep, $vtype_128B_dep, $vfeature_128B_dep ),* ;
             noncopy_variants_std:
                 $( $vdoc_32B_std, $vname_32B_std, $vtype_32B_std, $vfeature_32B_std ),* ;
-            pointer: $iusize_2B, $iusize_4B, $iusize_8B
+            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
         }
     };
 }
@@ -1124,8 +1167,7 @@ macro_rules! impl_data_unsafe_cells {
 }
 
 // MOCKUP IMPORTS OF OPTIONAL EXTERNAL DEPENDENCIES
-// -------------------------------------------------------------------------
-// so that `define_all_sizes` macro invocation works
+// -----------------------------------------------------------------------------
 
 // "external_continuous"
 
@@ -1209,47 +1251,53 @@ mod time {
 }
 
 // DEFINITIONS
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 define_all_sizes! {
     DataType, DataCell, DataUnsafeCell,
 
-    // ------------------------------------------------------------------------- 1-B / 8-b
+    // -------------------------------------------------------- 1-B / 8-b
     copy_variants_1B:
     "8-bit unsigned integer ", U8, u8,
     "8-bit signed integer", I8, i8,
-    "1-Byte array of bytes", ArrayBytes1, [u8; 1],
+    "1-Byte array of bytes", ByteArray1, [u8; 1],
     "Boolean value", Bool, bool,
     copy_variants_1B_dep:
-    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=0", P8, softposit::P8, "softposit",
+    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=0",
+        P8, softposit::P8, "softposit",
+    // copy_variants_1B_std:
     // noncopy_variants_1B:
     // noncopy_variants_1B_dep:
+    iusize_1B: target_pointer_width = "8",
 
-    // ------------------------------------------------------------------------- 2-B / 16-b
+    // -------------------------------------------------------- 2-B / 16-b
     copy_variants_2B:
     "16-bit unsigned integer ", U16, u16,
     "16-bit signed integer", I16, i16,
-    "2-Byte array of bytes", ArrayBytes2, [u8; 2],
+    "2-Byte array of bytes", ByteArray2, [u8; 2],
     copy_variants_2B_dep:
-    "16-bit [`half`](https://crates.io/crates/half)'s `binary16` floating-point number", F16, half::f16, "half",
-    "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number", BF16, half::bf16, "half",
-    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1", P16, softposit::P16, "softposit",
-    "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 1",
+    "16-bit [`half`](https://crates.io/crates/half)'s `binary16` floating-point number",
+        F16, half::f16, "half",
+    "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number",
+        BF16, half::bf16, "half",
+    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1",
+        P16, softposit::P16, "softposit",
+    "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=1",
         ArrayString1, ArrayString<typenum::U1>, "arraystring",
     // noncopy_variants_2B:
     // noncopy_variants_2B_dep:
     iusize_2B: target_pointer_width = "16",
 
-    // ------------------------------------------------------------------------- 4-B / 32-b
+    // -------------------------------------------------------- 4-B / 32-b
     copy_variants_4B:
     "32-bit unsigned integer ", U32, u32,
     "32-bit signed integer", I32, i32,
     "32-bit floating-point number", F32, f32,
-    "4-Byte array of bytes", ArrayBytes4, [u8; 4],
+    "4-Byte array of bytes", ByteArray4, [u8; 4],
     "4-Byte char ", Char, char,
     copy_variants_4B_dep:
     "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=2", P32, softposit::P32, "softposit",
-    "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 3",
+    "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=3",
         ArrayString3, ArrayString<typenum::U3>, "arraystring",
     "32-bit [`time`](https://crates.io/crates/time)'s `Date`", TDate, time::Date, "time",
     "32-bit [`time`](https://crates.io/crates/time)'s `UtcOffset`", TUtcOffset, time::UtcOffset, "time",
@@ -1283,11 +1331,11 @@ define_all_sizes! {
     "64-bit unsigned integer ", U64, u64,
     "64-bit signed integer", I64, i64,
     "64-bit floating-point number", F64, f64,
-    "8-Byte array of bytes", ArrayBytes8, [u8; 8],
+    "8-Byte array of bytes", ByteArray8, [u8; 8],
     copy_variants_8B_dep:
     "32-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
         R32, num_rational::Ratio<i32>, "num-rational",
-    "8-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 7",
+    "8-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=7",
         ArrayString7, ArrayString<typenum::U7>, "arraystring",
     "64-bit [`time`](https://crates.io/crates/time)'s `Time`", TTime, time::Time, "time",
     "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
@@ -1310,23 +1358,25 @@ define_all_sizes! {
         FugitInstant64Millis, fugit::Instant<u64, 1, 1_000>, "fugit",
     "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
         FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>, "fugit",
+    // copy_variants_8B_std:
     // noncopy_variants_8B:
     noncopy_variants_8B_dep:
     "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=1", Q16, softposit::Q16, "softposit",
+    // noncopy_variants_8B_std:
     iusize_8B: target_pointer_width = "64",
 
     // ------------------------------------------------------------------------- 16-B /128-b
     copy_variants_16B:
     "128-bit unsigned integer ", U128, u128,
     "128-bit signed integer", I128, i128,
-    "16-Byte array of bytes", ArrayBytes16, [u8; 16],
+    "16-Byte array of bytes", ByteArray16, [u8; 16],
     "128-bit Duration", Duration, core::time::Duration,
     copy_variants_16B_dep:
     "128-bit floating point number", F128, twofloat::TwoFloat, "twofloat",
     "64-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
         R64, num_rational::Ratio<i64>, "num-rational",
     "16-Byte [rust_decimal] Decimal number", Decimal, rust_decimal::Decimal, "rust_decimal",
-    "16-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 15",
+    "16-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=15",
         ArrayString15, ArrayString<typenum::U15>, "arraystring",
     "128-bit [`time`](https://crates.io/crates/time)'s `Duration`", TDuration, time::Duration, "time",
     "128-bit [`time`](https://crates.io/crates/time)'s `PrimitiveDateTime`",
@@ -1338,13 +1388,15 @@ define_all_sizes! {
     "128-bit SystemTime", SystemTime, std::time::SystemTime, "std",
     "128-bit [`time`](https://crates.io/crates/time)'s `Instant`", TInstant, time::Instant, "time",
     // noncopy_variants_16B:
+    // noncopy_variants_16B_std:
+    iusize_16B: target_pointer_width = "128",
 
     // ------------------------------------------------------------------------- 32-B / 256-b
     copy_variants_32B:
-    "32-Byte array of bytes", ArrayBytes32, [u8; 32],
+    "32-Byte array of bytes", ByteArray32, [u8; 32],
     copy_variants_32B_dep:
     "128-bit rational number", R128, num_rational::Ratio<i128>, "num-rational",
-    "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 31",
+    "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=31",
         ArrayString31, ArrayString<typenum::U31>, "arraystring",
     // noncopy_variants_32B:
     noncopy_variants_32B_dep:
@@ -1354,9 +1406,9 @@ define_all_sizes! {
 
     // ------------------------------------------------------------------------- 64 B
     copy_variants_64B:
-    "64-Byte array of bytes", ArrayBytes64, [u8; 64],
+    "64-Byte array of bytes", ByteArray64, [u8; 64],
     copy_variants_64B_dep:
-    "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 63",
+    "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=63",
         ArrayString63, ArrayString<typenum::U63>, "arraystring",
     // noncopy_variants_64B:
     noncopy_variants_64B_dep:
@@ -1364,9 +1416,9 @@ define_all_sizes! {
 
     // ------------------------------------------------------------------------- 128-B / 1024-b
     copy_variants_128B:
-    "128-Byte array of bytes", ArrayBytes128, [u8; 128],
+    "128-Byte array of bytes", ByteArray128, [u8; 128],
     copy_variants_128B_dep:
-    "127-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len 127",
+    "128-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=127",
         ArrayString127, ArrayString<typenum::U127>, "arraystring",
     noncopy_variants_128B: ,
     //
