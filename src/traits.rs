@@ -35,14 +35,14 @@ pub trait DataTypes: Copy + Debug {
     fn is_copy(&self) -> bool;
 }
 
-/// Common (marker) trait for *data types* representing `Copy` data.
+/// Common (marker) trait for `Copy` *data types*.
 ///
 /// Allows extending `DataType*Copy`**`With`** versions with custom *types*.
 ///
 /// # Coherence
 ///
 /// The `DataTypes::`[`is_copy`][DataTypes#method.is_copy]
-/// super-trait method should probably return `true` too.
+/// super-trait method should probably return `true` as well.
 ///
 /// # See also
 /// - [`DataTypes`]
@@ -70,7 +70,7 @@ pub trait DataCells: Debug {
 /// # Coherence
 ///
 /// The `DataCells::`[`is_copy`][DataCells#method.is_copy]
-/// super-trait method should probably return `true` too.
+/// super-trait method should probably return `true` as well.
 ///
 /// # See also
 /// - [`DataCells`]

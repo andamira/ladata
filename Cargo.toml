@@ -15,7 +15,7 @@ include = [
 	"README.md",
 ]
 categories = [ "no-std", "data-structures" ]
-keywords = [ "data", "dataframe" ]
+keywords = [ "data", "type", "cell" ] # dataframe
 publish = false
 
 [dependencies]
@@ -39,11 +39,17 @@ fugit = { version = "0.3.5", optional = true }
 time = { version = "0.3.7", optional = true }
 
 [features]
-default = [ "std", "deps_all" ]
+default = [ "std", "deps_default" ]
 std = [ ]
 deps_all = [
 	"deps_numerical",
 	"deps_categorical",
+]
+deps_default = [
+	"half", "twofloat", # !"softposit"
+	"deps_discrete",
+	"deps_string",
+	"time", # !"fugit",
 ]
 
 deps_numerical= ["deps_continuous", "deps_discrete" ]
