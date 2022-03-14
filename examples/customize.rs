@@ -1,4 +1,4 @@
-// ladata::examples::custom_data
+// ladata::examples::customize
 //
 //! Demonstrates how to use custom data types.
 

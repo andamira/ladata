@@ -1,32 +1,28 @@
 //! **`ladata`**
 //!
-//! A simple and versatile data model.
+//! A versatile data model for working with mixed data in a modular way.
 //!
-//! > *A wildy varied data type appears!*
+//! # Status
 //!
-//! ## External dependencies
+//! Experimental.
 //!
-//! This library enables by default the standard library. Removing the "std"
-//! feature makes the library completely `no_std`, independently of any other
-//! feature enabled.
+//! # Overview
 //!
-//! Most optional dependencies are also enabled by default. They bring all the
-//! types of data different from the fundamental Rust types.
+//! - Works in stable Rust and `no_std`.
+//! - Supports mixed/heterogeneous data.
+//! - Supports custom data types and features customization.
+//! - Is designed to be modular and composable like building blocks.
+//! - Is lightweight and simple enough.
 //!
-//! The dependencies are selected with the aim of having a well balanced default
-//! experience, and offering many choices while remaining very easily usable.
-//!
-//! # *Types* and *Cells*
-//!
-//! ## Overview
-//!
-//! The fundamental abstractions of this library are:
+//! The fundamental interconnected abstractions of this library are:
 //! - `DataType…` enums, which only contains type information.
 //! - `DataCell…` enums, which contains both data and type information.
 //! - `DataUnsafeCell…` unions, which only contains data.
 //!
-//! Each one has multiple concrete implementations that differ by the
-//! maximum **size** of the referred data, and its `Copy` semantics.
+//! Each one has multiple concrete implementations that differ by:
+//! - the maximum **`size`** of the referred data.
+//! - the presence or lack of `Copy` semantics.
+//! - the possibility of embedding a custom type in the `With` variant.
 //!
 //! For example, these are three inter-related implementations:
 //! - [`DataType2ByteCopy`][all::DataType2ByteCopy] represents a 2-byte sized
@@ -36,17 +32,71 @@
 //! - [`DataUnsafeCell2ByteCopy`][all::DataUnsafeCell2ByteCopy] represents the
 //!   corresponding 2-Byte sized data without the type (occupies 2 bytes).
 //!
-//! `DataUnsafeCell…`s are more space-efficient than `DataCell…`s but not as
-//! convenient to use, and they are unsafe to read. They are mostly intended
-//! to be used from collections that can store their corresponding `DataType…`s
-//! separately. At the moment they only support `Copy` types, and they can't
-//! include custom types either (lacking a `With` field).
+//! Note that `DataUnsafeCell…`s are more space-efficient than `DataCell…`s but
+//! not as convenient to use and, because they're unions, also unsafe to read.
+//! They are mostly intended to be used from collections that can store their
+//! corresponding `DataType…`s separately. At the moment they only support
+//! `Copy` types, and they can't include custom types (lacking a `With` field).
 //!
-//! ## Naming scheme
+//! ## External dependencies
+//!
+//! This library enables by default the standard library. Removing the "std"
+//! feature makes the library completely `no_std`, independently of any other
+//! feature enabled.
+//!
+//! The default features are selected with the intention of providing a well
+//! balanced default experience. Bringing all the new types of data other than
+//! the fundamental Rust types.
+//!
+//! ### Examples of features customizations
+//!
+//! * Only `no_std`, without any dependencies:
+//!   ```shell
+//!   $ cargo build --no-default-features
+//!   ```
+//!
+//! * only the standard library:
+//!   ```shell
+//!   $ cargo build --no-default-features --features=std
+//!   ```
+//!
+//! * all the dependencies (See the full list in
+//! [`Cargo.toml`](https://github.com/andamira/ladata/blob/main/Cargo.toml)):
+//!   ```shell
+//!   $ cargo build --features=deps_all
+//!   ```
+//!
+//! # Basic usage
+//! ```
+//! use ladata::all::*;
+//!
+//! let arr = [
+//!     DataCell32bit::F32(3.14),
+//!     DataCell32bit::Char('π'),
+//!     DataCell32bit::I16(-314),
+//!     DataCell32bit::ByteArray4([3, 141, 59, 26]),
+//! ];
+//!
+//! for c in arr {
+//!    match c {
+//!         DataCell32bit::F32(f) => println!("{f}"),
+//!         DataCell32bit::Char(c) => println!("{c:?}"),
+//!         DataCell32bit::I16(i) => println!("{i:?}"),
+//!         DataCell32bit::ByteArray4(ba) => println!("{ba:?}"),
+//!         _ => (),
+//!     }
+//! }
+//!
+//! ```
+//!
+//! See the [`customize.rs`](https://github.com/andamira/ladata/blob/main/examples/customize.rs)
+//! example on how to use custom data types.
+//!
+//! # How to choose *Types* and *Cells*
 //!
 //! The concrete implementations observes the following naming schemes:
 //! ```txt
-//! 1.    Data <Type|Cell>    <Size>     [Copy] [With]
+//! *)    Data <Type|Cell>    <Size>     [Copy] [With]
 //!                              ↑                             ·---------------·
 //!                       |   8b =   1B|                       |<> : required  |
 //!                       |  16b =   2B|                       |[] : optional  |
@@ -57,8 +107,8 @@
 //!                       | 512b =  64B|
 //!                       |1024b = 128B|
 //!                              ↓
-//! 2.    Data <UnsafeCell>   <Size>     <Copy>
-//! 3. No Data
+//! *)    Data <UnsafeCell>   <Size>     <Copy>
+//! *) No Data
 //! ```
 //! 0. `No`: a special prefix for the [`NoData`][all::NoData] type.
 //! 1. `Data`: everything revolves around this concept.
@@ -83,7 +133,7 @@
 //! [`DataCellsCopy`] trait.
 //!
 //! - `UnsafeCell` indicates the encapsulation of data without type information.
-//! All *`DataUnsafeCell`s* implement the [`DataUnsafeCells`] trait.
+//! All *`DataUnsafeCell`s* implements the (marker) [`DataUnsafeCells`] trait.
 //!
 //! ### `[Copy]`
 //!
@@ -123,50 +173,46 @@
 //! using the the zero-sized [`NoData`][all::NoData] type. E.g.:
 //! [`DataType32Byte`][all::DataType32Byte]
 //!
-//! # Feature customization
+//! # Design
 //!
-//! You can reduce the library to the bare minimum removing the default features.
-//! This will make the library `no_std` and disable all external dependencies.
-//! This way, you can precisely select only the ones you need.
+//! Some of the concerns when designing the library were:
 //!
-//! For example:
+//! - To figure out a simple enough and viable solution for working with
+//!   heterogeneous data in stable Rust.
 //!
-//! * `no_std`, nothing else:
-//!   ```shell
-//!   $ cargo build --no-default-features
-//!   ```
+//! - To fill the size gaps in the standard type system, providing more choice
+//!   of data types, specially in smaller memory sizes.
 //!
-//! * only the standard library, without external dependencies:
-//!   ```shell
-//!   $ cargo build --no-default-features --features=std
-//!   ```
+//! - To decouple the data type from the data representation and from the data
+//!   structures, enabling them to be easily used as modular building blocks
+//!   for more complex data structures.
 //!
-//! * only the numerical dependencies (full list of features in `Cargo.toml`):
-//!   ```shell
-//!   $ cargo build --no-default-features --features=deps_numerical
-//!   ```
+//! - To remain as lightweight and customizable as possible.
 //!
-//! * The `time::Instant` type requires `std`! so that's why it didn't appear before…
-//!   ```shell
-//!   $ cargo build --no-default-features --features=std,time
-//!   ```
+//!
+//! # Planned features
+//!
+//! - [ ] More automatic trait implementations.
+//! - [ ] More abstract data types.
+//! - [ ] More examples.
 
 #![allow(non_snake_case, non_camel_case_types)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
+
+mod builder;
 
 #[cfg(test)]
 #[allow(unused_imports)]
 mod tests;
 
 pub(crate) mod traits;
-
-mod builder;
-
 #[doc(inline)]
-pub use traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
+pub use traits::*;
 
 pub mod special;
+#[doc(inline)]
+pub use special::NoData;
 
 /// Everything is available here.
 pub mod all {

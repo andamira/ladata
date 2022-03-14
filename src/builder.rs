@@ -113,20 +113,17 @@ macro_rules! reexport {
 /// already classified according to the following grouping:
 ///
 /// - copy_variants_nB:         (doc, name, type),*
-/// - copy_variants_nB_dep:     (doc, name, type, feature),*
-/// - copy_variants_nB_std:     (doc, name, type, feature),*
+/// - copy_variants_nB_dep:     (doc, name, type, dep1, dep2),*
 /// - noncopy_variants_nB:      (doc, name, type),*
-/// - noncopy_variants_nB_dep:  (doc, name, type, feature),*
-/// - noncopy_variants_nB_std:  (doc, name, type, feature),*
+/// - noncopy_variants_nB_dep:  (doc, name, type, dep1, dep2),*
 /// - iusize_nB:                 pointer_size,
 ///
 /// where:
 /// - the `copy_` prefix indicates the types are `Copy`,
 ///   otherwise the `noncopy` prefix is used.
 /// - `nB` indicates the number of bytes of the types in the current group.
-/// - the `_dep` suffix indicates a dependency on a feature (4th argument).
-/// - the `_std` suffix indicates a dependency on the standard library and an
-///   optional secondary feature (4th argument) (pass "std" to only require std).
+/// - the `_dep` suffix indicates a dependency on 2 features (4th & 5th args)
+///   (pass the same dependency twice in order to only depend on one).
 /// - the `iusize` is used to receive the `target_pointer_width = "n"` attribute.
 ///
 /// The `define_single_size!` macro is called making sure each size contains
@@ -508,6 +505,12 @@ macro_rules! define_type {
                 /// A custom *data type* extension.
                 With(T),
 
+                $( // fundamental types
+                    #[doc = $cvdoc ]
+                    $cvname,
+                )*
+
+                // pointer sizes
                 #[cfg(any( $( $iusize ),* ))]
                 #[doc = $b "-bit usize"]
                 Usize,
@@ -515,16 +518,10 @@ macro_rules! define_type {
                 #[doc = $b "-bit isize"]
                 Isize,
 
-                // feature-gated dependencies
-                $(
+                $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep,
-                )*
-
-                $(
-                    #[doc = $cvdoc ]
-                    $cvname,
                 )*
             }
             type_aliases![t: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
@@ -552,6 +549,16 @@ macro_rules! define_type {
                 /// A custom *data type* extension.
                 With(T),
 
+                $( // fundamental types
+                    #[doc = $cvdoc ]
+                    $cvname,
+                )*
+                $(
+                    #[doc = $vdoc ]
+                    $vname,
+                )*
+
+                // pointer sizes
                 #[cfg(any( $( $iusize ),* ))]
                 #[doc = $b "-bit usize"]
                 Usize,
@@ -559,8 +566,7 @@ macro_rules! define_type {
                 #[doc = $b "-bit isize"]
                 Isize,
 
-                // feature-gated dependencies
-                $(
+                $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep,
@@ -569,15 +575,6 @@ macro_rules! define_type {
                     #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
                     #[doc = $vdoc_dep]
                     $vname_dep,
-                )*
-
-                $(
-                    #[doc = $cvdoc ]
-                    $cvname,
-                )*
-                $(
-                    #[doc = $vdoc ]
-                    $vname,
                 )*
             }
             type_aliases![t: $tname, size: $B, $b, "", "data **Type**", ""];
@@ -623,21 +620,23 @@ macro_rules! define_cell {
                 With(C),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
 
+                $( // fundamental types
+                    #[doc = $cvdoc]
+                    $cvname($cvtype),
+                )*
+
+                // pointer sizes
                 #[cfg(any($($iusize),*))]
+                #[doc = $b "-bit usize"]
                 Usize(usize),
                 #[cfg(any($($iusize),*))]
+                #[doc = $b "-bit isize"]
                 Isize(isize),
 
-                // feature-gated dependencies
-                $(
+                $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep($cvtype_dep),
-                )*
-
-                $(
-                    #[doc = $cvdoc]
-                    $cvname($cvtype),
                 )*
             }
             type_aliases![c: $cname, size: $B, $b, "Copy", "data **Cell**", "(Copy)"];
@@ -670,13 +669,24 @@ macro_rules! define_cell {
                 With(C),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
 
+                $( // fundamental types
+                    #[doc = $cvdoc]
+                    $cvname($cvtype),
+                )*
+                $(
+                    #[doc = $vdoc]
+                    $vname($vtype),
+                )*
+
+                // pointer sizes
                 #[cfg(any($($iusize),*))]
+                #[doc = $b "-bit usize"]
                 Usize(usize),
                 #[cfg(any($($iusize),*))]
+                #[doc = $b "-bit isize"]
                 Isize(isize),
 
-                // feature-gated dependencies
-                $(
+                $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep($cvtype_dep),
@@ -685,15 +695,6 @@ macro_rules! define_cell {
                     #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
                     #[doc = $vdoc_dep]
                     $vname_dep($vtype_dep),
-                )*
-
-                $(
-                    #[doc = $cvdoc]
-                    $cvname($cvtype),
-                )*
-                $(
-                    #[doc = $vdoc]
-                    $vname($vtype),
                 )*
             }
 
@@ -726,7 +727,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // Copy feature-bound
-                #[cfg(all(feature = $cvdep2_dep, feature = $cvdep2_dep ))]
+                #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
                 impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
@@ -751,7 +752,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy feature-bound
-                #[cfg(all(feature = $vdep2_dep, feature = $vdep2_dep ))]
+                #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
                 impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
@@ -775,7 +776,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // Copy feature-bound
-                #[cfg(all(feature = $cvdep2_dep, feature = $cvdep2_dep ))]
+                #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
                 impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $B Byte Copy With>]<C> {
                     fn from(v: $cvtype_dep) -> Self {
                         [<$cname $B Byte Copy With>]::$cvname_dep(v)
@@ -792,7 +793,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy feature-bound
-                #[cfg(all(feature = $vdep2_dep, feature = $vdep2_dep ))]
+                #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
                 impl<C: DataCells> From<$vtype_dep> for [<$cname $B Byte With>]<C> {
                     fn from(v: $vtype_dep) -> Self {
                         [<$cname $B Byte With>]::$vname_dep(v)
@@ -808,6 +809,11 @@ macro_rules! define_cell {
                         [<$cname $B Byte Copy With>]::None => Self { None: NoData },
                         [<$cname $B Byte Copy With>]::With(_) => Self { None: NoData },
 
+                        $( // fundamental types
+                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
+                        )*
+
+                        // pointer sizes
                         #[cfg(any($($iusize),*))]
                         [<$cname $B Byte Copy With>]::Usize(u) => Self { Usize: u },
                         #[cfg(any($($iusize),*))]
@@ -817,11 +823,6 @@ macro_rules! define_cell {
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                             [<$cname $B Byte Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
                         )*
-
-                        $(
-                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
-                        )*
-
                     }
                 }
 
@@ -896,7 +897,7 @@ macro_rules! type_aliases {
       $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
     ) => {
         paste::paste!{
-            // without `With` byte version:
+            // byte version without `With`:
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
             ///
             /// See also:
@@ -906,7 +907,7 @@ macro_rules! type_aliases {
             // pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<NoData, NoData>;
             pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<NoData>;
 
-            // without `With` bit version
+            // bit version without `With`:
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
             ///
             /// See also:
@@ -1304,8 +1305,8 @@ define_all_sizes! {
         Instant, std::time::Instant, "std", "std",
     "128-bit SystemTime",
         SystemTime, std::time::SystemTime, "std", "std",
-    "128-bit [`time`](https://crates.io/crates/time)'s
-        Instant`", TInstant, time::Instant, "std", "time",
+    "128-bit [`time`](https://crates.io/crates/time)'s Instant`",
+        TInstant, time::Instant, "std", "time",
     "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray128, crate::all::BitArray128, "bv", "bv",
     // noncopy_variants_16B: ,
