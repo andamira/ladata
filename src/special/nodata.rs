@@ -1,10 +1,10 @@
-// ladata::nodata
+// ladata::newtypes::nodata
 //
 //!
 
 use core::mem::{align_of, size_of};
 
-pub use crate::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
+use crate::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 
 /// A zero-sized type representing the absence of data.
 ///
@@ -26,12 +26,22 @@ impl DataTypes for NoData {
     fn data_size(&self) -> usize {
         size_of::<NoData>()
     }
+    // #[inline]
+    // fn type_id(&self) -> TypeId {
+    //     TypeId::of::<NoData>()
+    // }
     #[inline]
     fn is_copy(&self) -> bool {
         true
     }
 }
 impl DataCells for NoData {
+    // WIP ±
+    // type TYPE = NoData;
+    // #[inline]
+    // fn data_type(&self) -> Self::TYPE {
+    //     Self::TYPE
+    // }
     #[inline]
     fn is_copy(&self) -> bool {
         true

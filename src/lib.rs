@@ -1,6 +1,20 @@
 //! **`ladata`**
 //!
-//! A simple and versatile data model that facilitates working with heterogeneous data.
+//! A simple and versatile data model.
+//!
+//! > *A wildy varied data type appears!*
+//!
+//! ## External dependencies
+//!
+//! This library enables by default the standard library. Removing the "std"
+//! feature makes the library completely `no_std`, independently of any other
+//! feature enabled.
+//!
+//! Most optional dependencies are also enabled by default. They bring all the
+//! types of data different from the fundamental Rust types.
+//!
+//! The dependencies are selected with the aim of having a well balanced default
+//! experience, and offering many choices while remaining very easily usable.
 //!
 //! # *Types* and *Cells*
 //!
@@ -46,7 +60,7 @@
 //! 2.    Data <UnsafeCell>   <Size>     <Copy>
 //! 3. No Data
 //! ```
-//! 0. `No`: a special prefix for the [`NoData`] type.
+//! 0. `No`: a special prefix for the [`NoData`][all::NoData] type.
 //! 1. `Data`: everything revolves around this concept.
 //! 2. `<Type|Cell|UnsafeCell>`: encapsulates either just the data type,
 //!    both the data type and the data, or just the data.
@@ -106,8 +120,36 @@
 //!
 //! Internally, all non-`With` versions are convenient type aliases to the
 //! corresponding `With` version (having the same size and `Copy` semantics),
-//! using the the zero-sized [`NoData`] type. E.g.:
+//! using the the zero-sized [`NoData`][all::NoData] type. E.g.:
 //! [`DataType32Byte`][all::DataType32Byte]
+//!
+//! # Feature customization
+//!
+//! You can reduce the library to the bare minimum removing the default features.
+//! This will make the library `no_std` and disable all external dependencies.
+//! This way, you can precisely select only the ones you need.
+//!
+//! For example:
+//!
+//! * `no_std`, nothing else:
+//!   ```shell
+//!   $ cargo build --no-default-features
+//!   ```
+//!
+//! * only the standard library, without external dependencies:
+//!   ```shell
+//!   $ cargo build --no-default-features --features=std
+//!   ```
+//!
+//! * only the numerical dependencies (full list of features in `Cargo.toml`):
+//!   ```shell
+//!   $ cargo build --no-default-features --features=deps_numerical
+//!   ```
+//!
+//! * The `time::Instant` type requires `std`! so that's why it didn't appear before…
+//!   ```shell
+//!   $ cargo build --no-default-features --features=std,time
+//!   ```
 
 #![allow(non_snake_case, non_camel_case_types)]
 //
@@ -117,25 +159,26 @@
 #[allow(unused_imports)]
 mod tests;
 
-pub(crate) mod nodata;
 pub(crate) mod traits;
 
 mod builder;
 
 #[doc(inline)]
-pub use nodata::NoData;
-#[doc(inline)]
 pub use traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
 
-/// Every type and trait is re-exported here.
+pub mod special;
+
+/// Everything is available here.
 pub mod all {
     #[doc(inline)]
     pub use super::builder::*;
-    pub use super::nodata::*;
+    #[doc(inline)]
+    pub use super::special::*;
+    #[doc(inline)]
     pub use super::traits::*;
 }
 
-/// Re-export of data *cells* & *types* of specific sizes.
+/// Data *cells* & *types* classified by size.
 pub mod size {
     crate::reexport![mod_size super::builder; all_sizes];
 }
