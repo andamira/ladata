@@ -1,6 +1,6 @@
-// ladata::builder::types_cells
+// ladata::builder::types_units
 //
-//! DataType*s and DataCell*s are generated here.
+//! DataType*s and DataUnit*s are generated here.
 //
 // # TOC
 //
@@ -8,18 +8,18 @@
 //   - define_all_sizes
 //   - define_single_size
 //   - define_type
-//   - define_cell
+//   - define_unit
 //   - define_unsafe
 //   - type_aliases
 //   - impl_data_types
-//   - impl_data_cells
+//   - impl_data_units
 //   - impl_data_unsafes
 //
 // - MOCKUPS OF UNUSED DEPENDENCIES
 //
 // - DEFINITIONS
 //
-//   - DataType, DataCell, DataUnsafe @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
+//   - DataType, DataUnit, DataLone @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
 
 use core::{
     // any::TypeId,
@@ -28,9 +28,9 @@ use core::{
     mem::{align_of, size_of},
 };
 
-use crate::special::NoData;
-use crate::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafes};
 use crate::define_line;
+use crate::other::NoData;
+use crate::traits::{DataLones, DataTypes, DataTypesCopy, DataUnits, DataUnitsCopy};
 
 /// defines all sizes at the same time
 ///
@@ -58,7 +58,7 @@ use crate::define_line;
 /// all variants with a size less than or equal to the current size.
 macro_rules! define_all_sizes {
     (
-        $tname:ident, $cname:ident, $ucname:ident,
+        $tname:ident, $uname:ident, $lname:ident,
 
         // 1-Byte / 8-bit
         copy_variants_1B: $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
@@ -169,7 +169,7 @@ macro_rules! define_all_sizes {
     ) => {
         // 1-Byte / 8-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 1, 8,
             copy_variants: $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
             copy_variants_dep:
@@ -187,7 +187,7 @@ macro_rules! define_all_sizes {
 
         // 2-Byte / 16-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 2, 16,
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -211,7 +211,7 @@ macro_rules! define_all_sizes {
 
         // 4-Byte / 32-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 4, 32,
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -240,7 +240,7 @@ macro_rules! define_all_sizes {
 
         // 8-Byte / 32-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 8, 64,
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -276,7 +276,7 @@ macro_rules! define_all_sizes {
 
         // 16-Byte / 64-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 16, 128,
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -319,7 +319,7 @@ macro_rules! define_all_sizes {
 
         // 32-Byte / 128-bit
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 32, 256,
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -369,7 +369,7 @@ macro_rules! define_all_sizes {
         }
 
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 64, 512, // 64-Byte / 512-bit
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -426,7 +426,7 @@ macro_rules! define_all_sizes {
         }
 
         define_single_size! {
-            $tname, $cname, $ucname,
+            $tname, $uname, $lname,
             size: 128, 1024, // 128-Byte / 1024-bit
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
@@ -487,11 +487,10 @@ macro_rules! define_all_sizes {
     };
 }
 
-/// for defining in one pass: DataType*, DataCell* & DataUnsafe*
-/// also DataLine*
+/// for defining in one pass: DataType*, DataUnit*, DataLone*, DataLine*
 macro_rules! define_single_size {
     (
-        $tname:ident, $cname:ident, $ucname:ident,
+        $tname:ident, $uname:ident, $lname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
@@ -521,8 +520,8 @@ macro_rules! define_single_size {
             noncopy_variants_psize_dep: $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
-        define_cell!{
-            c: $cname, t:$tname, u:$ucname, size: $B, $b,
+        define_unit!{
+            u: $uname, t:$tname, l:$lname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
             copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
@@ -534,7 +533,7 @@ macro_rules! define_single_size {
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
         define_unsafe!{
-            $ucname, size: $B, $b,
+            $lname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
             copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
@@ -544,7 +543,7 @@ macro_rules! define_single_size {
 
         // WIP:lines
         define_line!{
-            c: $cname, t:$tname, u:$ucname, size: $B, $b,
+            u: $uname, t:$tname, l:$lname, size: $B, $b,
         }
     };
 }
@@ -690,10 +689,10 @@ macro_rules! define_type {
     };
 }
 
-/// for defining enum DataCell*
-macro_rules! define_cell {
+/// for defining enum DataUnit*
+macro_rules! define_unit {
     (
-        c: $cname:ident, t: $tname:ident, u: $ucname:ident,
+        u: $uname:ident, t: $tname:ident, l: $lname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
@@ -709,21 +708,21 @@ macro_rules! define_cell {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
-            // ## copy version (DataCell)
+            // ## copy version (DataUnit)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable) (Copy)"]
+            #[doc = $B "-Byte/" $b "-bit " "data **Unit** (extendable) (Copy)"]
             ///
             /// See also:
-            #[doc = "- [" [<$cname $B ByteWith>] "][" [<$cname $B ByteWith>] "] -Copy" ]
-            #[doc = "- [" [<$cname $B ByteCopy>] "][" [<$cname $B ByteCopy>] "] -With" ]
-            #[doc = "- [" [<$cname $B Byte>]  "][" [<$cname $B Byte>] "] -Copy -With" ]
+            #[doc = "- [" [<$uname $B ByteWith>] "][" [<$uname $B ByteWith>] "] -Copy" ]
+            #[doc = "- [" [<$uname $B ByteCopy>] "][" [<$uname $B ByteCopy>] "] -With" ]
+            #[doc = "- [" [<$uname $B Byte>]  "][" [<$uname $B Byte>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            // pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy, T: DataTypesCopy> {
-            pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy> {
+            // pub enum [<$uname $B Byte Copy With>]<U: DataUnitsCopy, T: DataTypesCopy> {
+            pub enum [<$uname $B Byte Copy With>]<U: DataUnitsCopy> {
                 /// Represents the absence of *data*.
                 None,
-                /// A custom *data cell* extension.
-                With(C),
+                /// A custom *data unit* extension.
+                With(U),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
 
                 $( // fundamental types
@@ -749,9 +748,9 @@ macro_rules! define_cell {
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
             }
-            type_aliases![c: $cname, size: $B, $b, "Copy", "data **Cell**", "(Copy)"];
-            impl_data_cells![
-                c: [< $cname $B Byte Copy With >], DataCellsCopy,
+            type_aliases![u: $uname, size: $B, $b, "Copy", "data **Unit**", "(Copy)"];
+            impl_data_units![
+                u: [< $uname $B Byte Copy With >], DataUnitsCopy,
                 t: [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
@@ -763,24 +762,24 @@ macro_rules! define_cell {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C, T> { }
-            impl<C: DataCellsCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C> { }
+            // impl<U: DataUnitsCopy, T: DataTypesCopy> DataUnitsCopy for [< $uname $B Byte Copy With >]<U, T> { }
+            impl<U: DataUnitsCopy> DataUnitsCopy for [< $uname $B Byte Copy With >]<U> { }
 
-            // ## non-copy version (DataCell)
+            // ## non-copy version (DataUnit)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable)"]
+            #[doc = $B "-Byte/" $b "-bit " "data **Unit** (extendable)"]
             ///
             /// See also:
-            #[doc = "- [" [<$cname $B ByteCopyWith>] "][" [<$cname $B ByteCopyWith>] "] +Copy" ]
-            #[doc = "- [" [<$cname $B ByteCopy>]  "][" [<$cname $B ByteCopy>] "] +Copy -With" ]
-            #[doc = "- [" [<$cname $B Byte >] "][" [<$cname $B Byte >] "] -With" ]
+            #[doc = "- [" [<$uname $B ByteCopyWith>] "][" [<$uname $B ByteCopyWith>] "] +Copy" ]
+            #[doc = "- [" [<$uname $B ByteCopy>]  "][" [<$uname $B ByteCopy>] "] +Copy -With" ]
+            #[doc = "- [" [<$uname $B Byte >] "][" [<$uname $B Byte >] "] -With" ]
             #[derive(Debug)]
-            // pub enum [<$cname $B Byte With>]<C: DataCells, T: DataTypes> {
-            pub enum [<$cname $B Byte With>]<C: DataCells> {
+            // pub enum [<$uname $B Byte With>]<U: DataUnits, T: DataTypes> {
+            pub enum [<$uname $B Byte With>]<U: DataUnits> {
                 /// Represents the absence of *data*.
                 None,
-                /// A custom *data cell* extension.
-                With(C),
+                /// A custom *data unit* extension.
+                With(U),
                 // _data_type(core::marker::PhantomData<*const T>), // WIP
 
                 $( // fundamental types
@@ -821,11 +820,11 @@ macro_rules! define_cell {
                 )*
             }
 
-            type_aliases![c: $cname, size: $B, $b, "", "data **Cell**", ""];
+            type_aliases![u: $uname, size: $B, $b, "", "data **Unit**", ""];
 
-            // implement the DataCells trait
-            impl_data_cells![
-                c: [< $cname $B Byte With >], DataCells,
+            // implement the DataUnits trait
+            impl_data_units![
+                u: [< $uname $B Byte With >], DataUnits,
                 t: [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
@@ -839,14 +838,14 @@ macro_rules! define_cell {
                     $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
 
-            // implement `TryFrom`<`DataCell`> for *contained-value*:
+            // implement `TryFrom`<`DataUnit`> for *contained-value*:
 
             $( // Copy
-                impl<C: DataCellsCopy> TryFrom<[<$cname $B Byte Copy With>]<C>> for $cvtype {
+                impl<U: DataUnitsCopy> TryFrom<[<$uname $B Byte Copy With>]<U>> for $cvtype {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte Copy With>]<C>) -> Result<Self, Self::Error> {
-                        match c {
-                            [<$cname $B Byte Copy With>]::$cvname(c) => Ok(c),
+                    fn try_from(u: [<$uname $B Byte Copy With>]<U>) -> Result<Self, Self::Error> {
+                        match u {
+                            [<$uname $B Byte Copy With>]::$cvname(u) => Ok(u),
                             _ => Err(()),
                         }
                     }
@@ -855,11 +854,11 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype_dep {
+                impl<U: DataUnits> TryFrom<[<$uname $B Byte With>]<U>> for $cvtype_dep {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
-                        match c {
-                            [<$cname $B Byte With>]::$cvname_dep(c) => Ok(c),
+                    fn try_from(u: [<$uname $B Byte With>]<U>) -> Result<Self, Self::Error> {
+                        match u {
+                            [<$uname $B Byte With>]::$cvname_dep(u) => Ok(u),
                             _ => Err(()),
                         }
                     }
@@ -867,11 +866,11 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype {
+                impl<U: DataUnits> TryFrom<[<$uname $B Byte With>]<U>> for $vtype {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
-                        match c {
-                            [<$cname $B Byte With>]::$vname(c) => Ok(c),
+                    fn try_from(u: [<$uname $B Byte With>]<U>) -> Result<Self, Self::Error> {
+                        match u {
+                            [<$uname $B Byte With>]::$vname(u) => Ok(u),
                             _ => Err(()),
                         }
                     }
@@ -880,11 +879,11 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype_dep {
+                impl<U: DataUnits> TryFrom<[<$uname $B Byte With>]<U>> for $vtype_dep {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
-                        match c {
-                            [<$cname $B Byte With>]::$vname_dep(c) => Ok(c),
+                    fn try_from(u: [<$uname $B Byte With>]<U>) -> Result<Self, Self::Error> {
+                        match u {
+                            [<$uname $B Byte With>]::$vname_dep(u) => Ok(u),
                             _ => Err(()),
                         }
                     }
@@ -892,62 +891,62 @@ macro_rules! define_cell {
                 }
             )*
 
-            // implement `From`<*contained-value*> for `DataCell`:
+            // implement `From`<*contained-value*> for `DataUnit`:
 
             $( // Copy
-                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $B Byte Copy With>]<C> {
+                impl<U: DataUnitsCopy> From<$cvtype> for [<$uname $B Byte Copy With>]<U> {
                     fn from(v: $cvtype) -> Self {
-                        [<$cname $B Byte Copy With>]::$cvname(v)
+                        [<$uname $B Byte Copy With>]::$cvname(v)
                     }
 
                 }
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $B Byte Copy With>]<C> {
+                impl<U: DataUnitsCopy> From<$cvtype_dep> for [<$uname $B Byte Copy With>]<U> {
                     fn from(v: $cvtype_dep) -> Self {
-                        [<$cname $B Byte Copy With>]::$cvname_dep(v)
+                        [<$uname $B Byte Copy With>]::$cvname_dep(v)
                     }
 
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> From<$vtype> for [<$cname $B Byte With>]<C> {
+                impl<U: DataUnits> From<$vtype> for [<$uname $B Byte With>]<U> {
                     fn from(v: $vtype) -> Self {
-                        [<$cname $B Byte With>]::$vname(v)
+                        [<$uname $B Byte With>]::$vname(v)
                     }
 
                 }
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> From<$vtype_dep> for [<$cname $B Byte With>]<C> {
+                impl<U: DataUnits> From<$vtype_dep> for [<$uname $B Byte With>]<U> {
                     fn from(v: $vtype_dep) -> Self {
-                        [<$cname $B Byte With>]::$vname_dep(v)
+                        [<$uname $B Byte With>]::$vname_dep(v)
                     }
 
                 }
             )*
 
-            // from DataCell to DataUnsafe
-            impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$ucname $B Byte Copy>] {
-                fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
-                    match cell {
-                        [<$cname $B Byte Copy With>]::None => Self { None: NoData },
-                        [<$cname $B Byte Copy With>]::With(_) => Self { None: NoData },
+            // from DataUnit to DataLone
+            impl<U: DataUnitsCopy> From<[<$uname $B Byte Copy With>]<U>> for [<$lname $B Byte Copy>] {
+                fn from(unit: [<$uname $B Byte Copy With>]<U>) -> Self {
+                    match unit {
+                        [<$uname $B Byte Copy With>]::None => Self { None: NoData },
+                        [<$uname $B Byte Copy With>]::With(_) => Self { None: NoData },
 
                         $( // fundamental types
-                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
+                            [<$uname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
                         )*
 
                         $( // pointer-size dependant
                             #[cfg($cvpsize_psize)]
-                            [<$cname $B Byte Copy With>]::$cvname_psize(u) => Self { $cvname_psize: u },
+                            [<$uname $B Byte Copy With>]::$cvname_psize(u) => Self { $cvname_psize: u },
                         )*
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
-                            [<$cname $B Byte Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
+                            [<$uname $B Byte Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
                         )*
                     }
                 }
@@ -957,11 +956,11 @@ macro_rules! define_cell {
     };
 }
 
-/// for defining union DataUnsafe*
+/// for defining union DataLone*
 macro_rules! define_unsafe {
-    // # ATM receive only Copy variants (DataUnsafe)
+    // # ATM receive only Copy variants (DataLone)
     (
-        $ucname:ident,
+        $lname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
@@ -972,12 +971,12 @@ macro_rules! define_unsafe {
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
-            // ## copy version (DataUnsafe)
+            // ## copy version (DataLone)
             // -----------------------------------------------------------------
             #[repr(C)]
-            #[doc = $B "Byte / " $b "bit " "data *unsafe* **Cell**"]
+            #[doc = $B "Byte / " $b "bit *untyped (unsafe)* data"]
             #[derive(Copy, Clone)]
-            pub union [<$ucname $B Byte Copy>] {
+            pub union [<$lname $B Byte Copy>] {
                 /// Represents the absence of *data*.
                 pub None: NoData,
 
@@ -1006,20 +1005,20 @@ macro_rules! define_unsafe {
                 )*
             }
             // type aliases:
-            #[doc = $B "Byte / " $b "bit " "data *unsafe* **Cell**"]
-            pub type [< $ucname $b bit Copy >] = [< $ucname $B Byte Copy >];
+            #[doc = $B "Byte / " $b "bit *untyped (unsafe)* data"]
+            pub type [< $lname $b bit Copy >] = [< $lname $B Byte Copy >];
             // TODO: unify with type_aliases
-            // type_aliases![c: $ucname, size: $B, $b, "Copy", "data cell", "(Copy)"];
+            // type_aliases![u: $lname, size: $B, $b, "Copy", "data unit", "(Copy)"];
 
             // Debug
-            impl fmt::Debug for [<$ucname $B Byte Copy>] {
+            impl fmt::Debug for [<$lname $B Byte Copy>] {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    write!(f, "{} {{...}}", stringify!{[< $ucname $B Byte Copy >]})
+                    write!(f, "{} {{...}}", stringify!{[< $lname $B Byte Copy >]})
                 }
             }
 
             impl_data_unsafes![
-                u: [< $ucname $B Byte Copy >],
+                l: [< $lname $B Byte Copy >],
             ];
         }
     };
@@ -1029,8 +1028,8 @@ macro_rules! define_unsafe {
 
 /// define: types aliases
 macro_rules! type_aliases {
-    // DataCell aliases
-    ( c: $name:ident, size: $B:literal, $b:literal,
+    // DataUnit aliases
+    ( u: $name:ident, size: $B:literal, $b:literal,
       $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
     ) => {
         paste::paste!{
@@ -1061,8 +1060,8 @@ macro_rules! type_aliases {
             #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] -With" ]
             #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte" ]
             #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte -With" ]
-            // pub type [< $name $b bit $nsuf With >]<C, T> = [< $name $B Byte $nsuf With >]<C, T>;
-            pub type [< $name $b bit $nsuf With >]<C> = [< $name $B Byte $nsuf With >]<C>;
+            // pub type [< $name $b bit $nsuf With >]<U, T> = [< $name $B Byte $nsuf With >]<U, T>;
+            pub type [< $name $b bit $nsuf With >]<U> = [< $name $B Byte $nsuf With >]<U>;
         }
     };
     // DataType aliases
@@ -1191,10 +1190,10 @@ macro_rules! impl_data_types {
     };
 }
 
-/// implement: DataCells trait
-macro_rules! impl_data_cells {
+/// implement: DataUnits trait
+macro_rules! impl_data_units {
     (
-        c: $cname:ident, $cbound:ident,
+        u: $uname:ident, $cbound:ident,
         t: $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
         copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
@@ -1210,8 +1209,8 @@ macro_rules! impl_data_cells {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste! {
-            // impl<C: $cbound, T: $tbound> DataCells for $cname<C, T> {
-            impl<C: $cbound> DataCells for $cname<C> {
+            // impl<U: $cbound, T: $tbound> DataUnits for $uname<U, T> {
+            impl<U: $cbound> DataUnits for $uname<U> {
                 // type TYPE = $tname<$tbound>;
                 // WIP
                 // fn data_type(&self) -> Self::TYPE {
@@ -1232,16 +1231,16 @@ macro_rules! impl_data_cells {
         }
     };
 }
-/// implement: DataUnsafes trait
+/// implement: DataLones trait
 macro_rules! impl_data_unsafes {
     (
-      u: $ucname:ident,
+      l: $lname:ident,
     ) => {
-        // impl DataCells for $ucname {
+        // impl DataUnits for $lname {
         //     fn is_copy(&self) -> bool { true }
         // }
-        // impl DataCellsCopy for $ucname {}
-        unsafe impl DataUnsafes for $ucname {}
+        // impl DataUnitsCopy for $lname {}
+        unsafe impl DataLones for $lname {}
     };
 }
 
@@ -1333,7 +1332,7 @@ mod time {
 // -----------------------------------------------------------------------------
 
 define_all_sizes! {
-    DataType, DataCell, DataUnsafe,
+    DataType, DataUnit, DataLone,
 
     // -------------------------------------------------------- 1-B / 8-b
     copy_variants_1B:

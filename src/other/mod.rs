@@ -1,6 +1,6 @@
-// ladata::special
+// ladata::other
 //
-//! Special types of data.
+//! Other types of data.
 //
 
 pub(crate) mod nodata;

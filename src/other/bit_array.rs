@@ -1,4 +1,4 @@
-// ladata::special::bit_array
+// ladata::other::bit_array
 //
 //!
 

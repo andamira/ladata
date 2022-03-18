@@ -8,83 +8,83 @@
 #[doc(hidden)]
 macro_rules! define_line {
     (
-        c: $cname:ident, t: $tname:ident, u: $ucname:ident,
+        u: $uname:ident, t: $tname:ident, l: $lcname:ident,
         size: $B:literal, $b:literal,
     ) => {
         paste::paste! {
-            // DEFINE DataArray*
+            // DEFINE DataLine*
 
             // array, Copy
             #[doc = "An array of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
+            [< $uname $B Byte Copy With >] "`][crate::all::" [< $uname $B Byte Copy With >] "]" ]
             #[derive(Clone, Copy, Debug)]
-            pub struct [< DataArray $B Byte Copy With >]<C: DataCellsCopy, const SIZE: usize> {
-                cells: [[< $cname $B Byte Copy With >]<C>; SIZE]
+            pub struct [< DataLine $B Byte Copy With >]<U: DataUnitsCopy, const SIZE: usize> {
+                cells: [[< $uname $B Byte Copy With >]<U>; SIZE]
             }
             // array, Copy, non-With
             #[doc = "An array of [`"
-            [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
-            pub type [< DataArray $B Byte Copy >]<const SIZE: usize> =
-                [< DataArray $B Byte Copy With >]<NoData, SIZE>;
+            [< $uname $B Byte Copy >] "`][crate::all::" [< $uname $B Byte Copy >] "]" ]
+            pub type [< DataLine $B Byte Copy >]<const SIZE: usize> =
+                [< DataLine $B Byte Copy With >]<NoData, SIZE>;
 
             // array, non-Copy
             #[doc = "An array of [`"
-            [< $cname $B Byte With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
+            [< $uname $B Byte With >] "`][crate::all::" [< $uname $B Byte With >] "]" ]
             #[derive(Debug)]
-            pub struct [< DataArray $B Byte With >]<C: DataCells, const SIZE: usize> {
-                cells: [[< $cname $B Byte With >]<C>; SIZE]
+            pub struct [< DataLine $B Byte With >]<U: DataUnits, const SIZE: usize> {
+                cells: [[< $uname $B Byte With >]<U>; SIZE]
             }
             // array, non-Copy, non-With
-            #[doc = "An array of [`" [< $cname $B Byte >] "`][crate::all::" [< $cname $B Byte >] "]" ]
-            pub type [< DataArray $B Byte >]<const SIZE: usize> =
-                [< DataArray $B Byte With >]<NoData, SIZE>;
+            #[doc = "An array of [`" [< $uname $B Byte >] "`][crate::all::" [< $uname $B Byte >] "]" ]
+            pub type [< DataLine $B Byte >]<const SIZE: usize> =
+                [< DataLine $B Byte With >]<NoData, SIZE>;
 
-            // DEFINE DataVec*
+            // DEFINE DataLineGrow*
 
             // vec, Copy
             #[doc = "A vector of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
+            [< $uname $B Byte Copy With >] "`][crate::all::" [< $uname $B Byte Copy With >] "]" ]
             #[derive(Clone, Debug)]
-            pub struct [< DataVec $B Byte Copy With >]<C: DataCellsCopy> {
-                cells: Vec<[< $cname $B Byte Copy With >]<C>>
+            pub struct [< DataLineGrow $B Byte Copy With >]<U: DataUnitsCopy> {
+                cells: Vec<[< $uname $B Byte Copy With >]<U>>
             }
             // vec, Copy, non-With
-            #[doc = "A vector of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
-            pub type [< DataVec $B Byte Copy >] = [< DataVec $B Byte Copy With >]<NoData>;
+            #[doc = "A vector of [`" [< $uname $B Byte Copy >] "`][crate::all::" [< $uname $B Byte Copy >] "]" ]
+            pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<NoData>;
 
             // vec, non-Copy
             #[doc = "A vector of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
+            [< $uname $B Byte Copy With >] "`][crate::all::" [< $uname $B Byte With >] "]" ]
             #[derive(Debug)]
-            pub struct [< DataVec $B Byte With >]<C: DataCells> {
-                cells: Vec<[< $cname $B Byte With >]<C>>
+            pub struct [< DataLineGrow $B Byte With >]<U: DataUnits> {
+                cells: Vec<[< $uname $B Byte With >]<U>>
             }
             // vec, non-Copy, non-With
-            #[doc = "A vector of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
-            pub type [< DataVec $B Byte >] = [< DataVec $B Byte With >]<NoData>;
+            #[doc = "A vector of [`" [< $uname $B Byte>] "`][crate::all::" [< $uname $B Byte >] "]" ]
+            pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<NoData>;
 
+            // DEFINE DataLineCompact*
 
-            // DEFINE DataMiniArray
-
-            // mini array, Copy
+            // compact array, Copy
             #[doc = "A dense array of [`"
-            [< $ucname $B Byte Copy >] "`][crate::all::" [< $ucname $B Byte Copy >] "]\n" ]
+            [< $lcname $B Byte Copy >] "`][crate::all::" [< $lcname $B Byte Copy >] "]\n" ]
             ///
             #[derive(Clone, Copy, Debug)]
-            pub struct [< DataMiniArray $B Byte Copy >]<const SIZE: usize> {
-                types: [[< $tname $B Byte Copy >]; SIZE],
-                cells: [[< $ucname $B Byte Copy >]; SIZE]
+            pub struct [< DataLineCompact $B Byte Copy >]<const SIZE: usize> {
+                // WIP
+                _types: [[< $tname $B Byte Copy >]; SIZE],
+                _cells: [[< $lcname $B Byte Copy >]; SIZE]
             }
 
             // WIP impl traits
 
-            // impl<C: DataCells> [< DataVec $B Byte With >]<C> {
-            //     fn new<I: Into<[<DataVec $B Byte With>]<C>>>(&mut self, i: I ) -> Self {
+            // impl<U: DataUnits> [< DataLineGrow $B Byte With >]<U> {
+            //     fn new<I: Into<[<DataLineGrow $B Byte With>]<U>>>(&mut self, i: I ) -> Self {
             //         Self::from(i)
             //     }
             // }
-            // impl<C, I> [< DataVec $B Byte With >]<C>
-            // where C: DataCells, I: Into<[<DataVec $B Byte With>]<C>> {
+            // impl<U, I> [< DataLineGrow $B Byte With >]<U>
+            // where U: DataUnits, I: Into<[<DataLineGrow $B Byte With>]<U>> {
             //     fn new(&mut self, i: I ) -> Self {
             //         Self::from(i)
             //     }
@@ -92,59 +92,59 @@ macro_rules! define_line {
 
 
             // From/Into Array, Copy
-            impl<C: DataCellsCopy, const SIZE: usize> From< [<DataArray $B Byte Copy With>]<C, SIZE> >
-                for [[<$cname $B Byte Copy With>]<C>; SIZE] {
-                fn from(from: [<DataArray $B Byte Copy With>]<C, SIZE>) -> Self {
+            impl<U: DataUnitsCopy, const SIZE: usize> From< [<DataLine $B Byte Copy With>]<U, SIZE> >
+                for [[<$uname $B Byte Copy With>]<U>; SIZE] {
+                fn from(from: [<DataLine $B Byte Copy With>]<U, SIZE>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCellsCopy, const SIZE: usize> From<[[<$cname $B Byte Copy With>]<C>; SIZE]>
-                for [<DataArray $B Byte Copy With>]<C, SIZE> {
-                fn from(from: [[<$cname $B Byte Copy With>]<C>; SIZE] ) -> Self {
-                    [<DataArray $B Byte Copy With>] {
+            impl<U: DataUnitsCopy, const SIZE: usize> From<[[<$uname $B Byte Copy With>]<U>; SIZE]>
+                for [<DataLine $B Byte Copy With>]<U, SIZE> {
+                fn from(from: [[<$uname $B Byte Copy With>]<U>; SIZE] ) -> Self {
+                    [<DataLine $B Byte Copy With>] {
                         cells: from
                     }
                 }
             }
             // From/Into Array, non-Copy
-            impl<C: DataCells, const SIZE: usize> From< [<DataArray $B Byte With>]<C, SIZE> >
-                for [[<$cname $B Byte With>]<C>; SIZE] {
-                fn from(from: [<DataArray $B Byte With>]<C, SIZE>) -> Self {
+            impl<U: DataUnits, const SIZE: usize> From< [<DataLine $B Byte With>]<U, SIZE> >
+                for [[<$uname $B Byte With>]<U>; SIZE] {
+                fn from(from: [<DataLine $B Byte With>]<U, SIZE>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCells, const SIZE: usize> From<[[<$cname $B Byte With>]<C>; SIZE]>
-                for [<DataArray $B Byte With>]<C, SIZE> {
-                fn from(from: [[<$cname $B Byte With>]<C>; SIZE] ) -> Self {
-                    [<DataArray $B Byte With>] {
+            impl<U: DataUnits, const SIZE: usize> From<[[<$uname $B Byte With>]<U>; SIZE]>
+                for [<DataLine $B Byte With>]<U, SIZE> {
+                fn from(from: [[<$uname $B Byte With>]<U>; SIZE] ) -> Self {
+                    [<DataLine $B Byte With>] {
                         cells: from
                     }
                 }
             }
 
             // From/Into Vec, Copy
-            impl<C: DataCellsCopy> From< [<DataVec $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
-                fn from(from: [<DataVec $B Byte Copy With>]<C>) -> Self {
+            impl<U: DataUnitsCopy> From< [<DataLineGrow $B Byte Copy With>]<U> > for Vec< [<$uname $B Byte Copy With>]<U> > {
+                fn from(from: [<DataLineGrow $B Byte Copy With>]<U>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCellsCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataVec $B Byte Copy With>]<C> {
-                fn from(from: Vec< [<$cname $B Byte Copy With>]<C> > ) -> Self {
-                    [<DataVec $B Byte Copy With>] {
+            impl<U: DataUnitsCopy> From< Vec<[<$uname $B Byte Copy With>]<U>> > for [<DataLineGrow $B Byte Copy With>]<U> {
+                fn from(from: Vec< [<$uname $B Byte Copy With>]<U> > ) -> Self {
+                    [<DataLineGrow $B Byte Copy With>] {
                         cells: from
                     }
                 }
             }
 
             // From/Into Vec, non-Copy
-            impl<C: DataCells> From< [<DataVec $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
-                fn from(from: [<DataVec $B Byte With>]<C>) -> Self {
+            impl<U: DataUnits> From< [<DataLineGrow $B Byte With>]<U> > for Vec< [<$uname $B Byte With>]<U> > {
+                fn from(from: [<DataLineGrow $B Byte With>]<U>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCells> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataVec $B Byte With>]<C> {
-                fn from(from: Vec< [<$cname $B Byte With>]<C> > ) -> Self {
-                    [<DataVec $B Byte With>] {
+            impl<U: DataUnits> From< Vec<[<$uname $B Byte With>]<U>> > for [<DataLineGrow $B Byte With>]<U> {
+                fn from(from: Vec< [<$uname $B Byte With>]<U> > ) -> Self {
+                    [<DataLineGrow $B Byte With>] {
                         cells: from
                     }
                 }
@@ -154,4 +154,3 @@ macro_rules! define_line {
 
     };
 }
-
