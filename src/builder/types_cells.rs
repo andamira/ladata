@@ -1,29 +1,25 @@
-// ladata::builder
+// ladata::builder::types_cells
 //
-//! Types are generated here and re-exported from several modules.
+//! DataType*s and DataCell*s are generated here.
 //
 // # TOC
 //
-// - MACROS
-//
-//   exported:
-//   - reexport
-//   private:
+// - MACROS:
 //   - define_all_sizes
 //   - define_single_size
 //   - define_type
 //   - define_cell
-//   - define_unsafe_cell
+//   - define_unsafe
 //   - type_aliases
 //   - impl_data_types
 //   - impl_data_cells
-//   - impl_data_unsafe_cells
+//   - impl_data_unsafes
 //
-// - Mockup imports of optional external dependencies
+// - MOCKUPS OF UNUSED DEPENDENCIES
 //
 // - DEFINITIONS
 //
-//   - DataType, DataCell, DataUnsafeCell @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
+//   - DataType, DataCell, DataUnsafe @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
 
 use core::{
     // any::TypeId,
@@ -32,99 +28,31 @@ use core::{
     mem::{align_of, size_of},
 };
 
-use super::special::NoData;
-use super::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafeCells};
-
-/// used for re-exporting types from public modules.
-#[macro_export]
-#[doc(hidden)]
-macro_rules! reexport {
-    // Generates `::size` sub-modules for all sizes.
-    (mod_size $path:path; all_sizes) => {
-        use crate::reexport;
-        reexport![mod_size $path; 1, 8];
-        reexport![mod_size $path; 2, 16];
-        reexport![mod_size $path; 4, 32];
-        reexport![mod_size $path; 8, 64];
-        reexport![mod_size $path; 16, 128];
-        reexport![mod_size $path; 32, 256];
-        reexport![mod_size $path; 64, 512];
-        reexport![mod_size $path; 128, 1024];
-    };
-
-    // Generates `::size` sub-modules for the pair of (Byte, bit) sizes.
-    // - Each module is referenced as a submodule of each other.
-    (mod_size $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
-            #[doc = $B " Byte data (== " $b " bit)" ]
-            pub mod [< B $B >] {
-                #[doc(inline)]
-                pub use super::[< b $b >];
-                crate::reexport![@cell_type super::$path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-                crate::reexport![@unsafecell super::$path; size: $B; ByteCopy ];
-            }
-            #[doc = $b " bit data (== " $B " Byte)" ]
-            pub mod [< b $b >] {
-                #[doc(inline)]
-                pub use super::[< B $B >];
-                crate::reexport![@cell_type super::$path; size: $b; bit bitWith bitCopy bitCopyWith ];
-                crate::reexport![@unsafecell super::$path; size: $b; bitCopy ];
-            }
-        }
-    };
-
-    // export Types of the given sizes in Bytes
-    ($path:path; Byte: $( $B:literal )+ ) => {
-        // reexport![@cells $path; Byte: $( $B )+ ];
-        reexport![@cells_copy $path; Byte: $( $B )+ ];
-        // reexport![@types $path; Byte: $( $B )+ ]; // TODO
-
-    };
-
-    // rethink
-    (@gentype $path:path; $type:ty; Byte: $( $B:literal )+ ) => {
-        $( paste::paste!{
-            pub use $path::[< $type $B Byte With >];
-            pub use $path::[< $type $B Byte >];
-        } )+
-    };
-
-    (@cell_type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@multisuf $path; DataCell; size: $size ; $( $suf )+ ];
-        crate::reexport![@multisuf $path; DataType; size: $size ; $( $suf )+ ];
-        // crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ]; //↓FIX
-    };
-    // TEMP: DataUnsafeCell can't accept non-copy (for now) so must be treated separately:
-    (@unsafecell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@multisuf $path; DataUnsafeCell; size: $size ; $( $suf )+ ];
-    };
-
-    // 1 size, multiple suffixes (must include the Byte|bit part)
-    (@multisuf $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
-        $( paste::paste!{
-            pub use $path::[< $type $size $suf >];
-        } )+
-    };
-}
+use crate::special::NoData;
+use crate::traits::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy, DataUnsafes};
+use crate::define_line;
 
 /// defines all sizes at the same time
 ///
 /// This single-branch macro receives all the types ordered by size,
 /// already classified according to the following grouping:
 ///
-/// - copy_variants_nB:         (doc, name, type),*
-/// - copy_variants_nB_dep:     (doc, name, type, dep1, dep2),*
-/// - noncopy_variants_nB:      (doc, name, type),*
-/// - noncopy_variants_nB_dep:  (doc, name, type, dep1, dep2),*
-/// - iusize_nB:                 pointer_size,
+/// - copy_variants_nB:              (name, type),*
+/// - copy_variants_nB_dep:          (doc, name, type, dep1, dep2),*
+/// - copy_variants_nB_psize:        (doc, name, type, psize),*
+/// - copy_variants_nB_psize_dep:    (doc, name, type, psize, dep1, dep2),*
+/// - noncopy_variants_nB:           (doc, name, type),*
+/// - noncopy_variants_nB_dep:       (doc, name, type, dep1, dep2),*
+/// - noncopy_variants_nB_psize:     (doc, name, type, psize),*
+/// - noncopy_variants_nB_psize_dep: (doc, name, type, psize, dep1, dep2),*
 ///
 /// where:
 /// - the `copy_` prefix indicates the types are `Copy`,
 ///   otherwise the `noncopy` prefix is used.
 /// - `nB` indicates the number of bytes of the types in the current group.
-/// - the `_dep` suffix indicates a dependency on 2 features (4th & 5th args)
+/// - the `_dep` suffix indicates a dependency on 2 features (dep1 & dep2)
 ///   (pass the same dependency twice in order to only depend on one).
-/// - the `iusize` is used to receive the `target_pointer_width = "n"` attribute.
+/// - the `_psize` suffix indicates a dependency on a specific pointer size.
 ///
 /// The `define_single_size!` macro is called making sure each size contains
 /// all variants with a size less than or equal to the current size.
@@ -136,47 +64,68 @@ macro_rules! define_all_sizes {
         copy_variants_1B: $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
         copy_variants_1B_dep: $( $cvdoc_1B_dep:literal, $cvname_1B_dep:ident, $cvtype_1B_dep:ty,
             $cvdep1_1B_dep:literal, $cvdep2_1B_dep:literal  ),* ,
+        copy_variants_1B_psize:
+        $( $cvdoc_1B_psize:literal, $cvname_1B_psize:ident, $cvtype_1B_psize:ty, $cvpsize_1B_psize:meta ),* ,
         // noncopy_variants_1B: $( $vdoc_1B:literal, $vname_1B:ident, $vtype_1B:ty ),* ,
         // noncopy_variants_1B_dep:
         // $( $vdoc_1B_dep:literal, $vname_1B_dep:ident, $vtype_1B_dep:ty,
+        // noncopy_variants_1B_psize:
+        // $( $vdoc_1B_psize:literal, $vname_1B_psize:ident, $vtype_1B_psize:ty, $vpsize_1B_psize:meta ),* ,
             // $vdep1_1B_dep:literal, $vdep2_1B_dep:literal ),* ,
-        iusize_1B: $iusize_1B:meta,
 
         // 2-Byte / 16-bit
         copy_variants_2B: $( $cvdoc_2B:literal, $cvname_2B:ident, $cvtype_2B:ty ),* ,
         copy_variants_2B_dep: $( $cvdoc_2B_dep:literal, $cvname_2B_dep:ident, $cvtype_2B_dep:ty,
             $cvdep1_2B_dep:literal, $cvdep2_2B_dep:literal ),* ,
+        copy_variants_2B_psize:
+        $( $cvdoc_2B_psize:literal, $cvname_2B_psize:ident, $cvtype_2B_psize:ty, $cvpsize_2B_psize:meta ),* ,
         // noncopy_variants_2B: $( $vdoc_2B:literal, $vname_2B:ident, $vtype_2B:ty ),* ,
         // noncopy_variants_2B_dep: $( $vdoc_2B_dep:literal, $vname_2B_dep:ident, $vtype_2B_dep:ty,
             // $vdep1_2B_dep:literal ),* ,
-        iusize_2B: $iusize_2B:meta,
+        // noncopy_variants_2B_psize:
+        // $( $vdoc_2B_psize:literal, $vname_2B_psize:ident, $vtype_2B_psize:ty, $vpsize_2B_psize:meta ),* ,
 
         // 4-Byte / 32-bit
         copy_variants_4B: $( $cvdoc_4B:literal, $cvname_4B:ident, $cvtype_4B:ty ),* ,
         copy_variants_4B_dep: $( $cvdoc_4B_dep:literal, $cvname_4B_dep:ident, $cvtype_4B_dep:ty,
             $cvdep1_4B_dep:literal, $cvdep2_4B_dep:literal ),* ,
+        copy_variants_4B_psize:
+        $( $cvdoc_4B_psize:literal, $cvname_4B_psize:ident, $cvtype_4B_psize:ty, $cvpsize_4B_psize:meta ),* ,
         // noncopy_variants_4B: $( $vdoc_4B:literal, $vname_4B:ident, $vtype_4B:ty ),* ,
         noncopy_variants_4B_dep: $( $vdoc_4B_dep:literal, $vname_4B_dep:ident, $vtype_4B_dep:ty,
             $vdep1_4B_dep:literal, $vdep2_4B_dep:literal ),* ,
-        iusize_4B: $iusize_4B:meta,
+        // noncopy_variants_4B_psize:
+        // $( $vdoc_4B_psize:literal, $vname_4B_psize:ident, $vtype_4B_psize:ty, $vpsize_4B_psize:meta ),* ,
 
         // 8-Byte / 64-bit
         copy_variants_8B: $( $cvdoc_8B:literal, $cvname_8B:ident, $cvtype_8B:ty ),* ,
         copy_variants_8B_dep: $( $cvdoc_8B_dep:literal, $cvname_8B_dep:ident, $cvtype_8B_dep:ty,
             $cvdep1_8B_dep:literal, $cvdep2_8B_dep:literal ),* ,
+        copy_variants_8B_psize:
+        $( $cvdoc_8B_psize:literal, $cvname_8B_psize:ident, $cvtype_8B_psize:ty, $cvpsize_8B_psize:meta ),* ,
         // noncopy_variants_8B: $( $vdoc_8B:literal, $vname_8B:ident, $vtype_8B:ty ),* ,
         noncopy_variants_8B_dep: $( $vdoc_8B_dep:literal, $vname_8B_dep:ident, $vtype_8B_dep:ty,
             $vdep1_8B_dep:literal, $vdep2_8B_dep:literal ),* ,
-        iusize_8B: $iusize_8B:meta,
+        // noncopy_variants_8B_psize:
+        // $( $vdoc_8B_psize:literal, $vname_8B_psize:ident, $vtype_8B_psize:ty, $vpsize_8B_psize:meta ),* ,
+        noncopy_variants_8B_psize_dep:
+        $( $vdoc_8B_psize_dep:literal, $vname_8B_psize_dep:ident, $vtype_8B_psize_dep:ty,
+           $vpsize_8B_psize_dep:meta, $vdep1_8B_psize_dep:literal, $vdep2_8B_psize_dep:literal ),* ,
 
         // 16-Byte / 128-bit
         copy_variants_16B: $( $cvdoc_16B:literal, $cvname_16B:ident, $cvtype_16B:ty ),* ,
         copy_variants_16B_dep: $( $cvdoc_16B_dep:literal, $cvname_16B_dep:ident, $cvtype_16B_dep:ty,
             $cvdep1_16B_dep:literal, $cvdep2_16B_dep:literal ),* ,
+        copy_variants_16B_psize:
+        $( $cvdoc_16B_psize:literal, $cvname_16B_psize:ident, $cvtype_16B_psize:ty, $cvpsize_16B_psize:meta ),* ,
         // noncopy_variants_16B: $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
         // noncopy_variants_16B_dep: $( $vdoc_16B_dep:literal, $vname_16B_dep:ident, $vtype_16B_dep:ty,
         //     $vdep1_16B_dep:literal, $vdep2_16B_dep:literal ),* ,
-        iusize_16B: $iusize_16B:meta,
+        // noncopy_variants_16B_psize:
+        // $( $vdoc_16B_psize:literal, $vname_16B_psize:ident, $vtype_16B_psize:ty, $vpsize_16B_psize:meta ),* ,
+        noncopy_variants_16B_psize_dep:
+        $( $vdoc_16B_psize_dep:literal, $vname_16B_psize_dep:ident, $vtype_16B_psize_dep:ty,
+           $vpsize_16B_psize_dep:meta, $vdep1_16B_psize_dep:literal, $vdep2_16B_psize_dep:literal ),* ,
 
         // 32-Byte / 256-bit
         copy_variants_32B: $( $cvdoc_32B:literal, $cvname_32B:ident, $cvtype_32B:ty ),* ,
@@ -185,6 +134,11 @@ macro_rules! define_all_sizes {
         // noncopy_variants_32B: $( $vdoc_32B:literal, $vname_32B:ident, $vtype_32B:ty ),* ,
         noncopy_variants_32B_dep: $( $vdoc_32B_dep:literal, $vname_32B_dep:ident, $vtype_32B_dep:ty,
             $vdep1_32B_dep:literal, $vdep2_32B_dep:literal ),* ,
+        // noncopy_variants_32B_psize:
+        // $( $vdoc_32B_psize:literal, $vname_32B_psize:ident, $vtype_32B_psize:ty, $vpsize_32B_psize:meta ),* ,
+        noncopy_variants_32B_psize_dep:
+        $( $vdoc_32B_psize_dep:literal, $vname_32B_psize_dep:ident, $vtype_32B_psize_dep:ty,
+           $vpsize_32B_psize_dep:meta, $vdep1_32B_psize_dep:literal, $vdep2_32B_psize_dep:literal ),* ,
 
         // 64-Byte / 512-bit
         copy_variants_64B: $( $cvdoc_64B:literal, $cvname_64B:ident, $cvtype_64B:ty ),* ,
@@ -193,6 +147,11 @@ macro_rules! define_all_sizes {
         // noncopy_variants_64B: $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
         noncopy_variants_64B_dep: $( $vdoc_64B_dep:literal, $vname_64B_dep:ident, $vtype_64B_dep:ty,
             $vdep1_64B_dep:literal, $vdep2_64B_dep:literal ),* ,
+        // noncopy_variants_64B_psize:
+        // $( $vdoc_64B_psize:literal, $vname_64B_psize:ident, $vtype_64B_psize:ty, $vpsize_64B_psize:meta ),* ,
+        noncopy_variants_64B_psize_dep:
+        $( $vdoc_64B_psize_dep:literal, $vname_64B_psize_dep:ident, $vtype_64B_psize_dep:ty,
+           $vpsize_64B_psize_dep:meta, $vdep1_64B_psize_dep:literal, $vdep2_64B_psize_dep:literal ),* ,
 
         // 128-Byte / 1024-bit
         copy_variants_128B: $( $cvdoc_128B:literal, $cvname_128B:ident, $cvtype_128B:ty ),* ,
@@ -201,6 +160,11 @@ macro_rules! define_all_sizes {
         // noncopy_variants_128B: $( $vdoc_128B:literal, $vname_128B:ident, $vtype_128B:ty ),* ,
         // noncopy_variants_128B_dep: $( $vdoc_128B_dep:literal, $vname_128B_dep:ident, $vtype_128B_dep:ty,
         //     $vdep1_128B_dep:literal, $vdep2_128B_dep:literal ),* ,
+        // noncopy_variants_128B_psize:
+        // $( $vdoc_128B_psize:literal, $vname_128B_psize:ident, $vtype_128B_psize:ty, $vpsize_128B_psize:meta ),* ,
+        // noncopy_variants_128B_psize_dep:
+        // $( $vdoc_128B_psize_dep:literal, $vname_128B_psize_dep:ident, $vtype_128B_psize_dep:ty,
+        //    $vpsize_128B_psize_dep:meta, $vdep1_128B_psize_dep:literal, $vdep2_128B_psize_dep:literal ),* ,
 
     ) => {
         // 1-Byte / 8-bit
@@ -210,13 +174,15 @@ macro_rules! define_all_sizes {
             copy_variants: $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep, $cvdep2_1B_dep ),* ;
-            noncopy_variants:
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ;
+            copy_variants_psize_dep: ;
+            noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
-            ;
-            noncopy_variants_dep:
+            noncopy_variants_dep: ;
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ;
-            ;
-            pointer: $iusize_1B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep: ;
         }
 
         // 2-Byte / 16-bit
@@ -229,14 +195,18 @@ macro_rules! define_all_sizes {
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep, $cvdep2_1B_dep ),* ,
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep, $cvdep2_2B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
-            noncopy_variants_dep:
+            noncopy_variants_dep: ;
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ;
-            ;
-            pointer: $iusize_1B, $iusize_2B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep: ;
         }
 
         // 4-Byte / 32-bit
@@ -251,6 +221,11 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep, $cvdep2_1B_dep ),* ,
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep, $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep, $cvdep2_4B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -259,7 +234,8 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
                 $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep: ;
         }
 
         // 8-Byte / 32-bit
@@ -276,6 +252,12 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep, $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep, $cvdep2_4B_dep ),* ,
                 $( $cvdoc_8B_dep, $cvname_8B_dep, $cvtype_8B_dep, $cvdep1_8B_dep, $cvdep2_8B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ,
+                $( $cvdoc_8B_psize, $cvname_8B_psize, $cvtype_8B_psize, $cvpsize_8B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -286,7 +268,10 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
                 $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
                 $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
+                   $vdep1_8B_psize_dep, $vdep2_8B_psize_dep ),* ;
         }
 
         // 16-Byte / 64-bit
@@ -305,6 +290,13 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep, $cvdep2_4B_dep ),* ,
                 $( $cvdoc_8B_dep, $cvname_8B_dep, $cvtype_8B_dep, $cvdep1_8B_dep, $cvdep2_8B_dep ),* ,
                 $( $cvdoc_16B_dep, $cvname_16B_dep, $cvtype_16B_dep, $cvdep1_16B_dep, $cvdep2_16B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ,
+                $( $cvdoc_8B_psize, $cvname_8B_psize, $cvtype_8B_psize, $cvpsize_8B_psize ),* ,
+                $( $cvdoc_16B_psize, $cvname_16B_psize, $cvtype_16B_psize, $cvpsize_16B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants: ;
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -317,7 +309,12 @@ macro_rules! define_all_sizes {
                 $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
                 $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
+                   $vdep1_8B_psize_dep, $vdep2_8B_psize_dep ),* ,
+                $( $vdoc_16B_psize_dep, $vname_16B_psize_dep, $vtype_16B_psize_dep, $vpsize_16B_psize_dep,
+                   $vdep1_16B_psize_dep, $vdep2_16B_psize_dep ),* ;
         }
 
         // 32-Byte / 128-bit
@@ -338,6 +335,14 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_8B_dep, $cvname_8B_dep, $cvtype_8B_dep, $cvdep1_8B_dep, $cvdep2_8B_dep ),* ,
                 $( $cvdoc_16B_dep, $cvname_16B_dep, $cvtype_16B_dep, $cvdep1_16B_dep, $cvdep2_16B_dep ),* ,
                 $( $cvdoc_32B_dep, $cvname_32B_dep, $cvtype_32B_dep, $cvdep1_32B_dep, $cvdep2_32B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ,
+                $( $cvdoc_8B_psize, $cvname_8B_psize, $cvtype_8B_psize, $cvpsize_8B_psize ),* ,
+                $( $cvdoc_16B_psize, $cvname_16B_psize, $cvtype_16B_psize, $cvpsize_16B_psize ),* ;
+                // $( $cvdoc_32B_psize, $cvname_32B_psize, $cvtype_32B_psize, $cvpsize_32B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants:
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -353,13 +358,19 @@ macro_rules! define_all_sizes {
                 $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ,
                 $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
+                   $vdep1_8B_psize_dep, $vdep2_8B_psize_dep ),* ,
+                $( $vdoc_16B_psize_dep, $vname_16B_psize_dep, $vtype_16B_psize_dep, $vpsize_16B_psize_dep,
+                   $vdep1_16B_psize_dep, $vdep2_16B_psize_dep ),* ,
+                $( $vdoc_32B_psize_dep, $vname_32B_psize_dep, $vtype_32B_psize_dep, $vpsize_32B_psize_dep,
+                   $vdep1_32B_psize_dep, $vdep2_32B_psize_dep ),* ;
         }
 
-        // 64-Byte / 512-bit
         define_single_size! {
             $tname, $cname, $ucname,
-            size: 64, 512,
+            size: 64, 512, // 64-Byte / 512-bit
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
                 $( $cvdoc_2B, $cvname_2B, $cvtype_2B ),* ,
@@ -376,6 +387,15 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_16B_dep, $cvname_16B_dep, $cvtype_16B_dep, $cvdep1_16B_dep, $cvdep2_16B_dep ),* ,
                 $( $cvdoc_32B_dep, $cvname_32B_dep, $cvtype_32B_dep, $cvdep1_32B_dep, $cvdep2_32B_dep ),* ,
                 $( $cvdoc_64B_dep, $cvname_64B_dep, $cvtype_64B_dep, $cvdep1_64B_dep, $cvdep2_64B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ,
+                $( $cvdoc_8B_psize, $cvname_8B_psize, $cvtype_8B_psize, $cvpsize_8B_psize ),* ,
+                $( $cvdoc_16B_psize, $cvname_16B_psize, $cvtype_16B_psize, $cvpsize_16B_psize ),* ;
+                // $( $cvdoc_32B_psize, $cvname_32B_psize, $cvtype_32B_psize, $cvpsize_32B_psize ),* ,
+                // $( $cvdoc_64B_psize, $cvname_64B_psize, $cvtype_64B_psize, $cvpsize_64B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants:
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
@@ -393,13 +413,21 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ,
                 $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ,
                 $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
+                   $vdep1_8B_psize_dep, $vdep2_8B_psize_dep ),* ,
+                $( $vdoc_16B_psize_dep, $vname_16B_psize_dep, $vtype_16B_psize_dep, $vpsize_16B_psize_dep,
+                   $vdep1_16B_psize_dep, $vdep2_16B_psize_dep ),* ,
+                $( $vdoc_32B_psize_dep, $vname_32B_psize_dep, $vtype_32B_psize_dep, $vpsize_32B_psize_dep,
+                   $vdep1_32B_psize_dep, $vdep2_32B_psize_dep ),* ,
+                $( $vdoc_64B_psize_dep, $vname_64B_psize_dep, $vtype_64B_psize_dep, $vpsize_64B_psize_dep,
+                   $vdep1_64B_psize_dep, $vdep2_64B_psize_dep ),* ;
         }
 
-        // 128-Byte / 1024-bit
         define_single_size! {
             $tname, $cname, $ucname,
-            size: 128, 1024,
+            size: 128, 1024, // 128-Byte / 1024-bit
             copy_variants:
                 $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
                 $( $cvdoc_2B, $cvname_2B, $cvtype_2B ),* ,
@@ -418,6 +446,16 @@ macro_rules! define_all_sizes {
                 $( $cvdoc_32B_dep, $cvname_32B_dep, $cvtype_32B_dep, $cvdep1_32B_dep, $cvdep2_32B_dep ),* ,
                 $( $cvdoc_64B_dep, $cvname_64B_dep, $cvtype_64B_dep, $cvdep1_64B_dep, $cvdep2_64B_dep ),* ,
                 $( $cvdoc_128B_dep, $cvname_128B_dep, $cvtype_128B_dep, $cvdep1_128B_dep, $cvdep2_128B_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_1B_psize, $cvname_1B_psize, $cvtype_1B_psize, $cvpsize_1B_psize ),* ,
+                $( $cvdoc_2B_psize, $cvname_2B_psize, $cvtype_2B_psize, $cvpsize_2B_psize ),* ,
+                $( $cvdoc_4B_psize, $cvname_4B_psize, $cvtype_4B_psize, $cvpsize_4B_psize ),* ,
+                $( $cvdoc_8B_psize, $cvname_8B_psize, $cvtype_8B_psize, $cvpsize_8B_psize ),* ,
+                $( $cvdoc_16B_psize, $cvname_16B_psize, $cvtype_16B_psize, $cvpsize_16B_psize ),* ;
+                // $( $cvdoc_32B_psize, $cvname_32B_psize, $cvtype_32B_psize, $cvpsize_32B_psize ),* ,
+                // $( $cvdoc_64B_psize, $cvname_64B_psize, $cvtype_64B_psize, $cvpsize_64B_psize ),* ,
+                // $( $cvdoc_128B_psize, $cvname_128B_psize, $cvtype_128B_psize, $cvpsize_128B_psize ),* ;
+            copy_variants_psize_dep: ;
             noncopy_variants:
                 // $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 // $( $vdoc_8B, $vname_8B, $vtype_8B ),* ,
@@ -435,12 +473,22 @@ macro_rules! define_all_sizes {
                 $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ,
                 $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
                 // $( $vdoc_128B_dep, $vname_128B_dep, $vtype_128B_dep, $vdep1_128B_dep, $vdep2_128B_dep ),* ;
-            pointer: $iusize_1B, $iusize_2B, $iusize_4B, $iusize_8B, $iusize_16B
+            noncopy_variants_psize: ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
+                   $vdep1_8B_psize_dep, $vdep2_8B_psize_dep ),* ,
+                $( $vdoc_16B_psize_dep, $vname_16B_psize_dep, $vtype_16B_psize_dep, $vpsize_16B_psize_dep,
+                   $vdep1_16B_psize_dep, $vdep2_16B_psize_dep ),* ,
+                $( $vdoc_32B_psize_dep, $vname_32B_psize_dep, $vtype_32B_psize_dep, $vpsize_32B_psize_dep,
+                   $vdep1_32B_psize_dep, $vdep2_32B_psize_dep ),* ,
+                $( $vdoc_64B_psize_dep, $vname_64B_psize_dep, $vtype_64B_psize_dep, $vpsize_64B_psize_dep,
+                   $vdep1_64B_psize_dep, $vdep2_64B_psize_dep ),* ;
         }
     };
 }
 
-/// for defining in one pass: DataType*, DataCell* & DataUnsafeCell*
+/// for defining in one pass: DataType*, DataCell* & DataUnsafe*
+/// also DataLine*
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $ucname:ident,
@@ -448,35 +496,59 @@ macro_rules! define_single_size {
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
+        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+            $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep:
+            $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
         noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        pointer: $( $iusize:meta ),*
+        noncopy_variants_psize: ;
+        noncopy_variants_psize_dep:
+        $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+           $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         define_type!{
             $tname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
             noncopy_variants_dep: $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-            pointer: $( $iusize ),* ;
+            noncopy_variants_psize_dep: $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
         define_cell!{
             c: $cname, t:$tname, u:$ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
             noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
             noncopy_variants_dep: $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-            pointer: $( $iusize ),* ;
+            noncopy_variants_psize_dep: $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
-        define_unsafe_cell!{
+        define_unsafe!{
             $ucname, size: $B, $b,
             copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
             copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-            pointer: $( $iusize ),* ;
+            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
+        }
+
+        // WIP:lines
+        define_line!{
+            c: $cname, t:$tname, u:$ucname, size: $B, $b,
         }
     };
 }
+
 /// for defining enum DataType*
 macro_rules! define_type {
     (
@@ -485,13 +557,19 @@ macro_rules! define_type {
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
+        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+            $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep: $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
         noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        pointer: $( $iusize:meta ),* ;
+        noncopy_variants_psize_dep: $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+            $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) =>  {
         paste::paste!{
             // ## copy version (DataType)
+            // -----------------------------------------------------------------
             #[doc = $B "-Byte / " $b "-bit " "data **Type** (extendable) (Copy)"]
             ///
             /// See also:
@@ -510,32 +588,41 @@ macro_rules! define_type {
                     $cvname,
                 )*
 
-                // pointer sizes
-                #[cfg(any( $( $iusize ),* ))]
-                #[doc = $b "-bit usize"]
-                Usize,
-                #[cfg(any( $( $iusize ),* ))]
-                #[doc = $b "-bit isize"]
-                Isize,
+                $( // pointer-size dependant
+                    #[cfg($cvpsize_psize)]
+                    #[doc = $cvdoc_psize]
+                    $cvname_psize,
+                )*
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep,
                 )*
+
+                $( // pointer-size & feature-gated dependencies
+                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[doc = $cvdoc_psize_dep]
+                    $cvname_psize_dep,
+                )*
+
             }
             type_aliases![t: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
             impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
                 copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                    $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: ;
                 noncopy_variants_dep: ;
-                pointer: $( $iusize ),* ;
+                noncopy_variants_psize_dep: ;
             ];
             impl<T: DataTypesCopy> DataTypesCopy for [< $tname $B Byte Copy With >]<T> { }
 
             // ## non-copy version (DataType)
+            // -----------------------------------------------------------------
             #[doc = $B "-Byte / " $b "-bit " "data **Type** (extendable)"]
             ///
             /// See also:
@@ -558,13 +645,11 @@ macro_rules! define_type {
                     $vname,
                 )*
 
-                // pointer sizes
-                #[cfg(any( $( $iusize ),* ))]
-                #[doc = $b "-bit usize"]
-                Usize,
-                #[cfg(any( $( $iusize ),* ))]
-                #[doc = $b "-bit isize"]
-                Isize,
+                $( // pointer-size dependant
+                    #[cfg($cvpsize_psize)]
+                    #[doc = $cvdoc_psize]
+                    $cvname_psize,
+                )*
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
@@ -576,15 +661,30 @@ macro_rules! define_type {
                     #[doc = $vdoc_dep]
                     $vname_dep,
                 )*
+                $( // pointer-size & feature-gated dependencies
+                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[doc = $cvdoc_psize_dep]
+                    $cvname_psize_dep,
+                )*
+                $(
+                    #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                    #[doc = $vdoc_psize_dep]
+                    $vname_psize_dep,
+                )*
+
             }
             type_aliases![t: $tname, size: $B, $b, "", "data **Type**", ""];
             impl_data_types![ [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
                 copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                    $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: $($vname, $vtype ),* ;
                 noncopy_variants_dep: $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-                pointer: $( $iusize ),* ;
+                noncopy_variants_psize_dep: $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                    $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
         }
     };
@@ -598,13 +698,19 @@ macro_rules! define_cell {
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
+        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+            $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep: $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
         noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
         noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        pointer: $( $iusize:meta ),* ;
+        noncopy_variants_psize_dep: $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+            $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
             // ## copy version (DataCell)
+            // -----------------------------------------------------------------
             #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable) (Copy)"]
             ///
             /// See also:
@@ -625,18 +731,22 @@ macro_rules! define_cell {
                     $cvname($cvtype),
                 )*
 
-                // pointer sizes
-                #[cfg(any($($iusize),*))]
-                #[doc = $b "-bit usize"]
-                Usize(usize),
-                #[cfg(any($($iusize),*))]
-                #[doc = $b "-bit isize"]
-                Isize(isize),
+                $( // pointer-size dependant
+                    #[cfg($cvpsize_psize)]
+                    #[doc = $cvdoc_psize]
+                    $cvname_psize($cvtype_psize),
+                )*
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep($cvtype_dep),
+                )*
+
+                $( // pointer-size & feature-gated dependencies
+                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[doc = $cvdoc_psize_dep]
+                    $cvname_psize_dep($cvtype_psize_dep),
                 )*
             }
             type_aliases![c: $cname, size: $B, $b, "Copy", "data **Cell**", "(Copy)"];
@@ -646,14 +756,18 @@ macro_rules! define_cell {
                 is_copy: true,
                 copy_variants: $( $cvname, $cvtype ),* ;
                 copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                    $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: ;
                 noncopy_variants_dep: ;
-                pointer: $( $iusize:meta ),* ;
+                noncopy_variants_psize_dep: ;
             ];
             // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C, T> { }
             impl<C: DataCellsCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C> { }
 
             // ## non-copy version (DataCell)
+            // -----------------------------------------------------------------
             #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable)"]
             ///
             /// See also:
@@ -678,13 +792,11 @@ macro_rules! define_cell {
                     $vname($vtype),
                 )*
 
-                // pointer sizes
-                #[cfg(any($($iusize),*))]
-                #[doc = $b "-bit usize"]
-                Usize(usize),
-                #[cfg(any($($iusize),*))]
-                #[doc = $b "-bit isize"]
-                Isize(isize),
+                $( // pointer-size dependant
+                    #[cfg($cvpsize_psize)]
+                    #[doc = $cvdoc_psize]
+                    $cvname_psize($cvtype_psize),
+                )*
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
@@ -695,6 +807,17 @@ macro_rules! define_cell {
                     #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
                     #[doc = $vdoc_dep]
                     $vname_dep($vtype_dep),
+                )*
+
+                $( // pointer-size & feature-gated dependencies
+                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[doc = $cvdoc_psize_dep]
+                    $cvname_psize_dep($cvtype_psize_dep),
+                )*
+                $(
+                    #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                    #[doc = $vdoc_psize_dep]
+                    $vname_psize_dep($vtype_psize_dep),
                 )*
             }
 
@@ -707,9 +830,13 @@ macro_rules! define_cell {
                 is_copy: false,
                 copy_variants: $( $cvname, $cvtype ),* ;
                 copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                    $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: $($vname, $vtype ),* ;
                 noncopy_variants_dep: $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-                pointer: $( $iusize:meta ),* ;
+                noncopy_variants_psize_dep: $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                    $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
 
             // implement `TryFrom`<`DataCell`> for *contained-value*:
@@ -802,7 +929,7 @@ macro_rules! define_cell {
                 }
             )*
 
-            // from DataCell to DataUnsafeCell
+            // from DataCell to DataUnsafe
             impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$ucname $B Byte Copy>] {
                 fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
                     match cell {
@@ -813,11 +940,10 @@ macro_rules! define_cell {
                             [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
                         )*
 
-                        // pointer sizes
-                        #[cfg(any($($iusize),*))]
-                        [<$cname $B Byte Copy With>]::Usize(u) => Self { Usize: u },
-                        #[cfg(any($($iusize),*))]
-                        [<$cname $B Byte Copy With>]::Isize(i) => Self { Isize: i },
+                        $( // pointer-size dependant
+                            #[cfg($cvpsize_psize)]
+                            [<$cname $B Byte Copy With>]::$cvname_psize(u) => Self { $cvname_psize: u },
+                        )*
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
@@ -831,19 +957,23 @@ macro_rules! define_cell {
     };
 }
 
-/// for defining union DataUnsafeCell*
-macro_rules! define_unsafe_cell {
-    // # receive only Copy variants (DataUnsafeCell)
+/// for defining union DataUnsafe*
+macro_rules! define_unsafe {
+    // # ATM receive only Copy variants (DataUnsafe)
     (
         $ucname:ident,
         size: $B:literal, $b:literal,
         copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
         copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        // noncopy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ;
-        pointer: $( $iusize:meta ),* ;
+        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+            $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
+            // ## copy version (DataUnsafe)
+            // -----------------------------------------------------------------
             #[repr(C)]
             #[doc = $B "Byte / " $b "bit " "data *unsafe* **Cell**"]
             #[derive(Copy, Clone)]
@@ -851,10 +981,16 @@ macro_rules! define_unsafe_cell {
                 /// Represents the absence of *data*.
                 pub None: NoData,
 
-                #[cfg(any($($iusize),*))]
-                pub Usize: usize,
-                #[cfg(any($($iusize),*))]
-                pub Isize: isize,
+                $(
+                    #[doc = $cvdoc]
+                    pub $cvname: $cvtype,
+                )*
+
+                $( // pointer-size dependant
+                    #[cfg($cvpsize_psize)]
+                    #[doc = $cvdoc_psize]
+                    $cvname_psize: $cvtype_psize,
+                )*
 
                 // feature-gated dependencies
                 $(
@@ -863,9 +999,10 @@ macro_rules! define_unsafe_cell {
                     pub $cvname_dep: $cvtype_dep,
                 )*
 
-                $(
-                    #[doc = $cvdoc]
-                    pub $cvname: $cvtype,
+                $( // pointer-size & feature-gated dependencies
+                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[doc = $cvdoc_psize_dep]
+                    $cvname_psize_dep($cvtype_psize_dep),
                 )*
             }
             // type aliases:
@@ -881,7 +1018,7 @@ macro_rules! define_unsafe_cell {
                 }
             }
 
-            impl_data_unsafe_cells![
+            impl_data_unsafes![
                 u: [< $ucname $B Byte Copy >],
             ];
         }
@@ -971,10 +1108,14 @@ macro_rules! impl_data_types {
         copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
         copy_variants_dep: $( $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
+        copy_variants_psize: $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
         noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
         noncopy_variants_dep: $( $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        pointer: $( $iusize:meta ),* ;
+        noncopy_variants_psize_dep: $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
+            $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
             impl<T: $tbound> DataTypes for $tname<T> {
@@ -984,13 +1125,15 @@ macro_rules! impl_data_types {
                         None => align_of::<NoData>(),
                         With(o) => o.data_align(),
 
-                        #[cfg(any( $( $iusize ),* ))]
-                        Usize => align_of::<usize>(),
-                        #[cfg(any( $( $iusize ),* ))]
-                        Isize => align_of::<isize>(),
+                        $( $cvname => align_of::<$cvtype>(), )*
+                        $( $vname => align_of::<$vtype>(), )*
 
-                        // feature-gated dependencies
-                        $(
+                        $( // pointer-size dependant
+                            #[cfg($cvpsize_psize)]
+                            $cvname_psize => align_of::<$cvtype_psize>(),
+                        )*
+
+                        $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                             $cvname_dep => align_of::<$cvtype_dep>(),
                         )*
@@ -999,8 +1142,14 @@ macro_rules! impl_data_types {
                             $vname_dep => align_of::<$vtype_dep>(),
                         )*
 
-                        $( $cvname => align_of::<$cvtype>(), )*
-                        $( $vname => align_of::<$vtype>(), )*
+                        $( // pointer-size & feature-gated dependencies
+                            #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            $cvname_psize_dep => align_of::<$cvtype_psize_dep>(),
+                        )*
+                        $(
+                            #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            $vname_psize_dep => align_of::<$vtype_psize_dep>(),
+                        )*
                     }
                 }
                 fn data_size(&self) -> usize {
@@ -1009,13 +1158,15 @@ macro_rules! impl_data_types {
                         None => size_of::<NoData>(),
                         With(o) => o.data_size(),
 
-                        #[cfg(any( $( $iusize ),* ))]
-                        Usize => size_of::<usize>(),
-                        #[cfg(any( $( $iusize ),* ))]
-                        Isize => size_of::<isize>(),
+                        $( $cvname => size_of::<$cvtype>(), )*
+                        $( $vname => size_of::<$vtype>(), )*
 
-                        // feature-gated dependencies
-                        $(
+                        $( // pointer-size dependant
+                            #[cfg($cvpsize_psize)]
+                            $cvname_psize => size_of::<$cvtype_psize>(),
+                        )*
+
+                        $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
                             $cvname_dep => size_of::<$cvtype_dep>(),
                         )*
@@ -1024,8 +1175,14 @@ macro_rules! impl_data_types {
                             $vname_dep => size_of::<$vtype_dep>(),
                         )*
 
-                        $( $cvname => align_of::<$cvtype>(), )*
-                        $( $vname => size_of::<$vtype>(), )*
+                        $( // pointer-size & feature-gated dependencies
+                            #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            $cvname_psize_dep => size_of::<$cvtype_psize_dep>(),
+                        )*
+                        $(
+                            #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            $vname_psize_dep => size_of::<$vtype_psize_dep>(),
+                        )*
                     }
                 }
                 fn is_copy(&self) -> bool { $is_copy }
@@ -1043,22 +1200,40 @@ macro_rules! impl_data_cells {
         copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
         copy_variants_dep: $( $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
+        copy_variants_psize: $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+            $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
         noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
         noncopy_variants_dep: $( $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        pointer: $( $iusize:meta ),* ;
+        noncopy_variants_psize_dep: $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
+            $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste! {
             // impl<C: $cbound, T: $tbound> DataCells for $cname<C, T> {
             impl<C: $cbound> DataCells for $cname<C> {
+                // type TYPE = $tname<$tbound>;
+                // WIP
+                // fn data_type(&self) -> Self::TYPE {
+                //     match self {
+                //         Self::None => Self::TYPE::None,
+                //         Self::With(c) => c.data_type(),
+                //         // WIP
+                //         // $(
+                //         //     Self::$vname(_) => Self::TYPE::$vname,
+                //         // ),*
+                //
+                //         _ => Self::TYPE::None, // TEMP
+                //     }
+                // }
 
                 fn is_copy(&self) -> bool { $is_copy }
             }
         }
     };
 }
-/// implement: DataUnsafeCells trait
-macro_rules! impl_data_unsafe_cells {
+/// implement: DataUnsafes trait
+macro_rules! impl_data_unsafes {
     (
       u: $ucname:ident,
     ) => {
@@ -1066,11 +1241,11 @@ macro_rules! impl_data_unsafe_cells {
         //     fn is_copy(&self) -> bool { true }
         // }
         // impl DataCellsCopy for $ucname {}
-        unsafe impl DataUnsafeCells for $ucname {}
+        unsafe impl DataUnsafes for $ucname {}
     };
 }
 
-// MOCKUP IMPORTS OF OPTIONAL EXTERNAL DEPENDENCIES
+// MOCKUPS OF UNUSED DEPENDENCIES
 // -----------------------------------------------------------------------------
 
 // "external_continuous"
@@ -1158,7 +1333,7 @@ mod time {
 // -----------------------------------------------------------------------------
 
 define_all_sizes! {
-    DataType, DataCell, DataUnsafeCell,
+    DataType, DataCell, DataUnsafe,
 
     // -------------------------------------------------------- 1-B / 8-b
     copy_variants_1B:
@@ -1171,9 +1346,12 @@ define_all_sizes! {
         P8, softposit::P8, "softposit", "softposit",
     "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray8, crate::all::BitArray8, "bv", "bv",
+    // WIP
+    copy_variants_1B_psize:
+        "8-bit usize", Usize, usize, target_pointer_width = "8",
+        "8-bit isize", Isize, isize, target_pointer_width = "8",
     // noncopy_variants_1B: ,
     // noncopy_variants_1B_dep: ,
-    iusize_1B: target_pointer_width = "8",
 
     // -------------------------------------------------------- 2-B / 16-b
     copy_variants_2B:
@@ -1191,9 +1369,11 @@ define_all_sizes! {
         ArrayString1, ArrayString<typenum::U1>, "arraystring", "arraystring",
     "16-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray16, crate::all::BitArray16, "bv", "bv",
+    copy_variants_2B_psize:
+        "16-bit usize", Usize, usize, target_pointer_width = "16",
+        "16-bit isize", Isize, isize, target_pointer_width = "16",
     // noncopy_variants_2B: ,
     // noncopy_variants_2B_dep: ,
-    iusize_2B: target_pointer_width = "16",
 
     // -------------------------------------------------------- 4-B / 32-b
     copy_variants_4B:
@@ -1233,11 +1413,13 @@ define_all_sizes! {
         FugitInstant32Nanos, fugit::Instant<u32, 1, 1_000_000>, "fugit", "fugit",
     "32-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray32, crate::all::BitArray32, "bv", "bv",
+    copy_variants_4B_psize:
+        "32-bit usize", Usize, usize, target_pointer_width = "32",
+        "32-bit isize", Isize, isize, target_pointer_width = "32",
     // noncopy_variants_4B: ,
     noncopy_variants_4B_dep:
     "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=0",
         Q8, softposit::Q8, "softposit", "softposit",
-    iusize_4B: target_pointer_width = "32",
 
     // ------------------------------------------------------------------------- 8-B / 64-b
     copy_variants_8B:
@@ -1274,11 +1456,15 @@ define_all_sizes! {
         FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>, "fugit", "fugit",
     "64-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray64, crate::all::BitArray64, "bv", "bv",
+    copy_variants_8B_psize:
+        "64-bit usize", Usize, usize, target_pointer_width = "64",
+        "64-bit isize", Isize, isize, target_pointer_width = "64",
     // noncopy_variants_8B: ,
     noncopy_variants_8B_dep:
     "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=1",
         Q16, softposit::Q16, "softposit", "softposit",
-    iusize_8B: target_pointer_width = "64",
+    noncopy_variants_8B_psize_dep:
+        "6-Byte fat-pointer String", String, std::string::String, target_pointer_width = "16", "std", "std",
 
     // ------------------------------------------------------------------------- 16-B /128-b
     copy_variants_16B:
@@ -1309,8 +1495,12 @@ define_all_sizes! {
         TInstant, time::Instant, "std", "time",
     "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray128, crate::all::BitArray128, "bv", "bv",
+    copy_variants_16B_psize:
+        "128-bit usize", Usize, usize, target_pointer_width = "128",
+        "128-bit isize", Isize, isize, target_pointer_width = "128",
     // noncopy_variants_16B: ,
-    iusize_16B: target_pointer_width = "128",
+    noncopy_variants_16B_psize_dep:
+        "12-Byte fat-pointer String", String, std::string::String, target_pointer_width = "32", "std", "std",
 
     // ------------------------------------------------------------------------- 32-B / 256-b
     copy_variants_32B:
@@ -1324,9 +1514,10 @@ define_all_sizes! {
     // noncopy_variants_32B: ,
     noncopy_variants_32B_dep:
     "Big Integer", BigInt, num_bigint::BigInt, "num-bigint", "num-bigint",
-    "string", String, std::string::String, "std", "std",
+    noncopy_variants_32B_psize_dep:
+        "24-Byte fat-pointer String", String, std::string::String, target_pointer_width = "64", "std", "std",
 
-    // ------------------------------------------------------------------------- 64 B
+    // ------------------------------------------------------------------------- 64 B / 512-b
     copy_variants_64B:
     "64-Byte array of bytes", ByteArray64, [u8; 64],
     copy_variants_64B_dep:
@@ -1338,6 +1529,8 @@ define_all_sizes! {
     noncopy_variants_64B_dep:
     "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=2",
         Q32, softposit::Q32, "softposit", "softposit",
+    noncopy_variants_64B_psize_dep:
+        "48-Byte fat-pointer String", String, std::string::String, target_pointer_width = "128", "std", "std",
 
     // ------------------------------------------------------------------------- 128-B / 1024-b
     copy_variants_128B:

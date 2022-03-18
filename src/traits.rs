@@ -11,7 +11,7 @@ use core::fmt::Debug;
 // - DataTypesCopy
 // - DataCells
 // - DataCellsCopy
-// - DataUnsafeCells
+// - DataUnsafes
 
 /// Common trait for *data types*.
 ///
@@ -83,4 +83,4 @@ pub trait DataCellsCopy: DataCells + Copy {}
 /// # Safety
 /// TODO
 ///
-pub unsafe trait DataUnsafeCells {}
+pub unsafe trait DataUnsafes {}
