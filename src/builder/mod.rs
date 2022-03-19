@@ -2,8 +2,8 @@
 //
 //! Types are generated in these submodules and re-exported from elsewhere.
 
-pub(crate) mod types_units;
-pub use types_units::*;
+pub(crate) mod types_cells;
+pub use types_cells::*;
 
 pub(crate) mod lines;
 pub use lines::*;
@@ -35,14 +35,14 @@ macro_rules! reexport {
             pub mod [< B $B >] {
                 #[doc(inline)]
                 pub use super::[< b $b >];
-                crate::reexport![@unit_type super::$path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+                crate::reexport![@cell_type super::$path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
                 crate::reexport![@unsafe super::$path; size: $B; ByteCopy ];
             }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
                 #[doc(inline)]
                 pub use super::[< B $B >];
-                crate::reexport![@unit_type super::$path; size: $b; bit bitWith bitCopy bitCopyWith ];
+                crate::reexport![@cell_type super::$path; size: $b; bit bitWith bitCopy bitCopyWith ];
                 crate::reexport![@unsafe super::$path; size: $b; bitCopy ];
             }
             // TODO:add lines
@@ -79,17 +79,17 @@ macro_rules! reexport {
         } )+
     };
 
-    // re-exports DataUnit & DataType
-    (@unit_type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@type $path; DataUnit; size: $size ; $( $suf )+ ];
+    // re-exports DataCell & DataType
+    (@cell_type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@type $path; DataCell; size: $size ; $( $suf )+ ];
         crate::reexport![@type $path; DataType; size: $size ; $( $suf )+ ];
-        // crate::reexport![@type $path; DataLone; size: $size ; $( $suf )+ ];
+        // crate::reexport![@type $path; DataBare; size: $size ; $( $suf )+ ];
     };
 
-    // re-exports DataLone
-    // NOTE DataLone can't accept non-copy (for now) so must be treated separately
+    // re-exports DataBare
+    // NOTE DataBare can't accept non-copy (for now) so must be treated separately
     (@unsafe $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@type $path; DataLone; size: $size ; $( $suf )+ ];
+        crate::reexport![@type $path; DataBare; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataLine

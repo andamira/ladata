@@ -9,9 +9,9 @@ use core::fmt::Debug;
 // -------------------------------------------------------------------------
 // - DataTypes
 // - DataTypesCopy
-// - DataUnits
-// - DataUnitsCopy
-// - DataLones
+// - DataCells
+// - DataCellsCopy
+// - DataBares
 
 /// Common trait for *data types*.
 ///
@@ -19,8 +19,8 @@ use core::fmt::Debug;
 ///
 /// # See also
 /// - [`DataTypesCopy`]
-/// - [`DataUnitsCopy`]
-/// - [`DataUnits`]
+/// - [`DataCellsCopy`]
+/// - [`DataCells`]
 pub trait DataTypes: Copy + Debug {
     /// Returns the alignment of the data represented by the current type.
     fn data_align(&self) -> usize;
@@ -46,41 +46,41 @@ pub trait DataTypes: Copy + Debug {
 ///
 /// # See also
 /// - [`DataTypes`]
-/// - [`DataUnits`]
-/// - [`DataUnitsCopy`]
+/// - [`DataCells`]
+/// - [`DataCellsCopy`]
 pub trait DataTypesCopy: DataTypes {}
 
 /// Common trait for *data cells*.
 ///
-/// Allows extending `DataUnit*`**`With`** versions.
+/// Allows extending `DataCell*`**`With`** versions.
 ///
 /// See also:
-/// - [`DataUnitsCopy`]
+/// - [`DataCellsCopy`]
 /// - [`DataTypesCopy`]
 /// - [`DataTypes`]
-pub trait DataUnits: Debug {
+pub trait DataCells: Debug {
     /// Whether the data type in the current variant is [`Copy`].
     fn is_copy(&self) -> bool;
 }
 
 /// Common (marker) trait for `Copy` *data cells*.
 ///
-/// Allows extending `DataUnit*Copy`**`With`** versions.
+/// Allows extending `DataCell*Copy`**`With`** versions.
 ///
 /// # Coherence
 ///
-/// The `DataUnits::`[`is_copy`][DataUnits#method.is_copy]
+/// The `DataCells::`[`is_copy`][DataCells#method.is_copy]
 /// super-trait method should probably return `true` as well.
 ///
 /// # See also
-/// - [`DataUnits`]
+/// - [`DataCells`]
 /// - [`DataTypes`]
 /// - [`DataTypesCopy`]
-pub trait DataUnitsCopy: DataUnits + Copy {}
+pub trait DataCellsCopy: DataCells + Copy {}
 
 /// Common trait for unsafe data cells implemented with `union`.
 ///
 /// # Safety
 /// TODO
 ///
-pub unsafe trait DataLones {}
+pub unsafe trait DataBares {}

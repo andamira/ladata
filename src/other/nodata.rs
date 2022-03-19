@@ -4,16 +4,16 @@
 
 use core::mem::{align_of, size_of};
 
-use crate::traits::{DataLones, DataTypes, DataTypesCopy, DataUnits, DataUnitsCopy};
+use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
 /// A zero-sized type representing the absence of data.
 ///
 /// Since it implements all traits it can represent the absence of
-/// `DataType`, `DataUnit` & `DataLone` indistinctly.
+/// `DataType`, `DataCell` & `DataBare` indistinctly.
 ///
 /// Mainly used for the non-`With` aliases of the
 /// [`DataTypes`]*[[`Copy`][DataTypesCopy]]* and
-/// [`DataUnits`]*[[`Copy`][DataUnitsCopy]]* default implementations.
+/// [`DataCells`]*[[`Copy`][DataCellsCopy]]* default implementations.
 #[derive(Debug, Copy, Clone)]
 pub struct NoData;
 
@@ -31,7 +31,7 @@ impl DataTypes for NoData {
         true
     }
 }
-impl DataUnits for NoData {
+impl DataCells for NoData {
     #[inline]
     fn is_copy(&self) -> bool {
         true
@@ -40,6 +40,6 @@ impl DataUnits for NoData {
 
 impl DataTypesCopy for NoData {}
 
-impl DataUnitsCopy for NoData {}
+impl DataCellsCopy for NoData {}
 
-unsafe impl DataLones for NoData {}
+unsafe impl DataBares for NoData {}

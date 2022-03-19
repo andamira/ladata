@@ -1,23 +1,17 @@
 //! **`ladata`**
 //!
-//! A simple data model for working with heterogeneous data.
+//! A simple model for working with heterogeneous data in stable Rust.
 //!
-//! # Overview
+//! It is Designed to be regular, modular and composable, like building blocks.
 //!
-//! - Works in stable Rust and `no_std`.
-//! - Supports custom data types and features customization.
-//! - Designed to be regular, modular and composable, like building blocks.
+//! ## Unitary
 //!
-//! ## Units
-//!
-//! The fundamental unitary abstractions are:
-//! - `DataUnit…` enums that contains both the data and the type information.
+//! The fundamental abstractions are:
+//! - `DataCell…` enums that contains both the data and the type information.
 //! - `DataType…` enums that only contains type information, not the data itself.
-//! - `DataLone…` unions that only contains the data, not the type of the data.
+//! - `DataBare…` unions that only contains the data, not the type of the data.
 //!
-//! They implement the [`DataUnits`], [`DataTypes`] and [`DataLones`] traits,
-//! respectively. (There are also sub-traits like [`DataUnitsCopy`] and
-//! [`DataTypesCopy`]) with additional constrains.
+//! They implement the [`DataCells`], [`DataTypes`] and [`DataBares`] traits.
 //!
 //! Each one has many concrete implementations differentiated by:
 //! - the maximum `size` of the represented data.
@@ -27,17 +21,17 @@
 //! For example, these are concrete parallel implementations:
 //! - [`DataType2ByteCopy`][all::DataType2ByteCopy] represents a 2-byte sized
 //!   `Copy` type (== 1 byte).
-//! - [`DataUnit2ByteCopy`][all::DataUnit2ByteWith] represents the corresponding
+//! - [`DataCell2ByteCopy`][all::DataCell2ByteWith] represents the corresponding
 //!   2-Byte sized type + data (== 4 bytes).
-//! - [`DataLone2ByteCopy`][all::DataLone2ByteCopy] represents the
+//! - [`DataBare2ByteCopy`][all::DataBare2ByteCopy] represents the
 //!   corresponding 2-Byte sized data without the type (== 2 bytes).
-//! - [`DataType2ByteCopyWith`][all::DataUnit2ByteCopyWith] represents the
+//! - [`DataType2ByteCopyWith`][all::DataCell2ByteCopyWith] represents the
 //!   corresponding 2-Byte sized type, with a custom type embedded (>= 2 bytes).
-//! - [`DataUnit2ByteCopyWith`][all::DataUnit2ByteCopyWith] represents the
+//! - [`DataCell2ByteCopyWith`][all::DataCell2ByteCopyWith] represents the
 //!   corresponding 2-Byte sized type + data, with a custom type embedded
 //!   (>= 4 bytes).
 //!
-//! Note that `DataLone…`s are more space-efficient than `DataUnit…`s but
+//! Note that `DataBare…`s are more space-efficient than `DataCell…`s but
 //! not as convenient to use and also unsafe to read, because they're unions.
 //! They are mostly intended to be used from collections that can store their
 //! corresponding `DataType…`s separately. At the moment they only support
@@ -46,9 +40,9 @@
 //! ## Linear
 //!
 //! The fundamental linear abstractions are:
-//! - `DataLine…` structs, based on `[DataUnit*; const usize]`.
-//! - `DataLineGrow…` structs, growable, based on a `Vec<DataUnit*>`.
-//! - `DataLineCompact*…` structs, uses `DataLone*` plus `DataType*`.
+//! - `DataLine…` structs, based on `[DataCell*; const usize]`.
+//! - `DataLineGrow…` structs, growable, based on a `Vec<DataCell*>`.
+//! - `DataLineCompact*…` structs, uses `DataBare*` plus `DataType*`.
 // - `DataLineEncoded*…` structs,
 //!
 // They all implement the [`DataLines`] trait
@@ -85,13 +79,13 @@
 //! ```
 //! # use ladata::all::*;
 //! let arr = [
-//!     DataUnit32bit::F32(3.14),
-//!     DataUnit32bit::Char('π'),
+//!     DataCell32bit::F32(3.14),
+//!     DataCell32bit::Char('π'),
 //! ];
 //! for c in arr {
 //!    match c {
-//!         DataUnit32bit::F32(f) => println!("a float {f}"),
-//!         DataUnit32bit::Char(c) => println!("a char {c:?}"),
+//!         DataCell32bit::F32(f) => println!("a float {f}"),
+//!         DataCell32bit::Char(c) => println!("a char {c:?}"),
 //!         _ => (),
 //!     }
 //! }
@@ -101,13 +95,13 @@
 //! example on how to use custom data types.
 //!
 //!
-//! # Unitary types: Data `Type*`|`Unit*`|`Lone*` and `NoData`
+//! # Unitary types: Data `Type*`|`Cell*`|`Bare*` and `NoData`
 //!
 //! The concrete implementations of **unitary types** observes the following naming schemes:
 //! ```txt
 //! *) No Data                                                           Legend      |     Sizes
-//! *)    Data <Type|Unit> <Size> [Copy] [With]                      --------------- | ------------
-//! *)    Data <Lone>    <Size> <Copy>                               <> : required   |    8b =   1B
+//! *)    Data <Type|Cell> <Size> [Copy] [With]                      --------------- | ------------
+//! *)    Data <Bare>    <Size> <Copy>                               <> : required   |    8b =   1B
 //!                                                                  [] : optional   |   16b =   2B
 //!                                                                   | : either or  |   32b =   4B
 //!                                                                   = : alias      |   64b =   8B
@@ -118,7 +112,7 @@
 //! ```
 //! 0. `No`: a special prefix for the [`NoData`][all::NoData] type.
 //! 1. `Data`: the *pivotal core*.
-//! 2. `<Type|Unit|Lone>`: encapsulates 1) only the data type,
+//! 2. `<Type|Cell|Bare>`: encapsulates 1) only the data type,
 //!    2) both the data type and the data, or 3) only the data.
 //! 3. `<Size>`: confines the maximum size of the represented data,
 //!    limiting the number of types and sizes of data available.
@@ -126,20 +120,20 @@
 //! 5. `[With]`: allows to embed a custom implementation of a data type or cell
 //!     in its `With` variant.
 //!
-//! ### `<Type|Unit|Lone>`
+//! ### `<Type|Cell|Bare>`
 //!
 //! - `Type` indicates the categorization of the data type information.
 //! All *`DataType*`s* must implement the [`DataTypes`] trait, and
 //! *`DataType*Copy*`* *types* must additionally implement the
 //! [`DataTypesCopy`] trait.
 //!
-//! - `Unit` indicates the encapsulation of the data and the type information.
-//! All *`DataUnit*`s* must implement the [`DataUnits`] trait, and
-//! *`DataUnit*Copy*`* *cells* must additionally implement the
-//! [`DataUnitsCopy`] trait.
+//! - `Cell` indicates the encapsulation of the data and the type information.
+//! All *`DataCell*`s* must implement the [`DataCells`] trait, and
+//! *`DataCell*Copy*`* *cells* must additionally implement the
+//! [`DataCellsCopy`] trait.
 //!
-//! - `Lone` indicates the encapsulation of data without the type information.
-//! All *`DataLone`s* implements the (marker) [`DataLones`] trait.
+//! - `Bare` indicates the encapsulation of data without the type information.
+//! All *`DataBare`s* implements the (marker) [`DataBares`] trait.
 //!
 //! ### `[Copy]`
 //!
@@ -157,7 +151,7 @@
 //!
 //! Specifically tells the maximum size of the data. Smaller-sized variants
 //! are also available in bigger-sized cells. For example the `U16(u16)` variant
-//! is present in `DataUnit2Byte` and `DataUnit4Byte` but not in `DataUnit1Byte`.
+//! is present in `DataCell2Byte` and `DataCell4Byte` but not in `DataCell1Byte`.
 //!
 //! There are also convenience aliases in bit sizes to byte sizes. E.g.:
 //! [`DataType32bit`][all::DataType32bit] == [`DataType4Byte`][all::DataType4Byte]
@@ -170,9 +164,9 @@
 //! implementing [`DataTypes`] in its `With` variant (or [`DataTypesCopy`]
 //! in the case of `DataType*CopyWith`.
 //!
-//! In the same way, **`DataUnit*With`** enums can be extended generically by
-//! storing a type implementing [`DataUnits`] in its `With` variant
-//! (or [`DataUnitsCopy`] in the case of `DataUnit*CopyWith`.
+//! In the same way, **`DataCell*With`** enums can be extended generically by
+//! storing a type implementing [`DataCells`] in its `With` variant
+//! (or [`DataCellsCopy`] in the case of `DataCell*CopyWith`.
 //!
 //! Internally, all non-`With` versions are convenient type aliases to the
 //! corresponding `With` version (having the same size and `Copy` semantics),
@@ -199,7 +193,7 @@
 //!                                                                                 | 128B  = 1024b
 //! ```
 //! 1. `Data`: the *pivotal core*.
-//! 2. `Line`: encapsulates a linear collection of units.
+//! 2. `Line`: encapsulates a linear collection of cells.
 //! 3. `[Compact]`: encapsulates a linear collection with a compact size.
 //! 4. `<Size>`: indicates the size of the data of the collected type.
 //! 5. `[Copy]`: indicates that all the included data types are `Copy`.
@@ -237,7 +231,7 @@ pub mod sizes {
     crate::reexport![mod_sizes super::builder; all_sizes];
 }
 
-/// Data *lines* (sequences of units).
+/// Data *lines* (sequences of cells).
 pub mod lines {
     crate::reexport![mod_lines super::builder; all_sizes];
 }
