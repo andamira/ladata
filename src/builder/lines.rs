@@ -15,20 +15,20 @@ macro_rules! define_line {
             // DEFINE DataLine*
 
             // array, Copy
-            #[doc = "An array of [`"
+            #[doc = "An **array** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
             #[derive(Clone, Copy, Debug)]
             pub struct [< DataLine $B Byte Copy With >]<C: DataCellsCopy, const LEN: usize> {
                 cells: [[< $cname $B Byte Copy With >]<C>; LEN]
             }
             // array, Copy, non-With
-            #[doc = "An array of [`"
+            #[doc = "An **array** of [`"
             [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
             pub type [< DataLine $B Byte Copy >]<const LEN: usize> =
                 [< DataLine $B Byte Copy With >]<NoData, LEN>;
 
             // array, non-Copy
-            #[doc = "An array of [`"
+            #[doc = "An **array** of [`"
             [< $cname $B Byte With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
             #[derive(Debug)]
             pub struct [< DataLine $B Byte With >]<C: DataCells, const LEN: usize> {
@@ -39,34 +39,37 @@ macro_rules! define_line {
             pub type [< DataLine $B Byte >]<const LEN: usize> =
                 [< DataLine $B Byte With >]<NoData, LEN>;
 
+            // WIP
+            // type_aliases![l: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
+
             // DEFINE DataLineGrow*
 
             // vec, Copy
-            #[doc = "A vector of [`"
+            #[doc = "A **vector** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
             #[derive(Clone, Debug)]
             pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellsCopy> {
                 cells: Vec<[< $cname $B Byte Copy With >]<C>>
             }
             // vec, Copy, non-With
-            #[doc = "A vector of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
+            #[doc = "A **vector** of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
             pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<NoData>;
 
             // vec, non-Copy
-            #[doc = "A vector of [`"
+            #[doc = "A **vector** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
             #[derive(Debug)]
             pub struct [< DataLineGrow $B Byte With >]<C: DataCells> {
                 cells: Vec<[< $cname $B Byte With >]<C>>
             }
             // vec, non-Copy, non-With
-            #[doc = "A vector of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
+            #[doc = "A **vector** of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
             pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<NoData>;
 
             // DEFINE DataLineCompact*
 
             // compact array, Copy
-            #[doc = "A dense array of [`"
+            #[doc = "A dense **array** of [`"
             [< $bname $B Byte Copy >] "`][crate::all::" [< $bname $B Byte Copy >] "]\n" ]
             ///
             #[derive(Clone, Copy, Debug)]

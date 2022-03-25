@@ -61,41 +61,47 @@ macro_rules! define_all_sizes {
         $tname:ident, $cname:ident, $bname:ident,
 
         // 1-Byte / 8-bit
-        copy_variants_1B: $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
+        copy_variants_1B:
+            $( $cvdoc_1B:literal, $cvname_1B:ident, $cvtype_1B:ty ),* ,
         copy_variants_1B_dep: $( $cvdoc_1B_dep:literal, $cvname_1B_dep:ident, $cvtype_1B_dep:ty,
             $cvdep1_1B_dep:literal, $cvdep2_1B_dep:literal  ),* ,
         copy_variants_1B_psize:
-        $( $cvdoc_1B_psize:literal, $cvname_1B_psize:ident, $cvtype_1B_psize:ty, $cvpsize_1B_psize:meta ),* ,
-        // noncopy_variants_1B: $( $vdoc_1B:literal, $vname_1B:ident, $vtype_1B:ty ),* ,
+            $( $cvdoc_1B_psize:literal, $cvname_1B_psize:ident, $cvtype_1B_psize:ty, $cvpsize_1B_psize:meta ),* ,
+        // noncopy_variants_1B:
+        //     $( $vdoc_1B:literal, $vname_1B:ident, $vtype_1B:ty ),* ,
         // noncopy_variants_1B_dep:
-        // $( $vdoc_1B_dep:literal, $vname_1B_dep:ident, $vtype_1B_dep:ty,
+        //     $( $vdoc_1B_dep:literal, $vname_1B_dep:ident, $vtype_1B_dep:ty,
         // noncopy_variants_1B_psize:
-        // $( $vdoc_1B_psize:literal, $vname_1B_psize:ident, $vtype_1B_psize:ty, $vpsize_1B_psize:meta ),* ,
-            // $vdep1_1B_dep:literal, $vdep2_1B_dep:literal ),* ,
+        //     $( $vdoc_1B_psize:literal, $vname_1B_psize:ident, $vtype_1B_psize:ty, $vpsize_1B_psize:meta ),* ,
+        //     $vdep1_1B_dep:literal, $vdep2_1B_dep:literal ),* ,
 
         // 2-Byte / 16-bit
-        copy_variants_2B: $( $cvdoc_2B:literal, $cvname_2B:ident, $cvtype_2B:ty ),* ,
+        copy_variants_2B:
+            $( $cvdoc_2B:literal, $cvname_2B:ident, $cvtype_2B:ty ),* ,
         copy_variants_2B_dep: $( $cvdoc_2B_dep:literal, $cvname_2B_dep:ident, $cvtype_2B_dep:ty,
             $cvdep1_2B_dep:literal, $cvdep2_2B_dep:literal ),* ,
         copy_variants_2B_psize:
-        $( $cvdoc_2B_psize:literal, $cvname_2B_psize:ident, $cvtype_2B_psize:ty, $cvpsize_2B_psize:meta ),* ,
-        // noncopy_variants_2B: $( $vdoc_2B:literal, $vname_2B:ident, $vtype_2B:ty ),* ,
+            $( $cvdoc_2B_psize:literal, $cvname_2B_psize:ident, $cvtype_2B_psize:ty, $cvpsize_2B_psize:meta ),* ,
+        // noncopy_variants_2B:
+        //     $( $vdoc_2B:literal, $vname_2B:ident, $vtype_2B:ty ),* ,
         // noncopy_variants_2B_dep: $( $vdoc_2B_dep:literal, $vname_2B_dep:ident, $vtype_2B_dep:ty,
-            // $vdep1_2B_dep:literal ),* ,
+        //     $vdep1_2B_dep:literal ),* ,
         // noncopy_variants_2B_psize:
-        // $( $vdoc_2B_psize:literal, $vname_2B_psize:ident, $vtype_2B_psize:ty, $vpsize_2B_psize:meta ),* ,
+        //     $( $vdoc_2B_psize:literal, $vname_2B_psize:ident, $vtype_2B_psize:ty, $vpsize_2B_psize:meta ),* ,
 
         // 4-Byte / 32-bit
-        copy_variants_4B: $( $cvdoc_4B:literal, $cvname_4B:ident, $cvtype_4B:ty ),* ,
+        copy_variants_4B:
+            $( $cvdoc_4B:literal, $cvname_4B:ident, $cvtype_4B:ty ),* ,
         copy_variants_4B_dep: $( $cvdoc_4B_dep:literal, $cvname_4B_dep:ident, $cvtype_4B_dep:ty,
             $cvdep1_4B_dep:literal, $cvdep2_4B_dep:literal ),* ,
         copy_variants_4B_psize:
-        $( $cvdoc_4B_psize:literal, $cvname_4B_psize:ident, $cvtype_4B_psize:ty, $cvpsize_4B_psize:meta ),* ,
-        // noncopy_variants_4B: $( $vdoc_4B:literal, $vname_4B:ident, $vtype_4B:ty ),* ,
+            $( $cvdoc_4B_psize:literal, $cvname_4B_psize:ident, $cvtype_4B_psize:ty, $cvpsize_4B_psize:meta ),* ,
+        // noncopy_variants_4B:
+        //     $( $vdoc_4B:literal, $vname_4B:ident, $vtype_4B:ty ),* ,
         noncopy_variants_4B_dep: $( $vdoc_4B_dep:literal, $vname_4B_dep:ident, $vtype_4B_dep:ty,
             $vdep1_4B_dep:literal, $vdep2_4B_dep:literal ),* ,
         // noncopy_variants_4B_psize:
-        // $( $vdoc_4B_psize:literal, $vname_4B_psize:ident, $vtype_4B_psize:ty, $vpsize_4B_psize:meta ),* ,
+        //     $( $vdoc_4B_psize:literal, $vname_4B_psize:ident, $vtype_4B_psize:ty, $vpsize_4B_psize:meta ),* ,
 
         // 8-Byte / 64-bit
         copy_variants_8B: $( $cvdoc_8B:literal, $cvname_8B:ident, $cvtype_8B:ty ),* ,
@@ -103,11 +109,12 @@ macro_rules! define_all_sizes {
             $cvdep1_8B_dep:literal, $cvdep2_8B_dep:literal ),* ,
         copy_variants_8B_psize:
         $( $cvdoc_8B_psize:literal, $cvname_8B_psize:ident, $cvtype_8B_psize:ty, $cvpsize_8B_psize:meta ),* ,
-        // noncopy_variants_8B: $( $vdoc_8B:literal, $vname_8B:ident, $vtype_8B:ty ),* ,
+        // noncopy_variants_8B:
+        //     $( $vdoc_8B:literal, $vname_8B:ident, $vtype_8B:ty ),* ,
         noncopy_variants_8B_dep: $( $vdoc_8B_dep:literal, $vname_8B_dep:ident, $vtype_8B_dep:ty,
             $vdep1_8B_dep:literal, $vdep2_8B_dep:literal ),* ,
         // noncopy_variants_8B_psize:
-        // $( $vdoc_8B_psize:literal, $vname_8B_psize:ident, $vtype_8B_psize:ty, $vpsize_8B_psize:meta ),* ,
+        //     $( $vdoc_8B_psize:literal, $vname_8B_psize:ident, $vtype_8B_psize:ty, $vpsize_8B_psize:meta ),* ,
         noncopy_variants_8B_psize_dep:
         $( $vdoc_8B_psize_dep:literal, $vname_8B_psize_dep:ident, $vtype_8B_psize_dep:ty,
            $vpsize_8B_psize_dep:meta, $vdep1_8B_psize_dep:literal, $vdep2_8B_psize_dep:literal ),* ,
@@ -118,11 +125,12 @@ macro_rules! define_all_sizes {
             $cvdep1_16B_dep:literal, $cvdep2_16B_dep:literal ),* ,
         copy_variants_16B_psize:
         $( $cvdoc_16B_psize:literal, $cvname_16B_psize:ident, $cvtype_16B_psize:ty, $cvpsize_16B_psize:meta ),* ,
-        // noncopy_variants_16B: $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
+        // noncopy_variants_16B:
+        //     $( $vdoc_16B:literal, $vname_16B:ident, $vtype_16B:ty ),* ,
         // noncopy_variants_16B_dep: $( $vdoc_16B_dep:literal, $vname_16B_dep:ident, $vtype_16B_dep:ty,
         //     $vdep1_16B_dep:literal, $vdep2_16B_dep:literal ),* ,
         // noncopy_variants_16B_psize:
-        // $( $vdoc_16B_psize:literal, $vname_16B_psize:ident, $vtype_16B_psize:ty, $vpsize_16B_psize:meta ),* ,
+        //     $( $vdoc_16B_psize:literal, $vname_16B_psize:ident, $vtype_16B_psize:ty, $vpsize_16B_psize:meta ),* ,
         noncopy_variants_16B_psize_dep:
         $( $vdoc_16B_psize_dep:literal, $vname_16B_psize_dep:ident, $vtype_16B_psize_dep:ty,
            $vpsize_16B_psize_dep:meta, $vdep1_16B_psize_dep:literal, $vdep2_16B_psize_dep:literal ),* ,
@@ -131,11 +139,12 @@ macro_rules! define_all_sizes {
         copy_variants_32B: $( $cvdoc_32B:literal, $cvname_32B:ident, $cvtype_32B:ty ),* ,
         copy_variants_32B_dep: $( $cvdoc_32B_dep:literal, $cvname_32B_dep:ident, $cvtype_32B_dep:ty,
             $cvdep1_32B_dep:literal, $cvdep2_32B_dep:literal ),* ,
-        // noncopy_variants_32B: $( $vdoc_32B:literal, $vname_32B:ident, $vtype_32B:ty ),* ,
+        // noncopy_variants_32B:
+        //     $( $vdoc_32B:literal, $vname_32B:ident, $vtype_32B:ty ),* ,
         noncopy_variants_32B_dep: $( $vdoc_32B_dep:literal, $vname_32B_dep:ident, $vtype_32B_dep:ty,
             $vdep1_32B_dep:literal, $vdep2_32B_dep:literal ),* ,
         // noncopy_variants_32B_psize:
-        // $( $vdoc_32B_psize:literal, $vname_32B_psize:ident, $vtype_32B_psize:ty, $vpsize_32B_psize:meta ),* ,
+        //     $( $vdoc_32B_psize:literal, $vname_32B_psize:ident, $vtype_32B_psize:ty, $vpsize_32B_psize:meta ),* ,
         noncopy_variants_32B_psize_dep:
         $( $vdoc_32B_psize_dep:literal, $vname_32B_psize_dep:ident, $vtype_32B_psize_dep:ty,
            $vpsize_32B_psize_dep:meta, $vdep1_32B_psize_dep:literal, $vdep2_32B_psize_dep:literal ),* ,
@@ -144,11 +153,12 @@ macro_rules! define_all_sizes {
         copy_variants_64B: $( $cvdoc_64B:literal, $cvname_64B:ident, $cvtype_64B:ty ),* ,
         copy_variants_64B_dep: $( $cvdoc_64B_dep:literal, $cvname_64B_dep:ident, $cvtype_64B_dep:ty,
             $cvdep1_64B_dep:literal, $cvdep2_64B_dep:literal ),* ,
-        // noncopy_variants_64B: $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
+        // noncopy_variants_64B:
+        //     $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
         noncopy_variants_64B_dep: $( $vdoc_64B_dep:literal, $vname_64B_dep:ident, $vtype_64B_dep:ty,
             $vdep1_64B_dep:literal, $vdep2_64B_dep:literal ),* ,
         // noncopy_variants_64B_psize:
-        // $( $vdoc_64B_psize:literal, $vname_64B_psize:ident, $vtype_64B_psize:ty, $vpsize_64B_psize:meta ),* ,
+        //     $( $vdoc_64B_psize:literal, $vname_64B_psize:ident, $vtype_64B_psize:ty, $vpsize_64B_psize:meta ),* ,
         noncopy_variants_64B_psize_dep:
         $( $vdoc_64B_psize_dep:literal, $vname_64B_psize_dep:ident, $vtype_64B_psize_dep:ty,
            $vpsize_64B_psize_dep:meta, $vdep1_64B_psize_dep:literal, $vdep2_64B_psize_dep:literal ),* ,
@@ -157,13 +167,15 @@ macro_rules! define_all_sizes {
         copy_variants_128B: $( $cvdoc_128B:literal, $cvname_128B:ident, $cvtype_128B:ty ),* ,
         copy_variants_128B_dep: $( $cvdoc_128B_dep:literal, $cvname_128B_dep:ident, $cvtype_128B_dep:ty,
             $cvdep1_128B_dep:literal, $cvdep2_128B_dep:literal ),* ,
-        // noncopy_variants_128B: $( $vdoc_128B:literal, $vname_128B:ident, $vtype_128B:ty ),* ,
-        // noncopy_variants_128B_dep: $( $vdoc_128B_dep:literal, $vname_128B_dep:ident, $vtype_128B_dep:ty,
+        // noncopy_variants_128B:
+        //     $( $vdoc_128B:literal, $vname_128B:ident, $vtype_128B:ty ),* ,
+        // noncopy_variants_128B_dep:
+        //     $( $vdoc_128B_dep:literal, $vname_128B_dep:ident, $vtype_128B_dep:ty,
         //     $vdep1_128B_dep:literal, $vdep2_128B_dep:literal ),* ,
         // noncopy_variants_128B_psize:
-        // $( $vdoc_128B_psize:literal, $vname_128B_psize:ident, $vtype_128B_psize:ty, $vpsize_128B_psize:meta ),* ,
+        //     $( $vdoc_128B_psize:literal, $vname_128B_psize:ident, $vtype_128B_psize:ty, $vpsize_128B_psize:meta ),* ,
         // noncopy_variants_128B_psize_dep:
-        // $( $vdoc_128B_psize_dep:literal, $vname_128B_psize_dep:ident, $vtype_128B_psize_dep:ty,
+        //     $( $vdoc_128B_psize_dep:literal, $vname_128B_psize_dep:ident, $vtype_128B_psize_dep:ty,
         //    $vpsize_128B_psize_dep:meta, $vdep1_128B_psize_dep:literal, $vdep2_128B_psize_dep:literal ),* ,
 
     ) => {
@@ -171,7 +183,8 @@ macro_rules! define_all_sizes {
         define_single_size! {
             $tname, $cname, $bname,
             size: 1, 8,
-            copy_variants: $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
+            copy_variants:
+                $( $cvdoc_1B, $cvname_1B, $cvtype_1B ),* ,
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep, $cvdep2_1B_dep ),* ;
             copy_variants_psize:
@@ -492,52 +505,75 @@ macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
         size: $B:literal, $b:literal,
-        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-        copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_dep:
+            $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+        copy_variants_psize:
+            $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
             $cvpsize_psize:meta ),* ;
         copy_variants_psize_dep:
             $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
-        noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
-        noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
+        noncopy_variants:
+            $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+        noncopy_variants_dep:
+            $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
         noncopy_variants_psize: ;
         noncopy_variants_psize_dep:
-        $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+            $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
            $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         define_type!{
             $tname, size: $B, $b,
-            copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
-            copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+            copy_variants:
+                $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_dep:
+                $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep:
+                $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                 $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
-            noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
-            noncopy_variants_dep: $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-            noncopy_variants_psize_dep: $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+            noncopy_variants:
+                $( $vdoc, $vname, $vtype ),* ;
+            noncopy_variants_dep:
+                $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
         define_cell!{
             c: $cname, t:$tname, b:$bname, size: $B, $b,
-            copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
-            copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+            copy_variants:
+                $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_dep:
+                $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep:
+                $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                 $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
-            noncopy_variants: $( $vdoc, $vname, $vtype ),* ;
-            noncopy_variants_dep: $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-            noncopy_variants_psize_dep: $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+            noncopy_variants:
+                $( $vdoc, $vname, $vtype ),* ;
+            noncopy_variants_dep:
+                $( $vdoc_dep, $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
+            noncopy_variants_psize_dep:
+                $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
         define_bare!{
             $bname, size: $B, $b,
-            copy_variants: $( $cvdoc, $cvname, $cvtype ),* ,
-            copy_variants_dep: $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-            copy_variants_psize: $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-            copy_variants_psize_dep: $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+            copy_variants:
+                $( $cvdoc, $cvname, $cvtype ),* ,
+            copy_variants_dep:
+                $( $cvdoc_dep, $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+            copy_variants_psize:
+                $( $cvdoc_psize, $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+            copy_variants_psize_dep:
+                $( $cvdoc_psize_dep, $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                 $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
         }
 
@@ -553,17 +589,24 @@ macro_rules! define_type {
     (
         $tname:ident,
         size: $B:literal, $b:literal,
-        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-        copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_dep:
+            $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+        copy_variants_psize:
+            $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
             $cvpsize_psize:meta ),* ;
-        copy_variants_psize_dep: $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+        copy_variants_psize_dep:
+            $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
-        noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
-        noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
+        noncopy_variants:
+            $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+        noncopy_variants_dep:
+            $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        noncopy_variants_psize_dep: $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+        noncopy_variants_psize_dep:
+            $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) =>  {
         paste::paste!{
@@ -609,10 +652,14 @@ macro_rules! define_type {
             type_aliases![t: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
             impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
-                copy_variants: $( $cvname, $cvtype ),* ;
-                copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                copy_variants:
+                    $( $cvname, $cvtype ),* ;
+                copy_variants_dep:
+                    $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize:
+                    $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep:
+                    $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                     $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: ;
                 noncopy_variants_dep: ;
@@ -661,12 +708,16 @@ macro_rules! define_type {
                     $vname_dep,
                 )*
                 $( // pointer-size & feature-gated dependencies
-                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg(all($cvpsize_psize_dep,
+                            feature = $cvdep1_psize_dep,
+                            feature = $cvdep2_psize_dep))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep,
                 )*
                 $(
-                    #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                    #[cfg(all($vpsize_psize_dep,
+                            feature = $vdep1_psize_dep,
+                            feature = $vdep2_psize_dep))]
                     #[doc = $vdoc_psize_dep]
                     $vname_psize_dep,
                 )*
@@ -675,14 +726,21 @@ macro_rules! define_type {
             type_aliases![t: $tname, size: $B, $b, "", "data **Type**", ""];
             impl_data_types![ [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
-                copy_variants: $( $cvname, $cvtype ),* ;
-                copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                copy_variants:
+                    $( $cvname, $cvtype ),* ;
+                copy_variants_dep:
+                    $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize:
+                    $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep:
+                    $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                     $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
-                noncopy_variants: $($vname, $vtype ),* ;
-                noncopy_variants_dep: $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-                noncopy_variants_psize_dep: $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                noncopy_variants:
+                    $($vname, $vtype ),* ;
+                noncopy_variants_dep:
+                    $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
+                noncopy_variants_psize_dep:
+                    $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                     $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
 
@@ -703,17 +761,24 @@ macro_rules! define_cell {
     (
         c: $cname:ident, t: $tname:ident, b: $bname:ident,
         size: $B:literal, $b:literal,
-        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-        copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_dep:
+            $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+        copy_variants_psize:
+            $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
             $cvpsize_psize:meta ),* ;
-        copy_variants_psize_dep: $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+        copy_variants_psize_dep:
+            $( $cvdoc_psize_dep:literal, $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
-        noncopy_variants: $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
-        noncopy_variants_dep: $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
+        noncopy_variants:
+            $( $vdoc:literal, $vname:ident, $vtype:ty ),* ;
+        noncopy_variants_dep:
+            $( $vdoc_dep:literal, $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        noncopy_variants_psize_dep: $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
+        noncopy_variants_psize_dep:
+            $( $vdoc_psize_dep:literal, $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
@@ -752,7 +817,9 @@ macro_rules! define_cell {
                 )*
 
                 $( // pointer-size & feature-gated dependencies
-                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg(all($cvpsize_psize_dep,
+                            feature = $cvdep1_psize_dep,
+                            feature = $cvdep2_psize_dep))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
@@ -762,10 +829,14 @@ macro_rules! define_cell {
                 c: [< $cname $B Byte Copy With >], DataCellsCopy,
                 t: [< $tname $B Byte Copy With >], DataTypesCopy,
                 is_copy: true,
-                copy_variants: $( $cvname, $cvtype ),* ;
-                copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                copy_variants:
+                    $( $cvname, $cvtype ),* ;
+                copy_variants_dep:
+                    $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize:
+                    $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep:
+                    $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                     $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
                 noncopy_variants: ;
                 noncopy_variants_dep: ;
@@ -818,12 +889,16 @@ macro_rules! define_cell {
                 )*
 
                 $( // pointer-size & feature-gated dependencies
-                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg(all($cvpsize_psize_dep,
+                            feature = $cvdep1_psize_dep,
+                            feature = $cvdep2_psize_dep))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
                 $(
-                    #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                    #[cfg(all($vpsize_psize_dep,
+                            feature = $vdep1_psize_dep,
+                            feature = $vdep2_psize_dep))]
                     #[doc = $vdoc_psize_dep]
                     $vname_psize_dep($vtype_psize_dep),
                 )*
@@ -836,14 +911,21 @@ macro_rules! define_cell {
                 c: [< $cname $B Byte With >], DataCells,
                 t: [< $tname $B Byte With >], DataTypes,
                 is_copy: false,
-                copy_variants: $( $cvname, $cvtype ),* ;
-                copy_variants_dep: $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
-                copy_variants_psize: $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
-                copy_variants_psize_dep: $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
+                copy_variants:
+                    $( $cvname, $cvtype ),* ;
+                copy_variants_dep:
+                    $( $cvname_dep, $cvtype_dep, $cvdep1_dep, $cvdep2_dep ),* ;
+                copy_variants_psize:
+                    $( $cvname_psize, $cvtype_psize, $cvpsize_psize ),* ;
+                copy_variants_psize_dep:
+                    $( $cvname_psize_dep, $cvtype_psize_dep, $cvpsize_psize_dep,
                     $cvdep1_psize_dep, $cvdep2_psize_dep ),* ;
-                noncopy_variants: $($vname, $vtype ),* ;
-                noncopy_variants_dep: $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
-                noncopy_variants_psize_dep: $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
+                noncopy_variants:
+                    $($vname, $vtype ),* ;
+                noncopy_variants_dep:
+                    $( $vname_dep, $vtype_dep, $vdep1_dep, $vdep2_dep ),* ;
+                noncopy_variants_psize_dep:
+                    $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                     $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
 
@@ -971,12 +1053,16 @@ macro_rules! define_bare {
     (
         $bname:ident,
         size: $B:literal, $b:literal,
-        copy_variants: $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
-        copy_variants_dep: $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvdoc:literal, $cvname:ident, $cvtype:ty ),* ,
+        copy_variants_dep:
+            $( $cvdoc_dep:literal, $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
+        copy_variants_psize:
+            $( $cvdoc_psize:literal, $cvname_psize:ident, $cvtype_psize:ty,
             $cvpsize_psize:meta ),* ;
-        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+        copy_variants_psize_dep:
+            $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
@@ -1113,16 +1199,23 @@ macro_rules! impl_data_types {
     (
         $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
-        copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
-        copy_variants_dep: $( $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvname:ident, $cvtype:ty ),* ;
+        copy_variants_dep:
+            $( $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
-        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+        copy_variants_psize:
+            $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep:
+            $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
-        noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
-        noncopy_variants_dep: $( $vname_dep:ident, $vtype_dep:ty,
+        noncopy_variants:
+            $( $vname:ident, $vtype:ty ),* ;
+        noncopy_variants_dep:
+            $( $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        noncopy_variants_psize_dep: $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
+        noncopy_variants_psize_dep:
+            $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
@@ -1205,16 +1298,23 @@ macro_rules! impl_data_cells {
         c: $cname:ident, $cbound:ident,
         t: $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
-        copy_variants: $( $cvname:ident, $cvtype:ty ),* ;
-        copy_variants_dep: $( $cvname_dep:ident, $cvtype_dep:ty,
+        copy_variants:
+            $( $cvname:ident, $cvtype:ty ),* ;
+        copy_variants_dep:
+            $( $cvname_dep:ident, $cvtype_dep:ty,
             $cvdep1_dep:literal, $cvdep2_dep:literal ),* ;
-        copy_variants_psize: $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
-        copy_variants_psize_dep: $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
+        copy_variants_psize:
+            $( $cvname_psize:ident, $cvtype_psize:ty, $cvpsize_psize:meta ),* ;
+        copy_variants_psize_dep:
+            $( $cvname_psize_dep:ident, $cvtype_psize_dep:ty,
             $cvpsize_psize_dep:meta, $cvdep1_psize_dep:literal, $cvdep2_psize_dep:literal ),* ;
-        noncopy_variants: $( $vname:ident, $vtype:ty ),* ;
-        noncopy_variants_dep: $( $vname_dep:ident, $vtype_dep:ty,
+        noncopy_variants:
+            $( $vname:ident, $vtype:ty ),* ;
+        noncopy_variants_dep:
+            $( $vname_dep:ident, $vtype_dep:ty,
             $vdep1_dep:literal, $vdep2_dep:literal ),* ;
-        noncopy_variants_psize_dep: $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
+        noncopy_variants_psize_dep:
+            $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste! {
@@ -1256,7 +1356,7 @@ macro_rules! impl_data_bares {
 // MOCKUPS OF UNUSED DEPENDENCIES
 // -----------------------------------------------------------------------------
 
-// "external_continuous"
+// "deps_continuous"
 
 #[cfg(not(feature = "half"))]
 mod half {
@@ -1280,7 +1380,7 @@ mod twofloat {
     pub struct TwoFloat;
 }
 
-// "external_discrete"
+// "deps_discrete"
 
 #[cfg(not(feature = "num-rational"))]
 mod num_rational {
@@ -1299,7 +1399,7 @@ mod rust_decimal {
     pub struct Decimal;
 }
 
-// "external_string"
+// "deps_string"
 
 #[cfg(not(feature = "arraystring"))]
 mod arraystring {
@@ -1311,7 +1411,7 @@ mod arraystring {
 #[cfg(feature = "arraystring")]
 use arraystring::{typenum, ArrayString};
 
-// "external_time"
+// "deps_time"
 
 #[cfg(not(feature = "fugit"))]
 mod fugit {
@@ -1354,7 +1454,6 @@ define_all_sizes! {
         P8, softposit::P8, "softposit", "softposit",
     "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
         BitArray8, crate::all::BitArray8, "bv", "bv",
-    // WIP
     copy_variants_1B_psize:
         "8-bit usize", Usize, usize, target_pointer_width = "8",
         "8-bit isize", Isize, isize, target_pointer_width = "8",

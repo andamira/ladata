@@ -1,9 +1,10 @@
 // ladata::builder
 //
 //! Types are generated in these submodules and re-exported from elsewhere.
+//
 
-pub(crate) mod types_cells;
-pub use types_cells::*;
+pub(crate) mod units;
+pub use units::*;
 
 pub(crate) mod lines;
 pub use lines::*;
@@ -12,90 +13,111 @@ pub use lines::*;
 #[macro_export]
 #[doc(hidden)]
 macro_rules! reexport {
-    // modules
+    // external branches, multi-type re-export
     // -------------------------------------------------------------------------
 
-    // Generates `::sizes` sub-modules for all sizes.
-    (mod_sizes $path:path; all_sizes) => {
+    // reexports all the sizes
+    ($mod:ident, $path:path; all_sizes) => {
         use crate::reexport;
-        reexport![mod_sizes $path; 1, 8];
-        reexport![mod_sizes $path; 2, 16];
-        reexport![mod_sizes $path; 4, 32];
-        reexport![mod_sizes $path; 8, 64];
-        reexport![mod_sizes $path; 16, 128];
-        reexport![mod_sizes $path; 32, 256];
-        reexport![mod_sizes $path; 64, 512];
-        reexport![mod_sizes $path; 128, 1024];
+        reexport![$mod $path; 1, 8];
+        reexport![$mod $path; 2, 16];
+        reexport![$mod $path; 4, 32];
+        reexport![$mod $path; 8, 64];
+        reexport![$mod $path; 16, 128];
+        reexport![$mod $path; 32, 256];
+        reexport![$mod $path; 64, 512];
+        reexport![$mod $path; 128, 1024];
     };
-    // Generates `::sizes::` sub-modules for the pair of (Byte, bit) sizes.
-    // - Each module is referenced as a submodule of each other.
+
+    // `::sizes::` sub-modules reexports, single size.
     (mod_sizes $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             #[doc = $B " Byte data (== " $b " bit)" ]
             pub mod [< B $B >] {
-                #[doc(inline)]
                 pub use super::[< b $b >];
-                crate::reexport![@cell_type super::$path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-                crate::reexport![@unsafe super::$path; size: $B; ByteCopy ];
+                crate::reexport![@CellType $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+                crate::reexport![@Bare $path; size: $B; ByteCopy ];
+                crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
             }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
-                #[doc(inline)]
                 pub use super::[< B $B >];
-                crate::reexport![@cell_type super::$path; size: $b; bit bitWith bitCopy bitCopyWith ];
-                crate::reexport![@unsafe super::$path; size: $b; bitCopy ];
+                crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+                crate::reexport![@Bare $path; size: $b; bitCopy ];
+                // crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
             }
-            // TODO:add lines
         }
     };
 
-    // Generates `::lines::` sub-modules for all sizes.
-    (mod_lines $path:path; all_sizes) => {
-        use crate::reexport;
-        reexport![mod_lines $path; 1, 8];
-        reexport![mod_lines $path; 2, 16];
-        reexport![mod_lines $path; 4, 32];
-        reexport![mod_lines $path; 8, 64];
-        reexport![mod_lines $path; 16, 128];
-        reexport![mod_lines $path; 32, 256];
-        reexport![mod_lines $path; 64, 512];
-        reexport![mod_lines $path; 128, 1024];
-    };
-
-    // Generates `::lines::` sub-modules for the pair of (Byte, bit) sizes.
+    // `::lines::` reexports, single size
     (mod_lines $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            crate::reexport![@line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-            // crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            // crate::reexport![@Line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
         }
     };
 
+    // `::cells::` reexports, single size
+    (mod_cells $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            crate::reexport![@Cell $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            crate::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
+    // `::types::` reexports, single size
+    (mod_types $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            crate::reexport![@Type $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            crate::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
+    // `::bares::` reexports, single size
+    (mod_bares $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            // WIP
+            crate::reexport![@Bare $path; size: $B; ByteCopy ];
+            crate::reexport![@Bare $path; size: $b; bitCopy ];
+            // crate::reexport![@Bare $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            // crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
+
+    // internal branches, single-type re-export
     // -------------------------------------------------------------------------
 
     // generic re-export
-    (@type $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
+    (@ $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
         $( paste::paste!{
             pub use $path::[< $type $size $suf >];
         } )+
     };
 
-    // re-exports DataCell & DataType
-    (@cell_type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@type $path; DataCell; size: $size ; $( $suf )+ ];
-        crate::reexport![@type $path; DataType; size: $size ; $( $suf )+ ];
-        // crate::reexport![@type $path; DataBare; size: $size ; $( $suf )+ ];
+    // re-exports DataCell
+    (@Cell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+    };
+
+    // re-exports DataType
+    (@Type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataBare
-    // NOTE DataBare can't accept non-copy (for now) so must be treated separately
-    (@unsafe $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@type $path; DataBare; size: $size ; $( $suf )+ ];
+    (@Bare $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+    };
+
+    // re-exports both DataCell & DataType
+    (@CellType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+        crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
+        // NOTE DataBare can't accept non-copy (for now) so must be treated separately
+        // crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataLine
-    (@line $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        crate::reexport![@type $path; DataLine; size: $size ; $( $suf )+ ];
-        crate::reexport![@type $path; DataLineGrow; size: $size ; $( $suf )+ ];
-        // TODO:WIP
+    (@Line $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataLine; size: $size ; $( $suf )+ ];
+        crate::reexport![@ $path; DataLineGrow; size: $size ; $( $suf )+ ];
     };
 }
