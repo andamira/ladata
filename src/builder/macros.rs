@@ -1,36 +1,24 @@
-// ladata::builder::types_cells
+// ladata::builder::macros
 //
-//! DataType*s and DataCell*s are generated here.
+//! Macros for generating types, and reexporting them
 //
 // # TOC
 //
-// - MACROS:
-//   - define_all_sizes
-//   - define_single_size
-//   - define_type
-//   - define_cell
-//   - define_bare
-//   - type_aliases
-//   - impl_data_types
-//   - impl_data_cells
-//   - impl_data_bares
+// - define_all_sizes
+// - define_single_size
 //
-// - MOCKUPS OF UNUSED DEPENDENCIES
+// - define_type
+// - define_cell
+// - define_bare
+// - define_line
 //
-// - DEFINITIONS
+// - type_aliases
 //
-//   - DataType, DataCell, DataBare @ Byte: 1, 2, 4, 8, 16, 32, 64, 128
-
-use core::{
-    // any::TypeId,
-    convert::TryFrom,
-    fmt,
-    mem::{align_of, size_of},
-};
-
-use crate::define_line;
-use crate::other::NoData;
-use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+// - impl_data_types
+// - impl_data_cells
+// - impl_data_bares
+//
+// - reexport
 
 /// defines all sizes at the same time
 ///
@@ -56,6 +44,8 @@ use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCop
 ///
 /// The `define_single_size!` macro is called making sure each size contains
 /// all variants with a size less than or equal to the current size.
+#[macro_export]
+#[doc(hidden)]
 macro_rules! define_all_sizes {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -501,6 +491,8 @@ macro_rules! define_all_sizes {
 }
 
 /// for defining in one pass: DataType*, DataCell*, DataBare*, DataLine*
+#[macro_export]
+#[doc(hidden)]
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -585,6 +577,8 @@ macro_rules! define_single_size {
 }
 
 /// for defining enum DataType*
+#[macro_export]
+#[doc(hidden)]
 macro_rules! define_type {
     (
         $tname:ident,
@@ -743,20 +737,13 @@ macro_rules! define_type {
                     $( $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                     $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
-
-            // DESIGN: nested loops :S
-            // $(
-            //     impl_From_variants![
-            //         from: [< $tname $B Byte With>],
-            //         for_: [<$tname $forBlist Byte With>]
-            //         …WIP... (→ next macro)
-            //     ];
-            // )*
         }
     };
 }
 
 /// for defining enum DataCell*
+#[macro_export]
+#[doc(hidden)]
 macro_rules! define_cell {
     (
         c: $cname:ident, t: $tname:ident, b: $bname:ident,
@@ -1048,6 +1035,8 @@ macro_rules! define_cell {
 }
 
 /// for defining union DataBare*
+#[macro_export]
+#[doc(hidden)]
 macro_rules! define_bare {
     // # ATM receive only Copy variants (DataBare)
     (
@@ -1106,8 +1095,8 @@ macro_rules! define_bare {
             // type_aliases![c: $bname, size: $B, $b, "Copy", "data cell", "(Copy)"];
 
             // Debug
-            impl fmt::Debug for [<$bname $B Byte Copy>] {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            impl core::fmt::Debug for [<$bname $B Byte Copy>] {
+                fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     write!(f, "{} {{...}}", stringify!{[< $bname $B Byte Copy >]})
                 }
             }
@@ -1119,9 +1108,160 @@ macro_rules! define_bare {
     };
 }
 
+/// for defining DataLine*
+#[macro_export]
+#[doc(hidden)]
+macro_rules! define_line {
+    (
+        c: $cname:ident, t: $tname:ident, b: $bname:ident,
+        size: $B:literal, $b:literal,
+    ) => {
+        paste::paste! {
+            // DEFINE DataLine*
+
+            // array, Copy
+            #[doc = "An **array** of [`"
+            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
+            #[derive(Clone, Copy, Debug)]
+            pub struct [< DataLine $B Byte Copy With >]<C: DataCellsCopy, const LEN: usize> {
+                cells: [[< $cname $B Byte Copy With >]<C>; LEN]
+            }
+            // array, Copy, non-With
+            #[doc = "An **array** of [`"
+            [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
+            pub type [< DataLine $B Byte Copy >]<const LEN: usize> =
+                [< DataLine $B Byte Copy With >]<NoData, LEN>;
+
+            // array, non-Copy
+            #[doc = "An **array** of [`"
+            [< $cname $B Byte With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
+            #[derive(Debug)]
+            pub struct [< DataLine $B Byte With >]<C: DataCells, const LEN: usize> {
+                cells: [[< $cname $B Byte With >]<C>; LEN]
+            }
+            // array, non-Copy, non-With
+            #[doc = "An array of [`" [< $cname $B Byte >] "`][crate::all::" [< $cname $B Byte >] "]" ]
+            pub type [< DataLine $B Byte >]<const LEN: usize> =
+                [< DataLine $B Byte With >]<NoData, LEN>;
+
+            // WIP
+            // type_aliases![l: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
+
+            // DEFINE DataLineGrow*
+
+            // vec, Copy
+            #[doc = "A **vector** of [`"
+            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
+            #[derive(Clone, Debug)]
+            pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellsCopy> {
+                cells: Vec<[< $cname $B Byte Copy With >]<C>>
+            }
+            // vec, Copy, non-With
+            #[doc = "A **vector** of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
+            pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<NoData>;
+
+            // vec, non-Copy
+            #[doc = "A **vector** of [`"
+            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
+            #[derive(Debug)]
+            pub struct [< DataLineGrow $B Byte With >]<C: DataCells> {
+                cells: Vec<[< $cname $B Byte With >]<C>>
+            }
+            // vec, non-Copy, non-With
+            #[doc = "A **vector** of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
+            pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<NoData>;
+
+            // DEFINE DataLineCompact*
+
+            // compact array, Copy
+            #[doc = "A dense **array** of [`"
+            [< $bname $B Byte Copy >] "`][crate::all::" [< $bname $B Byte Copy >] "]\n" ]
+            ///
+            #[derive(Clone, Copy, Debug)]
+            pub struct [< DataLineCompact $B Byte Copy >]<const LEN: usize> {
+                // WIP
+                _types: [[< $tname $B Byte Copy >]; LEN],
+                _cells: [[< $bname $B Byte Copy >]; LEN]
+            }
+
+            // From/Into Array, Copy
+            impl<C: DataCellsCopy, const LEN: usize> From< [<DataLine $B Byte Copy With>]<C, LEN> >
+                for [[<$cname $B Byte Copy With>]<C>; LEN] {
+                fn from(from: [<DataLine $B Byte Copy With>]<C, LEN>) -> Self {
+                    from.cells
+                }
+            }
+            impl<C: DataCellsCopy, const LEN: usize> From<[[<$cname $B Byte Copy With>]<C>; LEN]>
+                for [<DataLine $B Byte Copy With>]<C, LEN> {
+                fn from(from: [[<$cname $B Byte Copy With>]<C>; LEN] ) -> Self {
+                    [<DataLine $B Byte Copy With>] {
+                        cells: from
+                    }
+                }
+            }
+            // From/Into Array, non-Copy
+            impl<C: DataCells, const LEN: usize> From< [<DataLine $B Byte With>]<C, LEN> >
+                for [[<$cname $B Byte With>]<C>; LEN] {
+                fn from(from: [<DataLine $B Byte With>]<C, LEN>) -> Self {
+                    from.cells
+                }
+            }
+            impl<C: DataCells, const LEN: usize> From<[[<$cname $B Byte With>]<C>; LEN]>
+                for [<DataLine $B Byte With>]<C, LEN> {
+                fn from(from: [[<$cname $B Byte With>]<C>; LEN] ) -> Self {
+                    [<DataLine $B Byte With>] {
+                        cells: from
+                    }
+                }
+            }
+
+            // From/Into Vec, Copy
+            impl<C: DataCellsCopy> From< [<DataLineGrow $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
+                fn from(from: [<DataLineGrow $B Byte Copy With>]<C>) -> Self {
+                    from.cells
+                }
+            }
+            impl<C: DataCellsCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataLineGrow $B Byte Copy With>]<C> {
+                fn from(from: Vec< [<$cname $B Byte Copy With>]<C> > ) -> Self {
+                    [<DataLineGrow $B Byte Copy With>] {
+                        cells: from
+                    }
+                }
+            }
+
+            // From/Into Vec, non-Copy
+            impl<C: DataCells> From< [<DataLineGrow $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
+                fn from(from: [<DataLineGrow $B Byte With>]<C>) -> Self {
+                    from.cells
+                }
+            }
+            impl<C: DataCells> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataLineGrow $B Byte With>]<C> {
+                fn from(from: Vec< [<$cname $B Byte With>]<C> > ) -> Self {
+                    [<DataLineGrow $B Byte With>] {
+                        cells: from
+                    }
+                }
+            }
+
+        }
+
+        // TODO: impl common trait: DataLines?
+        // - accept Into<DataCell* exact> ?
+
+        // IDEAS
+        // - MixedVec<B: DataBares, T: DataTypes> // both vecs same len
+        // - UnmixedVec (dynamically enforced same type (only 1 T for all UC)
+        // - MixedArray<const LEN: usize, B: DataBares, T: DataTypes>
+        // - UnmixedArray<const LEN: usize, B: DataBares, T: DataTypes>
+
+    };
+}
+
 // -----------------------------------------------------------------------------
 
 /// define: types aliases
+#[macro_export]
+#[doc(hidden)]
 macro_rules! type_aliases {
     // DataCell aliases
     ( c: $name:ident, size: $B:literal, $b:literal,
@@ -1195,6 +1335,8 @@ macro_rules! type_aliases {
 }
 
 /// implement: DataTypes trait
+#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_data_types {
     (
         $tname:ident, $tbound:ident,
@@ -1223,66 +1365,66 @@ macro_rules! impl_data_types {
                 fn data_align(&self) -> usize {
                     use $tname::*;
                     match self {
-                        None => align_of::<NoData>(),
+                        None => core::mem::align_of::<NoData>(),
                         With(o) => o.data_align(),
 
-                        $( $cvname => align_of::<$cvtype>(), )*
-                        $( $vname => align_of::<$vtype>(), )*
+                        $( $cvname => core::mem::align_of::<$cvtype>(), )*
+                        $( $vname => core::mem::align_of::<$vtype>(), )*
 
                         $( // pointer-size dependant
                             #[cfg($cvpsize_psize)]
-                            $cvname_psize => align_of::<$cvtype_psize>(),
+                            $cvname_psize => core::mem::align_of::<$cvtype_psize>(),
                         )*
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
-                            $cvname_dep => align_of::<$cvtype_dep>(),
+                            $cvname_dep => core::mem::align_of::<$cvtype_dep>(),
                         )*
                         $(
                             #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
-                            $vname_dep => align_of::<$vtype_dep>(),
+                            $vname_dep => core::mem::align_of::<$vtype_dep>(),
                         )*
 
                         $( // pointer-size & feature-gated dependencies
                             #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
-                            $cvname_psize_dep => align_of::<$cvtype_psize_dep>(),
+                            $cvname_psize_dep => core::mem::align_of::<$cvtype_psize_dep>(),
                         )*
                         $(
                             #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
-                            $vname_psize_dep => align_of::<$vtype_psize_dep>(),
+                            $vname_psize_dep => core::mem::align_of::<$vtype_psize_dep>(),
                         )*
                     }
                 }
                 fn data_size(&self) -> usize {
                     use $tname::*;
                     match self {
-                        None => size_of::<NoData>(),
+                        None => core::mem::size_of::<NoData>(),
                         With(o) => o.data_size(),
 
-                        $( $cvname => size_of::<$cvtype>(), )*
-                        $( $vname => size_of::<$vtype>(), )*
+                        $( $cvname => core::mem::size_of::<$cvtype>(), )*
+                        $( $vname => core::mem::size_of::<$vtype>(), )*
 
                         $( // pointer-size dependant
                             #[cfg($cvpsize_psize)]
-                            $cvname_psize => size_of::<$cvtype_psize>(),
+                            $cvname_psize => core::mem::size_of::<$cvtype_psize>(),
                         )*
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
-                            $cvname_dep => size_of::<$cvtype_dep>(),
+                            $cvname_dep => core::mem::size_of::<$cvtype_dep>(),
                         )*
                         $(
                             #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
-                            $vname_dep => size_of::<$vtype_dep>(),
+                            $vname_dep => core::mem::size_of::<$vtype_dep>(),
                         )*
 
                         $( // pointer-size & feature-gated dependencies
                             #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
-                            $cvname_psize_dep => size_of::<$cvtype_psize_dep>(),
+                            $cvname_psize_dep => core::mem::size_of::<$cvtype_psize_dep>(),
                         )*
                         $(
                             #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
-                            $vname_psize_dep => size_of::<$vtype_psize_dep>(),
+                            $vname_psize_dep => core::mem::size_of::<$vtype_psize_dep>(),
                         )*
                     }
                 }
@@ -1293,6 +1435,8 @@ macro_rules! impl_data_types {
 }
 
 /// implement: DataCells trait
+#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_data_cells {
     (
         c: $cname:ident, $cbound:ident,
@@ -1341,6 +1485,8 @@ macro_rules! impl_data_cells {
     };
 }
 /// implement: DataBares trait
+#[macro_export]
+#[doc(hidden)]
 macro_rules! impl_data_bares {
     (
       b: $bname:ident,
@@ -1353,300 +1499,122 @@ macro_rules! impl_data_bares {
     };
 }
 
-// MOCKUPS OF UNUSED DEPENDENCIES
-// -----------------------------------------------------------------------------
+/// re-exports types from public modules.
+#[macro_export]
+#[doc(hidden)]
+macro_rules! reexport {
+    // external branches, multi-type re-export
+    // -------------------------------------------------------------------------
 
-// "deps_continuous"
+    // reexports all the sizes
+    ($mod:ident, $path:path; all_sizes) => {
+        use crate::reexport;
+        reexport![$mod $path; 1, 8];
+        reexport![$mod $path; 2, 16];
+        reexport![$mod $path; 4, 32];
+        reexport![$mod $path; 8, 64];
+        reexport![$mod $path; 16, 128];
+        reexport![$mod $path; 32, 256];
+        reexport![$mod $path; 64, 512];
+        reexport![$mod $path; 128, 1024];
+    };
 
-#[cfg(not(feature = "half"))]
-mod half {
-    #![allow(dead_code)]
-    pub struct f16;
-    pub struct bf16;
-}
-#[cfg(not(feature = "softposit"))]
-mod softposit {
-    #![allow(dead_code)]
-    pub struct P8;
-    pub struct P16;
-    pub struct P32;
-    pub struct Q8;
-    pub struct Q16;
-    pub struct Q32;
-}
-#[cfg(not(feature = "twofloat"))]
-mod twofloat {
-    #![allow(dead_code)]
-    pub struct TwoFloat;
-}
+    // `::sizes::` sub-modules reexports, single size.
+    (mod_sizes $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            #[doc = $B " Byte data (== " $b " bit)" ]
+            pub mod [< B $B >] {
+                pub use super::[< b $b >];
+                crate::reexport![@CellType $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+                crate::reexport![@Bare $path; size: $B; ByteCopy ];
+                crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            }
+            #[doc = $b " bit data (== " $B " Byte)" ]
+            pub mod [< b $b >] {
+                pub use super::[< B $B >];
+                crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+                crate::reexport![@Bare $path; size: $b; bitCopy ];
+                // crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
+            }
+        }
+    };
 
-// "deps_discrete"
+    // `::lines::` reexports, single size
+    (mod_lines $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            // crate::reexport![@Line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
+        }
+    };
 
-#[cfg(not(feature = "num-rational"))]
-mod num_rational {
-    #![allow(dead_code)]
-    pub struct Ratio;
-}
+    // `::cells::` reexports, single size
+    (mod_cells $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            crate::reexport![@Cell $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            crate::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
+    // `::types::` reexports, single size
+    (mod_types $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            crate::reexport![@Type $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            crate::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
+    // `::bares::` reexports, single size
+    (mod_bares $path:path; $B:literal, $b:literal ) => {
+        paste::paste!{
+            // WIP
+            crate::reexport![@Bare $path; size: $B; ByteCopy ];
+            crate::reexport![@Bare $path; size: $b; bitCopy ];
+            // crate::reexport![@Bare $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            // crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+        }
+    };
 
-#[cfg(not(feature = "num-bigint"))]
-mod num_bigint {
-    #![allow(dead_code)]
-    pub struct BigInt;
-}
-#[cfg(not(feature = "rust_decimal"))]
-mod rust_decimal {
-    #![allow(dead_code)]
-    pub struct Decimal;
-}
+    // internal branches, single-type re-export
+    // -------------------------------------------------------------------------
 
-// "deps_string"
+    // re-exports DataCell
+    (@Cell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+    };
 
-#[cfg(not(feature = "arraystring"))]
-mod arraystring {
-    #![allow(dead_code)]
-    pub struct ArrayString<T> {
-        _t: T,
-    }
-}
-#[cfg(feature = "arraystring")]
-use arraystring::{typenum, ArrayString};
+    // re-exports DataType
+    (@Type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
+    };
 
-// "deps_time"
+    // re-exports DataBare
+    (@Bare $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+    };
 
-#[cfg(not(feature = "fugit"))]
-mod fugit {
-    #![allow(dead_code)]
-    pub struct Instant<T, const A: usize, B: Into<usize>> {
-        _t: T,
-        _b: B,
-    }
-    pub struct Duration<T, const A: usize, B: Into<usize>> {
-        _t: T,
-        _b: B,
-    }
-}
-#[cfg(not(feature = "time"))]
-mod time {
-    #![allow(dead_code)]
-    pub struct Date;
-    pub struct Time;
-    pub struct Instant;
-    pub struct UtcOffset;
-    pub struct OffsetDateTime;
-    pub struct PrimitiveDateTime;
-    pub struct Duration;
-}
+    // re-exports both DataCell & DataType
+    (@CellType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+        crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
+        // NOTE DataBare can't accept non-copy (for now) so must be treated separately
+        // crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+    };
 
-// DEFINITIONS
-// -----------------------------------------------------------------------------
+    // re-exports DataLine
+    (@Line $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        crate::reexport![@ $path; DataLine; size: $size ; $( $suf )+ ];
+        crate::reexport![@ $path; DataLineGrow; size: $size ; $( $suf )+ ];
 
-define_all_sizes! {
-    DataType, DataCell, DataBare,
+        // TODO:WIP
+        // crate::reexport![@ $path; DataLineDense; size: $size ; $( $suf )+ ];
+        // crate::reexport![@ $path; DataLineGrowDense; size: $size ; $( $suf )+ ];
 
-    // -------------------------------------------------------- 1-B / 8-b
-    copy_variants_1B:
-    "8-bit unsigned integer ", U8, u8,
-    "8-bit signed integer", I8, i8,
-    "1-Byte array of bytes", ByteArray1, [u8; 1],
-    "Boolean value", Bool, bool,
-    copy_variants_1B_dep:
-    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=0",
-        P8, softposit::P8, "softposit", "softposit",
-    "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray8, crate::all::BitArray8, "bv", "bv",
-    copy_variants_1B_psize:
-        "8-bit usize", Usize, usize, target_pointer_width = "8",
-        "8-bit isize", Isize, isize, target_pointer_width = "8",
-    // noncopy_variants_1B: ,
-    // noncopy_variants_1B_dep: ,
+        // crate::reexport![@ $path; DataLineBuffer; size: $size ; $( $suf )+ ];
+        // crate::reexport![@ $path; DataLineGrowBuffer; size: $size ; $( $suf )+ ];
+    };
 
-    // -------------------------------------------------------- 2-B / 16-b
-    copy_variants_2B:
-    "16-bit unsigned integer ", U16, u16,
-    "16-bit signed integer", I16, i16,
-    "2-Byte array of bytes", ByteArray2, [u8; 2],
-    copy_variants_2B_dep:
-    "16-bit [`half`](https://crates.io/crates/half)'s `binary16` floating-point number",
-        F16, half::f16, "half", "half",
-    "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number",
-        BF16, half::bf16, "half", "half",
-    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1",
-        P16, softposit::P16, "softposit", "softposit",
-    "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=1",
-        ArrayString1, ArrayString<typenum::U1>, "arraystring", "arraystring",
-    "16-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray16, crate::all::BitArray16, "bv", "bv",
-    copy_variants_2B_psize:
-        "16-bit usize", Usize, usize, target_pointer_width = "16",
-        "16-bit isize", Isize, isize, target_pointer_width = "16",
-    // noncopy_variants_2B: ,
-    // noncopy_variants_2B_dep: ,
-
-    // -------------------------------------------------------- 4-B / 32-b
-    copy_variants_4B:
-    "32-bit unsigned integer ", U32, u32,
-    "32-bit signed integer", I32, i32,
-    "32-bit floating-point number", F32, f32,
-    "4-Byte array of bytes", ByteArray4, [u8; 4],
-    "4-Byte char ", Char, char,
-    copy_variants_4B_dep:
-    "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=2",
-        P32, softposit::P32, "softposit", "softposit",
-    "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=3",
-        ArrayString3, ArrayString<typenum::U3>, "arraystring", "arraystring",
-    "32-bit [`time`](https://crates.io/crates/time)'s `Date`",
-        TDate, time::Date, "time", "time",
-    "32-bit [`time`](https://crates.io/crates/time)'s `UtcOffset`",
-        TUtcOffset, time::UtcOffset, "time", "time",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
-        FugitDuration32Hours, fugit::Duration<u32, 3_600, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in minutes",
-        FugitDuration32Minutes, fugit::Duration<u32, 60, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in seconds",
-        FugitDuration32Seconds, fugit::Duration<u32, 1, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in milliseconds",
-        FugitDuration32Millis, fugit::Duration<u32, 1, 1_000>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in nanoseconds",
-        FugitDuration32Nanos, fugit::Duration<u32, 1, 1_000_000>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in hours",
-        FugitInstant32Hours, fugit::Instant<u32, 3_600, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in minutes",
-        FugitInstant32Minutes, fugit::Instant<u32, 60, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in seconds",
-        FugitInstant32Seconds, fugit::Instant<u32, 1, 1>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in milliseconds",
-        FugitInstant32Millis, fugit::Instant<u32, 1, 1_000>, "fugit", "fugit",
-    "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
-        FugitInstant32Nanos, fugit::Instant<u32, 1, 1_000_000>, "fugit", "fugit",
-    "32-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray32, crate::all::BitArray32, "bv", "bv",
-    copy_variants_4B_psize:
-        "32-bit usize", Usize, usize, target_pointer_width = "32",
-        "32-bit isize", Isize, isize, target_pointer_width = "32",
-    // noncopy_variants_4B: ,
-    noncopy_variants_4B_dep:
-    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=0",
-        Q8, softposit::Q8, "softposit", "softposit",
-
-    // ------------------------------------------------------------------------- 8-B / 64-b
-    copy_variants_8B:
-    "64-bit unsigned integer ", U64, u64,
-    "64-bit signed integer", I64, i64,
-    "64-bit floating-point number", F64, f64,
-    "8-Byte array of bytes", ByteArray8, [u8; 8],
-    copy_variants_8B_dep:
-    "32-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
-        R32, num_rational::Ratio<i32>, "num-rational", "num-rational",
-    "8-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=7",
-        ArrayString7, ArrayString<typenum::U7>, "arraystring", "arraystring",
-    "64-bit [`time`](https://crates.io/crates/time)'s `Time`",
-        TTime, time::Time, "time", "time",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in hours",
-        FugitDuration64Hours, fugit::Duration<u64, 3_600, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in minutes",
-        FugitDuration64Minutes, fugit::Duration<u64, 60, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in seconds",
-        FugitDuration64Seconds, fugit::Duration<u64, 1, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in milliseconds",
-        FugitDuration64Millis, fugit::Duration<u64, 1, 1_000>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Duration` in nanoseconds",
-        FugitDuration64Nanos, fugit::Duration<u64, 1, 1_000_000>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in hours",
-        FugitInstant64Hours, fugit::Instant<u64, 3_600, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in minutes",
-        FugitInstant64Minutes, fugit::Instant<u64, 60, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in seconds",
-        FugitInstant64Seconds, fugit::Instant<u64, 1, 1>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in milliseconds",
-        FugitInstant64Millis, fugit::Instant<u64, 1, 1_000>, "fugit", "fugit",
-    "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
-        FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>, "fugit", "fugit",
-    "64-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray64, crate::all::BitArray64, "bv", "bv",
-    copy_variants_8B_psize:
-        "64-bit usize", Usize, usize, target_pointer_width = "64",
-        "64-bit isize", Isize, isize, target_pointer_width = "64",
-    // noncopy_variants_8B: ,
-    noncopy_variants_8B_dep:
-    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=1",
-        Q16, softposit::Q16, "softposit", "softposit",
-    noncopy_variants_8B_psize_dep:
-        "6-Byte fat-pointer String", String, std::string::String, target_pointer_width = "16", "std", "std",
-
-    // ------------------------------------------------------------------------- 16-B /128-b
-    copy_variants_16B:
-    "128-bit unsigned integer ", U128, u128,
-    "128-bit signed integer", I128, i128,
-    "16-Byte array of bytes", ByteArray16, [u8; 16],
-    "128-bit Duration", Duration, core::time::Duration,
-    copy_variants_16B_dep:
-    "64-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
-        R64, num_rational::Ratio<i64>, "num-rational", "num-rational",
-    "16-Byte [rust_decimal] Decimal number",
-        Decimal, rust_decimal::Decimal, "rust_decimal", "rust_decimal",
-    "16-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=15",
-        ArrayString15, ArrayString<typenum::U15>, "arraystring", "arraystring",
-    "128-bit [`time`](https://crates.io/crates/time)'s `Duration`",
-        TDuration, time::Duration, "time", "time",
-    "128-bit [`time`](https://crates.io/crates/time)'s `PrimitiveDateTime`",
-        TDateTime, time::PrimitiveDateTime, "time", "time",
-    "128-bit [`time`](https://crates.io/crates/time)'s `OffsetDateTime`",
-        TOffsetDateTime, time::OffsetDateTime, "time", "time",
-    "128-bit floating point number",
-        F128, twofloat::TwoFloat, "std", "twofloat",
-    "128-bit Instant",
-        Instant, std::time::Instant, "std", "std",
-    "128-bit SystemTime",
-        SystemTime, std::time::SystemTime, "std", "std",
-    "128-bit [`time`](https://crates.io/crates/time)'s Instant`",
-        TInstant, time::Instant, "std", "time",
-    "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray128, crate::all::BitArray128, "bv", "bv",
-    copy_variants_16B_psize:
-        "128-bit usize", Usize, usize, target_pointer_width = "128",
-        "128-bit isize", Isize, isize, target_pointer_width = "128",
-    // noncopy_variants_16B: ,
-    noncopy_variants_16B_psize_dep:
-        "12-Byte fat-pointer String", String, std::string::String, target_pointer_width = "32", "std", "std",
-
-    // ------------------------------------------------------------------------- 32-B / 256-b
-    copy_variants_32B:
-    "32-Byte array of bytes", ByteArray32, [u8; 32],
-    copy_variants_32B_dep:
-    "128-bit rational number", R128, num_rational::Ratio<i128>, "num-rational", "num-rational",
-    "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=31",
-        ArrayString31, ArrayString<typenum::U31>, "arraystring", "arraystring",
-    "256-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray256, crate::all::BitArray256, "bv", "bv",
-    // noncopy_variants_32B: ,
-    noncopy_variants_32B_dep:
-    "Big Integer", BigInt, num_bigint::BigInt, "num-bigint", "num-bigint",
-    noncopy_variants_32B_psize_dep:
-        "24-Byte fat-pointer String", String, std::string::String, target_pointer_width = "64", "std", "std",
-
-    // ------------------------------------------------------------------------- 64 B / 512-b
-    copy_variants_64B:
-    "64-Byte array of bytes", ByteArray64, [u8; 64],
-    copy_variants_64B_dep:
-    "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=63",
-        ArrayString63, ArrayString<typenum::U63>, "arraystring", "arraystring",
-    "512-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray512, crate::all::BitArray512, "bv", "bv",
-    // noncopy_variants_64B: ,
-    noncopy_variants_64B_dep:
-    "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=2",
-        Q32, softposit::Q32, "softposit", "softposit",
-    noncopy_variants_64B_psize_dep:
-        "48-Byte fat-pointer String", String, std::string::String, target_pointer_width = "128", "std", "std",
-
-    // ------------------------------------------------------------------------- 128-B / 1024-b
-    copy_variants_128B:
-    "128-Byte array of bytes", ByteArray128, [u8; 128],
-    copy_variants_128B_dep:
-    "128-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=127",
-        ArrayString127, ArrayString<typenum::U127>, "arraystring", "arraystring",
-    "1024-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
-        BitArray1024, crate::all::BitArray1024, "bv", "bv",
-    // noncopy_variants_128B: ,
-    // noncopy_variants_128B_dep: ,
+    // generic re-export
+    (@ $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
+        $( paste::paste!{
+            pub use $path::[< $type $size $suf >];
+        } )+
+    };
 }

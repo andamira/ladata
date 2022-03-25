@@ -4,7 +4,7 @@
 //!
 //! # Overview
 //!
-//! ## Unitary
+//! ## Units
 //!
 //! See the [`units`] module for more information.
 //!
@@ -39,7 +39,7 @@
 //! corresponding `DataType…`s separately. At the moment they only support
 //! `Copy` types, and they can't host any custom types (lacking a `With` field).
 //!
-//! ## Linear
+//! ## Lines
 //!
 //! See the [`lines`] module for more information.
 //!
@@ -99,6 +99,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod builder;
+use builder::built;
 
 #[cfg(test)]
 #[allow(unused_imports)]
@@ -113,7 +114,7 @@ pub mod other;
 /// Everything is directly available in here.
 pub mod all {
     #[doc(inline)]
-    pub use super::builder::*;
+    pub use crate::built::*;
     #[doc(inline)]
     pub use super::other::*;
     #[doc(inline)]
@@ -121,10 +122,10 @@ pub mod all {
 }
 /// Everything is available in here, organized by size.
 pub mod sizes {
-    crate::reexport![mod_sizes, crate::builder; all_sizes];
+    crate::reexport![mod_sizes, crate::built; all_sizes];
 }
 
-/// Units of data, either just the data, just the type, or both.
+/// Units of data, whether just the data, the type, or both.
 /// # Unitary types: Data `Type*`|`Cell*`|`Bare*` and `NoData`
 ///
 /// The concrete implementations of **unitary types** observes the following naming schemes:
@@ -205,17 +206,17 @@ pub mod sizes {
 pub mod units {
     /// Data *Bares* (just the unsafe bare data).
     pub mod bares {
-        crate::reexport![mod_bares, crate::builder; all_sizes];
+        crate::reexport![mod_bares, crate::built; all_sizes];
     }
 
     /// Data *Cells* (the encapsulation of *data* plus *type*).
     pub mod cells {
-        crate::reexport![mod_cells, crate::builder; all_sizes];
+        crate::reexport![mod_cells, crate::built; all_sizes];
     }
 
     /// Data *Types* (just the type of the data).
     pub mod types {
-        crate::reexport![mod_types, crate::builder; all_sizes];
+        crate::reexport![mod_types, crate::built; all_sizes];
     }
 
     #[doc(inline)]
@@ -252,5 +253,5 @@ pub mod units {
 ///     in its `With` variant.
 ///
 pub mod lines {
-    crate::reexport![mod_lines, crate::builder; all_sizes];
+    crate::reexport![mod_lines, crate::built; all_sizes];
 }
