@@ -28,9 +28,6 @@ pub trait DataTypes: Copy + Debug {
     /// Returns the size of the data represented by this type.
     fn data_size(&self) -> usize;
 
-    // /// Returns the `TypeId` of the data represented by this type.
-    // fn type_id(&self) -> TypeId;
-
     /// Returns true if the data represented by this type is [`Copy`].
     fn is_copy(&self) -> bool;
 }
@@ -78,9 +75,16 @@ pub trait DataCells: Debug {
 /// - [`DataTypesCopy`]
 pub trait DataCellsCopy: DataCells + Copy {}
 
-/// Common trait for unsafe data cells implemented with `union`.
+/// Common trait for *unsafe data cells*.
 ///
 /// # Safety
 /// TODO
 ///
 pub unsafe trait DataBares {}
+
+/// Comon (marker) trait for *unsafe* `Copy` *data cells*.
+///
+/// # Safety
+/// TODO
+///
+pub unsafe trait DataBaresCopy: DataBares + Copy {}

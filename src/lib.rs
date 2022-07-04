@@ -1,5 +1,3 @@
-//! **`ladata`**
-//!
 //! A simple & modular mixed data model for stable Rust.
 //!
 //! # Overview
@@ -93,7 +91,12 @@
 //! See the [`customize.rs`](https://github.com/andamira/ladata/blob/main/examples/customize.rs)
 //! example on how to use custom data types.
 //!
-
+//! # Status
+//! - This is still experimental work in progress. The API can and will keep changing.
+//! - Currently waiting for [GAT stabilization] to keep improving the traits.
+//!
+//! [Gat stabilization]: https://github.com/rust-lang/rust/issues/44265
+//!
 #![allow(non_snake_case, non_camel_case_types)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -114,11 +117,11 @@ pub mod other;
 /// Everything is directly available in here.
 pub mod all {
     #[doc(inline)]
-    pub use crate::built::*;
-    #[doc(inline)]
     pub use super::other::*;
     #[doc(inline)]
     pub use super::traits::*;
+    #[doc(inline)]
+    pub use crate::built::*;
 }
 /// Everything is available in here, organized by size.
 pub mod sizes {
