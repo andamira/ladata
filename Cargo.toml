@@ -9,14 +9,14 @@ repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
 license = "MIT/Apache-2.0"
 include = [
-	"src/**/*.rs",
+	"/src/**/*.rs",
 	"/Cargo.toml",
 	"/LICENSE*",
 	"/README.md",
 ]
 categories = [ "no-std", "data-structures" ]
 keywords = [ "data", "type", "cell" ] # dataframe
-publish = false
+publish = true
 
 [dependencies]
 paste = "1"
