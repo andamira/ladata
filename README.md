@@ -4,7 +4,7 @@
 [![API](https://docs.rs/ladata/badge.svg)](https://docs.rs/ladata/)
 [![Lines Of Code](https://tokei.rs/b1/github/andamira/ladata?category=lines)](https://github.com/andamira/ladata)
 
-A simple & modular mixed data model in Rust.
+A simple & modular mixed data model.
 
 See [the documentation](https://docs.rs/ladata/) for more information.
 

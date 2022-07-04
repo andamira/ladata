@@ -1,4 +1,4 @@
-//! A simple & modular mixed data model for stable Rust.
+//! A simple & modular mixed data model.
 //!
 //! # Overview
 //!

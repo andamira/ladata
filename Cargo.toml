@@ -1,18 +1,18 @@
 [package]
 name = "ladata"
-description = "data model"
-version = "0.0.17"
+description = "A simple & modular data model."
+version = "0.0.18"
 edition = "2021"
-rust-version = "1.59"
+rust-version = "1.62"
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
 repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
 license = "MIT/Apache-2.0"
 include = [
 	"src/**/*.rs",
-	"Cargo.toml",
-	"LICENSE*",
-	"README.md",
+	"/Cargo.toml",
+	"/LICENSE*",
+	"/README.md",
 ]
 categories = [ "no-std", "data-structures" ]
 keywords = [ "data", "type", "cell" ] # dataframe
@@ -70,6 +70,9 @@ deps_datetime = [ "fugit", "time" ]
 deps_string =  [ "arraystring" ]
 
 [dev-dependencies]
+
+[package.metadata.docs.rs]
+features = ["deps_all"]
 
 [badges]
 maintenance = { status = "actively-developed" }
