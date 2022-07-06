@@ -576,7 +576,7 @@ macro_rules! define_single_size {
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
 
-        // WIP:lines
+        // WIP:DATALINE
         define_line!{
             c: $cname, t:$tname, b:$bname, size: $B, $b,
         }
@@ -1126,6 +1126,7 @@ macro_rules! define_bare {
 /// for defining DataLine*
 #[macro_export]
 #[doc(hidden)]
+// WIP:DATALINE: define copy types
 macro_rules! define_line {
     (
         c: $cname:ident, t: $tname:ident, b: $bname:ident,
@@ -1159,7 +1160,7 @@ macro_rules! define_line {
             pub type [< DataLine $B Byte >]<const LEN: usize> =
                 [< DataLine $B Byte With >]<NoData, LEN>;
 
-            // WIP
+            // WIP:DATALINE
             // type_aliases![l: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
 
             // DEFINE DataLineGrow*
@@ -1167,15 +1168,18 @@ macro_rules! define_line {
             // vec, Copy
             #[doc = "A **vector** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
+            #[cfg(feature = "std" )]
             #[derive(Clone, Debug)]
             pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellsCopy> {
                 cells: Vec<[< $cname $B Byte Copy With >]<C>>
             }
             // vec, Copy, non-With
+            #[cfg(feature = "std" )]
             #[doc = "A **vector** of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
             pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<NoData>;
 
             // vec, non-Copy
+            #[cfg(feature = "std" )]
             #[doc = "A **vector** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
             #[derive(Debug)]
@@ -1183,6 +1187,7 @@ macro_rules! define_line {
                 cells: Vec<[< $cname $B Byte With >]<C>>
             }
             // vec, non-Copy, non-With
+            #[cfg(feature = "std" )]
             #[doc = "A **vector** of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
             pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<NoData>;
 
@@ -1231,11 +1236,13 @@ macro_rules! define_line {
             }
 
             // From/Into Vec, Copy
+            #[cfg(feature = "std" )]
             impl<C: DataCellsCopy> From< [<DataLineGrow $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
                 fn from(from: [<DataLineGrow $B Byte Copy With>]<C>) -> Self {
                     from.cells
                 }
             }
+            #[cfg(feature = "std" )]
             impl<C: DataCellsCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataLineGrow $B Byte Copy With>]<C> {
                 fn from(from: Vec< [<$cname $B Byte Copy With>]<C> > ) -> Self {
                     [<DataLineGrow $B Byte Copy With>] {
@@ -1245,11 +1252,13 @@ macro_rules! define_line {
             }
 
             // From/Into Vec, non-Copy
+            #[cfg(feature = "std" )]
             impl<C: DataCells> From< [<DataLineGrow $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
                 fn from(from: [<DataLineGrow $B Byte With>]<C>) -> Self {
                     from.cells
                 }
             }
+            #[cfg(feature = "std" )]
             impl<C: DataCells> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataLineGrow $B Byte With>]<C> {
                 fn from(from: Vec< [<$cname $B Byte With>]<C> > ) -> Self {
                     [<DataLineGrow $B Byte With>] {
@@ -1512,6 +1521,7 @@ macro_rules! reexport {
         paste::paste!{
             #[doc = $B " Byte data (== " $b " bit)" ]
             pub mod [< B $B >] {
+                #[doc(inline)]
                 pub use super::[< b $b >];
                 $crate::reexport![@CellType $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
                 $crate::reexport![@Bare $path; size: $B; ByteCopy ];
@@ -1519,10 +1529,12 @@ macro_rules! reexport {
             }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
+                #[doc(inline)]
                 pub use super::[< B $B >];
                 $crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
                 $crate::reexport![@Bare $path; size: $b; bitCopy ];
-                // $crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
+                // WIP:DATALINE
+                // $crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ];
             }
         }
     };
@@ -1531,7 +1543,8 @@ macro_rules! reexport {
     (mod_lines $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             $crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-            // crate::reexport![@Line $path; size: $b; bit bitWith bitCopy bitCopyWith ]; // TODO
+            // WIP:DATALINE
+            // $crate::reexport![@Line $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
 
@@ -1555,8 +1568,8 @@ macro_rules! reexport {
             // WIP
             $crate::reexport![@Bare $path; size: $B; ByteCopy ];
             $crate::reexport![@Bare $path; size: $b; bitCopy ];
-            // crate::reexport![@Bare $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-            // crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            // $crate::reexport![@Bare $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
+            // $crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
 
@@ -1589,6 +1602,7 @@ macro_rules! reexport {
     // re-exports DataLine
     (@Line $path:path; size: $size:literal; $( $suf:ident )+ ) => {
         $crate::reexport![@ $path; DataLine; size: $size ; $( $suf )+ ];
+        #[cfg(feature = "std" )]
         $crate::reexport![@ $path; DataLineGrow; size: $size ; $( $suf )+ ];
     };
 
