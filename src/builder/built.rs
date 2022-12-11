@@ -106,8 +106,12 @@ define_all_sizes! {
     copy_variants_1B_psize:
         "8-bit usize", Usize, usize, target_pointer_width = "8",
         "8-bit isize", Isize, isize, target_pointer_width = "8",
-    // noncopy_variants_1B: ,
-    // noncopy_variants_1B_dep: ,
+    copy_variants_1B_psize_dep: ,
+
+    noncopy_variants_1B: ,
+    noncopy_variants_1B_dep: ,
+    noncopy_variants_1B_psize: ,
+    noncopy_variants_1B_psize_dep: ,
 
     // -------------------------------------------------------- 2-B / 16-b
     copy_variants_2B:
@@ -126,8 +130,12 @@ define_all_sizes! {
     copy_variants_2B_psize:
         "16-bit usize", Usize, usize, target_pointer_width = "16",
         "16-bit isize", Isize, isize, target_pointer_width = "16",
-    // noncopy_variants_2B: ,
-    // noncopy_variants_2B_dep: ,
+    copy_variants_2B_psize_dep: ,
+
+    noncopy_variants_2B: ,
+    noncopy_variants_2B_dep: ,
+    noncopy_variants_2B_psize: ,
+    noncopy_variants_2B_psize_dep: ,
 
     // -------------------------------------------------------- 4-B / 32-b
     copy_variants_4B:
@@ -168,8 +176,12 @@ define_all_sizes! {
     copy_variants_4B_psize:
         "32-bit usize", Usize, usize, target_pointer_width = "32",
         "32-bit isize", Isize, isize, target_pointer_width = "32",
-    // noncopy_variants_4B: ,
-    // noncopy_variants_4B_dep: ,
+    copy_variants_4B_psize_dep: ,
+
+    noncopy_variants_4B: ,
+    noncopy_variants_4B_dep: ,
+    noncopy_variants_4B_psize: ,
+    noncopy_variants_4B_psize_dep: ,
 
     // ------------------------------------------------------------------------- 8-B / 64-b
     copy_variants_8B:
@@ -209,10 +221,14 @@ define_all_sizes! {
     copy_variants_8B_psize:
         "64-bit usize", Usize, usize, target_pointer_width = "64",
         "64-bit isize", Isize, isize, target_pointer_width = "64",
-    // noncopy_variants_8B: ,
-    // noncopy_variants_8B_dep:
+    copy_variants_8B_psize_dep: ,
+
+    noncopy_variants_8B: ,
+    noncopy_variants_8B_dep: ,
+    noncopy_variants_8B_psize: ,
     noncopy_variants_8B_psize_dep:
-        "6-Byte fat-pointer String", String, std::string::String, target_pointer_width = "16", "std", "std",
+        "6-Byte fat-pointer String", String, std::string::String,
+            target_pointer_width = "16", "std", "std",
 
     // ------------------------------------------------------------------------- 16-B /128-b
     copy_variants_16B:
@@ -246,9 +262,14 @@ define_all_sizes! {
     copy_variants_16B_psize:
         "128-bit usize", Usize, usize, target_pointer_width = "128",
         "128-bit isize", Isize, isize, target_pointer_width = "128",
-    // noncopy_variants_16B: ,
+    copy_variants_16B_psize_dep: ,
+
+    noncopy_variants_16B: ,
+    noncopy_variants_16B_dep: ,
+    noncopy_variants_16B_psize: ,
     noncopy_variants_16B_psize_dep:
-        "12-Byte fat-pointer String", String, std::string::String, target_pointer_width = "32", "std", "std",
+        "12-Byte fat-pointer String", String, std::string::String,
+            target_pointer_width = "32", "std", "std",
 
     // ------------------------------------------------------------------------- 32-B / 256-b
     copy_variants_32B:
@@ -259,11 +280,16 @@ define_all_sizes! {
         ArrayString31, ArrayString<typenum::U31>, "arraystring", "arraystring",
     "256-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray256, crate::all::BitArray256, "bv", "bv",
-    // noncopy_variants_32B: ,
+    copy_variants_32B_psize: ,
+    copy_variants_32B_psize_dep: ,
+
+    noncopy_variants_32B: ,
     noncopy_variants_32B_dep:
     "Big Integer", BigInt, num_bigint::BigInt, "num-bigint", "num-bigint",
+    noncopy_variants_32B_psize: ,
     noncopy_variants_32B_psize_dep:
-        "24-Byte fat-pointer String", String, std::string::String, target_pointer_width = "64", "std", "std",
+        "24-Byte fat-pointer String", String, std::string::String,
+            target_pointer_width = "64", "std", "std",
 
     // ------------------------------------------------------------------------- 64 B / 512-b
     copy_variants_64B:
@@ -273,10 +299,15 @@ define_all_sizes! {
         ArrayString63, ArrayString<typenum::U63>, "arraystring", "arraystring",
     "512-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray512, crate::all::BitArray512, "bv", "bv",
-    // noncopy_variants_64B: ,
-    // noncopy_variants_64B_dep: ,
+    copy_variants_64B_psize: ,
+    copy_variants_64B_psize_dep: ,
+
+    noncopy_variants_64B: ,
+    noncopy_variants_64B_dep: ,
+    noncopy_variants_64B_psize: ,
     noncopy_variants_64B_psize_dep:
-        "48-Byte fat-pointer String", String, std::string::String, target_pointer_width = "128", "std", "std",
+        "48-Byte fat-pointer String", String, std::string::String,
+            target_pointer_width = "128", "std", "std",
 
     // ------------------------------------------------------------------------- 128-B / 1024-b
     copy_variants_128B:
@@ -286,6 +317,11 @@ define_all_sizes! {
         ArrayString127, ArrayString<typenum::U127>, "arraystring", "arraystring",
     "1024-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray1024, crate::all::BitArray1024, "bv", "bv",
-    // noncopy_variants_128B: ,
-    // noncopy_variants_128B_dep: ,
+    copy_variants_128B_psize: ,
+    copy_variants_128B_psize_dep: ,
+
+    noncopy_variants_128B: ,
+    noncopy_variants_128B_dep: ,
+    noncopy_variants_128B_psize: ,
+    noncopy_variants_128B_psize_dep: ,
 }
