@@ -11,7 +11,7 @@
 //! - `DataType…` enums that only contains type information, not the data itself.
 //! - `DataBare…` unions that only contains the data, not the type of the data.
 //!
-//! They implement the [`DataCells`], [`DataTypes`] and [`DataBares`] traits.
+//! They implement the [`DataCell`], [`DataType`] and [`DataBare`] traits.
 //!
 //! Each one has many concrete implementations differentiated by:
 //! - the maximum `size` of the represented data.
@@ -156,17 +156,17 @@ pub mod sizes {
 /// ### `<Type|Cell|Bare>`
 ///
 /// - `Type` indicates the categorization of the data type information.
-/// All *`DataType*`s* must implement the [`DataTypes`] trait, and
+/// All *`DataType*`s* must implement the [`DataType`] trait, and
 /// *`DataType*Copy*`* *types* must additionally implement the
-/// [`DataTypesCopy`] trait.
+/// [`DataTypeCopy`] trait.
 ///
 /// - `Cell` indicates the encapsulation of the data and the type information.
-/// All *`DataCell*`s* must implement the [`DataCells`] trait, and
+/// All *`DataCell*`s* must implement the [`DataCell`] trait, and
 /// *`DataCell*Copy*`* *cells* must additionally implement the
-/// [`DataCellsCopy`] trait.
+/// [`DataCellCopy`] trait.
 ///
 /// - `Bare` indicates the encapsulation of data without the type information.
-/// All *`DataBare`s* implements the (marker) [`DataBares`] trait.
+/// All *`DataBare`s* implements the (marker) [`DataBare`] trait.
 ///
 /// ### `[Copy]`
 ///
@@ -194,12 +194,12 @@ pub mod sizes {
 /// ### `[With]`
 ///
 /// **`DataType*With`** enums can be extended generically by storing a type
-/// implementing [`DataTypes`] in its `With` variant (or [`DataTypesCopy`]
+/// implementing [`DataType`] in its `With` variant (or [`DataTypeCopy`]
 /// in the case of `DataType*CopyWith`.
 ///
 /// In the same way, **`DataCell*With`** enums can be extended generically by
-/// storing a type implementing [`DataCells`] in its `With` variant
-/// (or [`DataCellsCopy`] in the case of `DataCell*CopyWith`.
+/// storing a type implementing [`DataCell`] in its `With` variant
+/// (or [`DataCellCopy`] in the case of `DataCell*CopyWith`.
 ///
 /// Internally, all non-`With` versions are convenient type aliases to the
 /// corresponding `With` version (having the same size and `Copy` semantics),

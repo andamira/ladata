@@ -12,7 +12,7 @@
 //
 
 use super::macros::*;
-use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use crate::traits::{DataBare, DataCell, DataCellCopy, DataType, DataTypeCopy};
 
 // 1. Mockups for substituting unused dependencies
 // -----------------------------------------------------------------------------

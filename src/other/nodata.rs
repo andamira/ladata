@@ -6,9 +6,9 @@
 
 use core::mem::{align_of, size_of};
 
-use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use crate::traits::{DataBare, DataCell, DataCellCopy, DataType, DataTypeCopy};
 
-impl DataTypes for () {
+impl DataType for () {
     #[inline]
     fn data_align(&self) -> usize {
         align_of::<()>()
@@ -22,15 +22,15 @@ impl DataTypes for () {
         true
     }
 }
-impl DataCells for () {
+impl DataCell for () {
     #[inline]
     fn is_copy(&self) -> bool {
         true
     }
 }
 
-impl DataTypesCopy for () {}
+impl DataTypeCopy for () {}
 
-impl DataCellsCopy for () {}
+impl DataCellCopy for () {}
 
-unsafe impl DataBares for () {}
+unsafe impl DataBare for () {}

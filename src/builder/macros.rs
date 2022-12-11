@@ -616,7 +616,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $B ByteCopy>] "][" [<$tname $B ByteCopy>] "] -With" ]
             #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $B Byte Copy With >]<T: DataTypesCopy> {
+            pub enum [< $tname $B Byte Copy With >]<T: DataTypeCopy> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -647,7 +647,7 @@ macro_rules! define_type {
 
             }
             type_aliases![t: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
-            impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
+            impl_data_types![ [< $tname $B Byte Copy With >], DataTypeCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -662,7 +662,7 @@ macro_rules! define_type {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            impl<T: DataTypesCopy> DataTypesCopy for [< $tname $B Byte Copy With >]<T> { }
+            impl<T: DataTypeCopy> DataTypeCopy for [< $tname $B Byte Copy With >]<T> { }
 
             // ## non-copy version (DataType)
             // -----------------------------------------------------------------
@@ -673,7 +673,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $B ByteCopy>]  "][" [<$tname $B ByteCopy>] "] +Copy -With" ]
             #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $B Byte With >]<T: DataTypes> {
+            pub enum [< $tname $B Byte With >]<T: DataType> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -721,7 +721,7 @@ macro_rules! define_type {
 
             }
             type_aliases![t: $tname, size: $B, $b, "", "data **Type**", ""];
-            impl_data_types![ [< $tname $B Byte With >], DataTypes,
+            impl_data_types![ [< $tname $B Byte With >], DataType,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -780,8 +780,8 @@ macro_rules! define_cell {
             #[doc = "- [" [<$cname $B ByteCopy>] "][" [<$cname $B ByteCopy>] "] -With" ]
             #[doc = "- [" [<$cname $B Byte>]  "][" [<$cname $B Byte>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            // pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy, T: DataTypesCopy> {
-            pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy> {
+            // pub enum [<$cname $B Byte Copy With>]<C: DataCellCopy, T: DataTypeCopy> {
+            pub enum [<$cname $B Byte Copy With>]<C: DataCellCopy> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
@@ -815,8 +815,8 @@ macro_rules! define_cell {
             }
             type_aliases![c: $cname, size: $B, $b, "Copy", "data **Cell**", "(Copy)"];
             impl_data_cells![
-                c: [< $cname $B Byte Copy With >], DataCellsCopy,
-                t: [< $tname $B Byte Copy With >], DataTypesCopy,
+                c: [< $cname $B Byte Copy With >], DataCellCopy,
+                t: [< $tname $B Byte Copy With >], DataTypeCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -831,8 +831,8 @@ macro_rules! define_cell {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C, T> { }
-            impl<C: DataCellsCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C> { }
+            // impl<C: DataCellCopy, T: DataTypeCopy> DataCellCopy for [< $cname $B Byte Copy With >]<C, T> { }
+            impl<C: DataCellCopy> DataCellCopy for [< $cname $B Byte Copy With >]<C> { }
 
             // ## non-copy version (DataCell)
             // -----------------------------------------------------------------
@@ -843,8 +843,8 @@ macro_rules! define_cell {
             #[doc = "- [" [<$cname $B ByteCopy>]  "][" [<$cname $B ByteCopy>] "] +Copy -With" ]
             #[doc = "- [" [<$cname $B Byte >] "][" [<$cname $B Byte >] "] -With" ]
             #[derive(Debug)]
-            // pub enum [<$cname $B Byte With>]<C: DataCells, T: DataTypes> {
-            pub enum [<$cname $B Byte With>]<C: DataCells> {
+            // pub enum [<$cname $B Byte With>]<C: DataCell, T: DataType> {
+            pub enum [<$cname $B Byte With>]<C: DataCell> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
@@ -895,10 +895,10 @@ macro_rules! define_cell {
 
             type_aliases![c: $cname, size: $B, $b, "", "data **Cell**", ""];
 
-            // implement the DataCells trait
+            // implement the DataCell trait
             impl_data_cells![
-                c: [< $cname $B Byte With >], DataCells,
-                t: [< $tname $B Byte With >], DataTypes,
+                c: [< $cname $B Byte With >], DataCell,
+                t: [< $tname $B Byte With >], DataType,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -921,7 +921,7 @@ macro_rules! define_cell {
             // implement `TryFrom`<`DataCell`> for *contained-value*:
 
             $( // Copy
-                impl<C: DataCellsCopy> TryFrom<[<$cname $B Byte Copy With>]<C>> for $cvtype {
+                impl<C: DataCellCopy> TryFrom<[<$cname $B Byte Copy With>]<C>> for $cvtype {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte Copy With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -934,7 +934,7 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype_dep {
+                impl<C: DataCell> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -946,7 +946,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype {
+                impl<C: DataCell> TryFrom<[<$cname $B Byte With>]<C>> for $vtype {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -959,7 +959,7 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype_dep {
+                impl<C: DataCell> TryFrom<[<$cname $B Byte With>]<C>> for $vtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -974,7 +974,7 @@ macro_rules! define_cell {
             // implement `From`<*contained-value*> for `DataCell`:
 
             $( // Copy
-                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $B Byte Copy With>]<C> {
+                impl<C: DataCellCopy> From<$cvtype> for [<$cname $B Byte Copy With>]<C> {
                     fn from(v: $cvtype) -> Self {
                         [<$cname $B Byte Copy With>]::$cvname(v)
                     }
@@ -983,7 +983,7 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $B Byte Copy With>]<C> {
+                impl<C: DataCellCopy> From<$cvtype_dep> for [<$cname $B Byte Copy With>]<C> {
                     fn from(v: $cvtype_dep) -> Self {
                         [<$cname $B Byte Copy With>]::$cvname_dep(v)
                     }
@@ -991,7 +991,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> From<$vtype> for [<$cname $B Byte With>]<C> {
+                impl<C: DataCell> From<$vtype> for [<$cname $B Byte With>]<C> {
                     fn from(v: $vtype) -> Self {
                         [<$cname $B Byte With>]::$vname(v)
                     }
@@ -1000,7 +1000,7 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> From<$vtype_dep> for [<$cname $B Byte With>]<C> {
+                impl<C: DataCell> From<$vtype_dep> for [<$cname $B Byte With>]<C> {
                     fn from(v: $vtype_dep) -> Self {
                         [<$cname $B Byte With>]::$vname_dep(v)
                     }
@@ -1009,7 +1009,7 @@ macro_rules! define_cell {
             )*
 
             // from DataCell to DataBare
-            impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$bname $B Byte Copy>] {
+            impl<C: DataCellCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$bname $B Byte Copy>] {
                 fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
                     match cell {
                         [<$cname $B Byte Copy With>]::None => Self { None: () },
@@ -1132,7 +1132,7 @@ macro_rules! define_line {
             #[doc = "An **array** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
             #[derive(Clone, Copy, Debug)]
-            pub struct [< DataLine $B Byte Copy With >]<C: DataCellsCopy, const LEN: usize> {
+            pub struct [< DataLine $B Byte Copy With >]<C: DataCellCopy, const LEN: usize> {
                 cells: [[< $cname $B Byte Copy With >]<C>; LEN]
             }
             // array, Copy, non-With
@@ -1145,7 +1145,7 @@ macro_rules! define_line {
             #[doc = "An **array** of [`"
             [< $cname $B Byte With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
             #[derive(Debug)]
-            pub struct [< DataLine $B Byte With >]<C: DataCells, const LEN: usize> {
+            pub struct [< DataLine $B Byte With >]<C: DataCell, const LEN: usize> {
                 cells: [[< $cname $B Byte With >]<C>; LEN]
             }
             // array, non-Copy, non-With
@@ -1163,7 +1163,7 @@ macro_rules! define_line {
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
             #[cfg(feature = "std" )]
             #[derive(Clone, Debug)]
-            pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellsCopy> {
+            pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellCopy> {
                 cells: Vec<[< $cname $B Byte Copy With >]<C>>
             }
             // vec, Copy, non-With
@@ -1176,7 +1176,7 @@ macro_rules! define_line {
             #[doc = "A **vector** of [`"
             [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
             #[derive(Debug)]
-            pub struct [< DataLineGrow $B Byte With >]<C: DataCells> {
+            pub struct [< DataLineGrow $B Byte With >]<C: DataCell> {
                 cells: Vec<[< $cname $B Byte With >]<C>>
             }
             // vec, non-Copy, non-With
@@ -1198,13 +1198,13 @@ macro_rules! define_line {
             }
 
             // From/Into Array, Copy
-            impl<C: DataCellsCopy, const LEN: usize> From< [<DataLine $B Byte Copy With>]<C, LEN> >
+            impl<C: DataCellCopy, const LEN: usize> From< [<DataLine $B Byte Copy With>]<C, LEN> >
                 for [[<$cname $B Byte Copy With>]<C>; LEN] {
                 fn from(from: [<DataLine $B Byte Copy With>]<C, LEN>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCellsCopy, const LEN: usize> From<[[<$cname $B Byte Copy With>]<C>; LEN]>
+            impl<C: DataCellCopy, const LEN: usize> From<[[<$cname $B Byte Copy With>]<C>; LEN]>
                 for [<DataLine $B Byte Copy With>]<C, LEN> {
                 fn from(from: [[<$cname $B Byte Copy With>]<C>; LEN] ) -> Self {
                     [<DataLine $B Byte Copy With>] {
@@ -1213,13 +1213,13 @@ macro_rules! define_line {
                 }
             }
             // From/Into Array, non-Copy
-            impl<C: DataCells, const LEN: usize> From< [<DataLine $B Byte With>]<C, LEN> >
+            impl<C: DataCell, const LEN: usize> From< [<DataLine $B Byte With>]<C, LEN> >
                 for [[<$cname $B Byte With>]<C>; LEN] {
                 fn from(from: [<DataLine $B Byte With>]<C, LEN>) -> Self {
                     from.cells
                 }
             }
-            impl<C: DataCells, const LEN: usize> From<[[<$cname $B Byte With>]<C>; LEN]>
+            impl<C: DataCell, const LEN: usize> From<[[<$cname $B Byte With>]<C>; LEN]>
                 for [<DataLine $B Byte With>]<C, LEN> {
                 fn from(from: [[<$cname $B Byte With>]<C>; LEN] ) -> Self {
                     [<DataLine $B Byte With>] {
@@ -1230,13 +1230,13 @@ macro_rules! define_line {
 
             // From/Into Vec, Copy
             #[cfg(feature = "std" )]
-            impl<C: DataCellsCopy> From< [<DataLineGrow $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
+            impl<C: DataCellCopy> From< [<DataLineGrow $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
                 fn from(from: [<DataLineGrow $B Byte Copy With>]<C>) -> Self {
                     from.cells
                 }
             }
             #[cfg(feature = "std" )]
-            impl<C: DataCellsCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataLineGrow $B Byte Copy With>]<C> {
+            impl<C: DataCellCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataLineGrow $B Byte Copy With>]<C> {
                 fn from(from: Vec< [<$cname $B Byte Copy With>]<C> > ) -> Self {
                     [<DataLineGrow $B Byte Copy With>] {
                         cells: from
@@ -1246,13 +1246,13 @@ macro_rules! define_line {
 
             // From/Into Vec, non-Copy
             #[cfg(feature = "std" )]
-            impl<C: DataCells> From< [<DataLineGrow $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
+            impl<C: DataCell> From< [<DataLineGrow $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
                 fn from(from: [<DataLineGrow $B Byte With>]<C>) -> Self {
                     from.cells
                 }
             }
             #[cfg(feature = "std" )]
-            impl<C: DataCells> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataLineGrow $B Byte With>]<C> {
+            impl<C: DataCell> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataLineGrow $B Byte With>]<C> {
                 fn from(from: Vec< [<$cname $B Byte With>]<C> > ) -> Self {
                     [<DataLineGrow $B Byte With>] {
                         cells: from
@@ -1340,7 +1340,7 @@ macro_rules! type_aliases {
 }
 pub(crate) use type_aliases;
 
-/// implement: DataTypes trait
+/// implement: DataType trait
 macro_rules! impl_data_types {
     (
         $tname:ident, $tbound:ident,
@@ -1365,7 +1365,7 @@ macro_rules! impl_data_types {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
-            impl<T: $tbound> DataTypes for $tname<T> {
+            impl<T: $tbound> DataType for $tname<T> {
                 fn data_align(&self) -> usize {
                     use $tname::*;
                     match self {
@@ -1439,7 +1439,7 @@ macro_rules! impl_data_types {
 }
 pub(crate) use impl_data_types;
 
-/// implement: DataCells trait
+/// implement: DataCell trait
 macro_rules! impl_data_cells {
     (
         c: $cname:ident, $cbound:ident,
@@ -1465,7 +1465,7 @@ macro_rules! impl_data_cells {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste! {
-            impl<C: $cbound> DataCells for $cname<C> {
+            impl<C: $cbound> DataCell for $cname<C> {
                 fn is_copy(&self) -> bool { $is_copy }
             }
         }
@@ -1473,16 +1473,16 @@ macro_rules! impl_data_cells {
 }
 pub(crate) use impl_data_cells;
 
-/// implement: DataBares trait
+/// implement: DataBare trait
 macro_rules! impl_data_bares {
     (
       b: $bname:ident,
     ) => {
-        // impl DataCells for $bname {
+        // impl DataCell for $bname {
         //     fn is_copy(&self) -> bool { true }
         // }
-        // impl DataCellsCopy for $bname {}
-        unsafe impl DataBares for $bname {}
+        // impl DataCellCopy for $bname {}
+        unsafe impl DataBare for $bname {}
     };
 }
 pub(crate) use impl_data_bares;
