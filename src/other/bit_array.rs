@@ -11,7 +11,7 @@ macro_rules! build_bit_array {
     (size: $b:literal $ty:ty ) => {
         paste::paste! {
             #[doc = $b "-bit [`bv`](https://crates.io/crates/bv)'s array of `Bits`."]
-            #[derive(Clone, Copy, Debug, PartialEq)]
+            #[derive(Clone, Copy, Debug, PartialEq, Eq)]
             pub struct [< BitArray $b >](pub $ty);
 
             impl Bits for [< BitArray $b >] {

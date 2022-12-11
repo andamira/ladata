@@ -92,7 +92,7 @@
 //! example on how to use custom data types.
 //!
 //! # Status
-//! - This is still experimental work in progress. The API can and will keep changing.
+//! - This is an experimental work in progress. The API can and will keep changing.
 //! - Currently waiting for [GAT stabilization] to keep improving the traits.
 //!
 //! [Gat stabilization]: https://github.com/rust-lang/rust/issues/44265
@@ -102,7 +102,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 mod builder;
-use builder::built;
+use builder::{built, macros::reexport};
 
 #[cfg(test)]
 #[allow(unused_imports)]

@@ -44,8 +44,6 @@
 ///
 /// The `define_single_size!` macro is called making sure each size contains
 /// all variants with a size less than or equal to the current size.
-#[macro_export]
-#[doc(hidden)]
 macro_rules! define_all_sizes {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -489,10 +487,9 @@ macro_rules! define_all_sizes {
         }
     };
 }
+pub(crate) use define_all_sizes;
 
 /// for defining in one pass: DataType*, DataCell*, DataBare*, DataLine*
-#[macro_export]
-#[doc(hidden)]
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -582,10 +579,9 @@ macro_rules! define_single_size {
         }
     };
 }
+pub(crate) use define_single_size;
 
 /// for defining enum DataType*
-#[macro_export]
-#[doc(hidden)]
 macro_rules! define_type {
     (
         $tname:ident,
@@ -747,10 +743,9 @@ macro_rules! define_type {
         }
     };
 }
+pub(crate) use define_type;
 
 /// for defining enum DataCell*
-#[macro_export]
-#[doc(hidden)]
 macro_rules! define_cell {
     (
         c: $cname:ident, t: $tname:ident, b: $bname:ident,
@@ -1040,10 +1035,9 @@ macro_rules! define_cell {
         }
     };
 }
+pub(crate) use define_cell;
 
 /// for defining union DataBare*
-#[macro_export]
-#[doc(hidden)]
 macro_rules! define_bare {
     (
         $bname:ident,
@@ -1122,10 +1116,9 @@ macro_rules! define_bare {
         }
     };
 }
+pub(crate) use define_bare;
 
 /// for defining DataLine*
-#[macro_export]
-#[doc(hidden)]
 // WIP:DATALINE: define copy types
 macro_rules! define_line {
     (
@@ -1269,12 +1262,11 @@ macro_rules! define_line {
         }
     };
 }
+pub(crate) use define_line;
 
 // -----------------------------------------------------------------------------
 
 /// define: types aliases
-#[macro_export]
-#[doc(hidden)]
 macro_rules! type_aliases {
     // DataCell aliases
     ( c: $name:ident, size: $B:literal, $b:literal,
@@ -1346,10 +1338,9 @@ macro_rules! type_aliases {
         }
     };
 }
+pub(crate) use type_aliases;
 
 /// implement: DataTypes trait
-#[macro_export]
-#[doc(hidden)]
 macro_rules! impl_data_types {
     (
         $tname:ident, $tbound:ident,
@@ -1446,10 +1437,9 @@ macro_rules! impl_data_types {
         }
     };
 }
+pub(crate) use impl_data_types;
 
 /// implement: DataCells trait
-#[macro_export]
-#[doc(hidden)]
 macro_rules! impl_data_cells {
     (
         c: $cname:ident, $cbound:ident,
@@ -1481,9 +1471,9 @@ macro_rules! impl_data_cells {
         }
     };
 }
+pub(crate) use impl_data_cells;
+
 /// implement: DataBares trait
-#[macro_export]
-#[doc(hidden)]
 macro_rules! impl_data_bares {
     (
       b: $bname:ident,
@@ -1495,10 +1485,9 @@ macro_rules! impl_data_bares {
         unsafe impl DataBares for $bname {}
     };
 }
+pub(crate) use impl_data_bares;
 
 /// re-exports types from public modules.
-#[macro_export]
-#[doc(hidden)]
 macro_rules! reexport {
     // external branches, multi-type re-export
     // -------------------------------------------------------------------------
@@ -1613,3 +1602,4 @@ macro_rules! reexport {
         } )+
     };
 }
+pub(crate) use reexport;

@@ -8,10 +8,6 @@ A simple & modular mixed data model.
 
 See [the documentation](https://docs.rs/ladata/) for more information.
 
-
 # Status
 
-- This is still experimental work in progress. The API can and will keep changing.
-- Currently waiting for [GAT stabilization] to keep improving the traits.
-
-[Gat stabilization]: https://github.com/rust-lang/rust/issues/44265
+- This is an experimental work in progress. The API can and will keep changing.
