@@ -25,16 +25,6 @@ mod half {
     pub struct f16;
     pub struct bf16;
 }
-#[cfg(not(feature = "softposit"))]
-mod softposit {
-    #![allow(dead_code)]
-    pub struct P8;
-    pub struct P16;
-    pub struct P32;
-    pub struct Q8;
-    pub struct Q16;
-    pub struct Q32;
-}
 #[cfg(not(feature = "twofloat"))]
 mod twofloat {
     #![allow(dead_code)]
@@ -111,9 +101,7 @@ define_all_sizes! {
     "1-Byte array of bytes", ByteArray1, [u8; 1],
     "Boolean value", Bool, bool,
     copy_variants_1B_dep:
-    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=0",
-        P8, softposit::P8, "softposit", "softposit",
-    "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray8, crate::all::BitArray8, "bv", "bv",
     copy_variants_1B_psize:
         "8-bit usize", Usize, usize, target_pointer_width = "8",
@@ -131,11 +119,9 @@ define_all_sizes! {
         F16, half::f16, "half", "half",
     "16-bit [`half`](https://crates.io/crates/half)'s `bfloat16` floating-point number",
         BF16, half::bf16, "half", "half",
-    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=1",
-        P16, softposit::P16, "softposit", "softposit",
     "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=1",
         ArrayString1, ArrayString<typenum::U1>, "arraystring", "arraystring",
-    "16-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "16-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray16, crate::all::BitArray16, "bv", "bv",
     copy_variants_2B_psize:
         "16-bit usize", Usize, usize, target_pointer_width = "16",
@@ -151,8 +137,6 @@ define_all_sizes! {
     "4-Byte array of bytes", ByteArray4, [u8; 4],
     "4-Byte char ", Char, char,
     copy_variants_4B_dep:
-    "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Posit` with exp=2",
-        P32, softposit::P32, "softposit", "softposit",
     "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=3",
         ArrayString3, ArrayString<typenum::U3>, "arraystring", "arraystring",
     "32-bit [`time`](https://crates.io/crates/time)'s `Date`",
@@ -179,15 +163,13 @@ define_all_sizes! {
         FugitInstant32Millis, fugit::Instant<u32, 1, 1_000>, "fugit", "fugit",
     "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
         FugitInstant32Nanos, fugit::Instant<u32, 1, 1_000_000>, "fugit", "fugit",
-    "32-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "32-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray32, crate::all::BitArray32, "bv", "bv",
     copy_variants_4B_psize:
         "32-bit usize", Usize, usize, target_pointer_width = "32",
         "32-bit isize", Isize, isize, target_pointer_width = "32",
     // noncopy_variants_4B: ,
-    noncopy_variants_4B_dep:
-    "8-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=0",
-        Q8, softposit::Q8, "softposit", "softposit",
+    // noncopy_variants_4B_dep: ,
 
     // ------------------------------------------------------------------------- 8-B / 64-b
     copy_variants_8B:
@@ -222,15 +204,13 @@ define_all_sizes! {
         FugitInstant64Millis, fugit::Instant<u64, 1, 1_000>, "fugit", "fugit",
     "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
         FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>, "fugit", "fugit",
-    "64-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "64-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray64, crate::all::BitArray64, "bv", "bv",
     copy_variants_8B_psize:
         "64-bit usize", Usize, usize, target_pointer_width = "64",
         "64-bit isize", Isize, isize, target_pointer_width = "64",
     // noncopy_variants_8B: ,
-    noncopy_variants_8B_dep:
-    "16-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=1",
-        Q16, softposit::Q16, "softposit", "softposit",
+    // noncopy_variants_8B_dep:
     noncopy_variants_8B_psize_dep:
         "6-Byte fat-pointer String", String, std::string::String, target_pointer_width = "16", "std", "std",
 
@@ -261,7 +241,7 @@ define_all_sizes! {
         SystemTime, std::time::SystemTime, "std", "std",
     "128-bit [`time`](https://crates.io/crates/time)'s Instant`",
         TInstant, time::Instant, "std", "time",
-    "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray128, crate::all::BitArray128, "bv", "bv",
     copy_variants_16B_psize:
         "128-bit usize", Usize, usize, target_pointer_width = "128",
@@ -277,7 +257,7 @@ define_all_sizes! {
     "128-bit rational number", R128, num_rational::Ratio<i128>, "num-rational", "num-rational",
     "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=31",
         ArrayString31, ArrayString<typenum::U31>, "arraystring", "arraystring",
-    "256-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "256-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray256, crate::all::BitArray256, "bv", "bv",
     // noncopy_variants_32B: ,
     noncopy_variants_32B_dep:
@@ -291,12 +271,10 @@ define_all_sizes! {
     copy_variants_64B_dep:
     "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=63",
         ArrayString63, ArrayString<typenum::U63>, "arraystring", "arraystring",
-    "512-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "512-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray512, crate::all::BitArray512, "bv", "bv",
     // noncopy_variants_64B: ,
-    noncopy_variants_64B_dep:
-    "32-bit [`softposit`](https://crates.io/crates/softposit)'s `Quire` with exp=2",
-        Q32, softposit::Q32, "softposit", "softposit",
+    // noncopy_variants_64B_dep: ,
     noncopy_variants_64B_psize_dep:
         "48-Byte fat-pointer String", String, std::string::String, target_pointer_width = "128", "std", "std",
 
@@ -306,7 +284,7 @@ define_all_sizes! {
     copy_variants_128B_dep:
     "128-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=127",
         ArrayString127, ArrayString<typenum::U127>, "arraystring", "arraystring",
-    "1024-bit Array of bits (implementing [`bv`](https://crates.io/crates/softposit)'s `Bits`)",
+    "1024-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
         BitArray1024, crate::all::BitArray1024, "bv", "bv",
     // noncopy_variants_128B: ,
     // noncopy_variants_128B_dep: ,

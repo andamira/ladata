@@ -25,11 +25,6 @@ fn test_sizes_without() {
 
     assert_eq![1, size_of::<DataType8Byte>()];
 
-    #[cfg(not(feature = "softposit"))]
-    assert_eq![16, size_of::<DataCell8Byte>()];
-    #[cfg(feature = "softposit")]
-    assert_eq![24, size_of::<DataCell8Byte>()]; // Q16
-
     assert_eq![16, size_of::<DataCell8ByteCopy>()];
     assert_eq![8, size_of::<DataBare8ByteCopy>()];
 

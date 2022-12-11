@@ -24,7 +24,6 @@ paste = "1.0.9"
 
 # feature: "deps_continuous" (continuous numbers):
 half = { version = "2.0.0", optional = true, default-features = false } # F16 BF16
-softposit = { version = "0.3.9", optional = true } # P8, P16, P32, Q8, Q16, Q32
 twofloat = { version = "0.5.0", optional = true, default-features = false } # F128
 
 # feature: "deps_discrete" (discrete numbers):
@@ -53,7 +52,7 @@ deps_default = [
 	#"deps_numerical",
 		"deps_discrete",
 		#"deps_continuous",
-			"half", "twofloat", # !"softposit"
+			"half", "twofloat",
 	#"deps_categorical",
 		"deps_bit",
 		"deps_string",
@@ -62,7 +61,7 @@ deps_default = [
 ]
 
 deps_numerical= [ "deps_continuous", "deps_discrete" ]
-deps_continuous = [ "half", "softposit", "twofloat" ]
+deps_continuous = [ "half", "twofloat" ]
 deps_discrete = [ "num-rational", "num-bigint", "rust_decimal" ]
 
 deps_categorical = [ "deps_bit", "deps_datetime", "deps_string" ]

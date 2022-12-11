@@ -86,8 +86,8 @@ macro_rules! define_all_sizes {
             $( $cvdoc_4B_psize:literal, $cvname_4B_psize:ident, $cvtype_4B_psize:ty, $cvpsize_4B_psize:meta ),* ,
         // noncopy_variants_4B:
         //     $( $vdoc_4B:literal, $vname_4B:ident, $vtype_4B:ty ),* ,
-        noncopy_variants_4B_dep: $( $vdoc_4B_dep:literal, $vname_4B_dep:ident, $vtype_4B_dep:ty,
-            $vdep1_4B_dep:literal, $vdep2_4B_dep:literal ),* ,
+        // noncopy_variants_4B_dep: $( $vdoc_4B_dep:literal, $vname_4B_dep:ident, $vtype_4B_dep:ty,
+        //     $vdep1_4B_dep:literal, $vdep2_4B_dep:literal ),* ,
         // noncopy_variants_4B_psize:
         //     $( $vdoc_4B_psize:literal, $vname_4B_psize:ident, $vtype_4B_psize:ty, $vpsize_4B_psize:meta ),* ,
 
@@ -99,8 +99,8 @@ macro_rules! define_all_sizes {
         $( $cvdoc_8B_psize:literal, $cvname_8B_psize:ident, $cvtype_8B_psize:ty, $cvpsize_8B_psize:meta ),* ,
         // noncopy_variants_8B:
         //     $( $vdoc_8B:literal, $vname_8B:ident, $vtype_8B:ty ),* ,
-        noncopy_variants_8B_dep: $( $vdoc_8B_dep:literal, $vname_8B_dep:ident, $vtype_8B_dep:ty,
-            $vdep1_8B_dep:literal, $vdep2_8B_dep:literal ),* ,
+        // noncopy_variants_8B_dep: $( $vdoc_8B_dep:literal, $vname_8B_dep:ident, $vtype_8B_dep:ty,
+        //     $vdep1_8B_dep:literal, $vdep2_8B_dep:literal ),* ,
         // noncopy_variants_8B_psize:
         //     $( $vdoc_8B_psize:literal, $vname_8B_psize:ident, $vtype_8B_psize:ty, $vpsize_8B_psize:meta ),* ,
         noncopy_variants_8B_psize_dep:
@@ -143,8 +143,8 @@ macro_rules! define_all_sizes {
             $cvdep1_64B_dep:literal, $cvdep2_64B_dep:literal ),* ,
         // noncopy_variants_64B:
         //     $( $vdoc_64B:literal, $vname_64B:ident, $vtype_64B:ty ),* ,
-        noncopy_variants_64B_dep: $( $vdoc_64B_dep:literal, $vname_64B_dep:ident, $vtype_64B_dep:ty,
-            $vdep1_64B_dep:literal, $vdep2_64B_dep:literal ),* ,
+        // noncopy_variants_64B_dep: $( $vdoc_64B_dep:literal, $vname_64B_dep:ident, $vtype_64B_dep:ty,
+        //     $vdep1_64B_dep:literal, $vdep2_64B_dep:literal ),* ,
         // noncopy_variants_64B_psize:
         //     $( $vdoc_64B_psize:literal, $vname_64B_psize:ident, $vtype_64B_psize:ty, $vpsize_64B_psize:meta ),* ,
         noncopy_variants_64B_psize_dep:
@@ -231,10 +231,10 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_1B, $vname_1B, $vtype_1B ),* ,
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
                 // $( $vdoc_4B, $vname_4B, $vtype_4B ),* ;
-            noncopy_variants_dep:
+            noncopy_variants_dep: ;
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ;
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ;
             noncopy_variants_psize: ;
             noncopy_variants_psize_dep: ;
         }
@@ -264,11 +264,11 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_2B, $vname_2B, $vtype_2B ),* ,
                 // $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 // $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
-            noncopy_variants_dep:
+            noncopy_variants_dep: ;
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
-                $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
+                // $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
             noncopy_variants_psize: ;
             noncopy_variants_psize_dep:
                 $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
@@ -304,11 +304,11 @@ macro_rules! define_all_sizes {
                 // $( $vdoc_4B, $vname_4B, $vtype_4B ),* ,
                 // $( $vdoc_8B, $vname_8B, $vtype_8B ),* ;
                 // $( $vdoc_16B, $vname_16B, $vtype_16B ),* ;
-            noncopy_variants_dep:
+            noncopy_variants_dep: ;
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
-                $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
+                // $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ;
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ;
             noncopy_variants_psize: ;
             noncopy_variants_psize_dep:
@@ -355,8 +355,8 @@ macro_rules! define_all_sizes {
             noncopy_variants_dep:
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
-                $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
+                // $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ,
                 $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ;
             noncopy_variants_psize: ;
@@ -409,11 +409,11 @@ macro_rules! define_all_sizes {
             noncopy_variants_dep:
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
-                $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
+                // $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ,
-                $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ,
-                $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
+                $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ;
+                // $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
             noncopy_variants_psize: ;
             noncopy_variants_psize_dep:
                 $( $vdoc_8B_psize_dep, $vname_8B_psize_dep, $vtype_8B_psize_dep, $vpsize_8B_psize_dep,
@@ -468,11 +468,11 @@ macro_rules! define_all_sizes {
             noncopy_variants_dep:
                 // $( $vdoc_1B_dep, $vname_1B_dep, $vtype_1B_dep, $vdep1_1B_dep, $vdep2_1B_dep ),* ,
                 // $( $vdoc_2B_dep, $vname_2B_dep, $vtype_2B_dep, $vdep1_2B_dep, $vdep2_2B_dep ),* ,
-                $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
-                $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
+                // $( $vdoc_4B_dep, $vname_4B_dep, $vtype_4B_dep, $vdep1_4B_dep, $vdep2_4B_dep ),* ,
+                // $( $vdoc_8B_dep, $vname_8B_dep, $vtype_8B_dep, $vdep1_8B_dep, $vdep2_8B_dep ),* ,
                 // $( $vdoc_16B_dep, $vname_16B_dep, $vtype_16B_dep, $vdep1_16B_dep, $vdep2_16B_dep ),* ,
-                $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ,
-                $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
+                $( $vdoc_32B_dep, $vname_32B_dep, $vtype_32B_dep, $vdep1_32B_dep, $vdep2_32B_dep ),* ;
+                // $( $vdoc_64B_dep, $vname_64B_dep, $vtype_64B_dep, $vdep1_64B_dep, $vdep2_64B_dep ),* ;
                 // $( $vdoc_128B_dep, $vname_128B_dep, $vtype_128B_dep, $vdep1_128B_dep, $vdep2_128B_dep ),* ;
             noncopy_variants_psize: ;
             noncopy_variants_psize_dep:
