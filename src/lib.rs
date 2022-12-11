@@ -133,7 +133,7 @@ pub mod sizes {
 ///
 /// The concrete implementations of **unitary types** observes the following naming schemes:
 /// ```txt
-/// *)                                                                   Legend      |     Sizes
+///                                                                      Legend      |     Sizes
 /// *)    Data <Type|Cell> <Size> [Copy] [With]                      --------------- | ------------
 /// *)    Data <Bare>    <Size> <Copy>                               <> : required   |    8b =   1B
 ///                                                                  [] : optional   |   16b =   2B

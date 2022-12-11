@@ -12,12 +12,12 @@ enum MyCell {
     B(f64),
 }
 
-impl DataCells for MyCell {
+impl DataCell for MyCell {
     fn is_copy(&self) -> bool {
         true
     }
 }
-impl DataCellsCopy for MyCell {}
+impl DataCellCopy for MyCell {}
 
 fn main() {
     // Standalone custom data:
@@ -39,7 +39,7 @@ fn main() {
     type MyCellInside = DataCell64bitCopyWith<MyCell>;
 
     assert_eq![16, size_of::<DataCell64bitCopy>()];
-    assert_eq![24, size_of::<MyCellInside>()]; // note the size increase
+    assert_eq![16, size_of::<MyCellInside>()];
 
     let a2 = [
         MyCellInside::Bool(true),
