@@ -8,7 +8,6 @@
 //! Secondly the crate types are built for the following sizes:
 //! - bytes: 1, 2, 4, 8, 16, 32, 64, 128
 //! - bits: 8, 16, 32, 64, 128, 256, 512, 1024
-//!
 //
 
 use super::macros::*;
@@ -91,6 +90,10 @@ mod time {
 // 2. TYPES DEFINITIONS
 // -----------------------------------------------------------------------------
 
+// NOTE that right now several groups are empty. In some cases the macro can
+// error when adding new elements, because of unexpected commas in the matching
+// rules. The macro must be updated in the necessary places, by adding or
+// removing commas as needed. See for example the `NOTE:missing-commas` tags.
 define_all_sizes! {
     DataType, DataCell, DataBare,
 
