@@ -1012,8 +1012,8 @@ macro_rules! define_cell {
             impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$bname $B Byte Copy>] {
                 fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
                     match cell {
-                        [<$cname $B Byte Copy With>]::None => Self { None: NoData },
-                        [<$cname $B Byte Copy With>]::With(_) => Self { None: NoData },
+                        [<$cname $B Byte Copy With>]::None => Self { None: () },
+                        [<$cname $B Byte Copy With>]::With(_) => Self { None: () },
 
                         $( // fundamental types
                             [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
@@ -1071,7 +1071,7 @@ macro_rules! define_bare {
             #[derive(Copy, Clone)]
             pub union [<$bname $B Byte Copy>] {
                 /// Represents the absence of *data*.
-                pub None: NoData,
+                pub None: (),
 
                 $(
                     #[doc = $cvdoc]
@@ -1139,7 +1139,7 @@ macro_rules! define_line {
             #[doc = "An **array** of [`"
             [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
             pub type [< DataLine $B Byte Copy >]<const LEN: usize> =
-                [< DataLine $B Byte Copy With >]<NoData, LEN>;
+                [< DataLine $B Byte Copy With >]<(), LEN>;
 
             // array, non-Copy
             #[doc = "An **array** of [`"
@@ -1151,7 +1151,7 @@ macro_rules! define_line {
             // array, non-Copy, non-With
             #[doc = "An array of [`" [< $cname $B Byte >] "`][crate::all::" [< $cname $B Byte >] "]" ]
             pub type [< DataLine $B Byte >]<const LEN: usize> =
-                [< DataLine $B Byte With >]<NoData, LEN>;
+                [< DataLine $B Byte With >]<(), LEN>;
 
             // WIP:DATALINE
             // type_aliases![l: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
@@ -1169,7 +1169,7 @@ macro_rules! define_line {
             // vec, Copy, non-With
             #[cfg(feature = "std" )]
             #[doc = "A **vector** of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
-            pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<NoData>;
+            pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<()>;
 
             // vec, non-Copy
             #[cfg(feature = "std" )]
@@ -1182,7 +1182,7 @@ macro_rules! define_line {
             // vec, non-Copy, non-With
             #[cfg(feature = "std" )]
             #[doc = "A **vector** of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
-            pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<NoData>;
+            pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<()>;
 
             // DEFINE DataLineCompact*
 
@@ -1280,8 +1280,8 @@ macro_rules! type_aliases {
             #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] +With" ]
             #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] as bit +With" ]
             #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] as bit" ]
-            // pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<NoData, NoData>;
-            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<NoData>;
+            // pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<(), ()>;
+            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
 
             // bit version without `With`:
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
@@ -1290,8 +1290,8 @@ macro_rules! type_aliases {
             #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] +With" ]
             #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte" ]
             #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte +With" ]
-            // pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<NoData, NoData>;
-            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<NoData>;
+            // pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<(), ()>;
+            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
 
             // bit version:
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " (extendable) " $dsuf2 ]
@@ -1316,7 +1316,7 @@ macro_rules! type_aliases {
             #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] +With" ]
             #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] as bit +With" ]
             #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] as bit" ]
-            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<NoData>;
+            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
 
             // without `With` bit version
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
@@ -1325,7 +1325,7 @@ macro_rules! type_aliases {
             #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] +With" ]
             #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte" ]
             #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte +With" ]
-            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<NoData>;
+            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
 
             // bit version:
             #[doc = $B "-Byte / " $b "-bit " $dsuf1 " (extendable) " $dsuf2 ]
@@ -1369,7 +1369,7 @@ macro_rules! impl_data_types {
                 fn data_align(&self) -> usize {
                     use $tname::*;
                     match self {
-                        None => core::mem::align_of::<NoData>(),
+                        None => core::mem::align_of::<()>(),
                         With(o) => o.data_align(),
 
                         $( $cvname => core::mem::align_of::<$cvtype>(), )*
@@ -1402,7 +1402,7 @@ macro_rules! impl_data_types {
                 fn data_size(&self) -> usize {
                     use $tname::*;
                     match self {
-                        None => core::mem::size_of::<NoData>(),
+                        None => core::mem::size_of::<()>(),
                         With(o) => o.data_size(),
 
                         $( $cvname => core::mem::size_of::<$cvtype>(), )*

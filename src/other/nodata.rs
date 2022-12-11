@@ -1,45 +1,36 @@
-// ladata::newtypes::nodata
+// ladata::other::nodata
 //
+//! Treating the unit type [`()`] to represent the absence of data.
 //!
+//! Mainly used for the non-`With` aliases.
 
 use core::mem::{align_of, size_of};
 
 use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
-/// A zero-sized type representing the absence of data.
-///
-/// Since it implements all traits it can represent the absence of
-/// `DataType`, `DataCell` & `DataBare` indistinctly.
-///
-/// Mainly used for the non-`With` aliases of the
-/// [`DataTypes`]*[[`Copy`][DataTypesCopy]]* and
-/// [`DataCells`]*[[`Copy`][DataCellsCopy]]* default implementations.
-#[derive(Debug, Copy, Clone)]
-pub struct NoData;
-
-impl DataTypes for NoData {
+impl DataTypes for () {
     #[inline]
     fn data_align(&self) -> usize {
-        align_of::<NoData>()
+        align_of::<()>()
     }
     #[inline]
     fn data_size(&self) -> usize {
-        size_of::<NoData>()
+        size_of::<()>()
     }
     #[inline]
     fn is_copy(&self) -> bool {
         true
     }
 }
-impl DataCells for NoData {
+impl DataCells for () {
     #[inline]
     fn is_copy(&self) -> bool {
         true
     }
 }
 
-impl DataTypesCopy for NoData {}
+impl DataTypesCopy for () {}
 
-impl DataCellsCopy for NoData {}
+impl DataCellsCopy for () {}
 
-unsafe impl DataBares for NoData {}
+unsafe impl DataBares for () {}

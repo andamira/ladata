@@ -129,11 +129,11 @@ pub mod sizes {
 }
 
 /// Units of data, whether just the data, the type, or both.
-/// # Unitary types: Data `Type*`|`Cell*`|`Bare*` and `NoData`
+/// # Unitary types: Data `Type*`|`Cell*`|`Bare*` and [`()`]
 ///
 /// The concrete implementations of **unitary types** observes the following naming schemes:
 /// ```txt
-/// *) No Data                                                           Legend      |     Sizes
+/// *)                                                                   Legend      |     Sizes
 /// *)    Data <Type|Cell> <Size> [Copy] [With]                      --------------- | ------------
 /// *)    Data <Bare>    <Size> <Copy>                               <> : required   |    8b =   1B
 ///                                                                  [] : optional   |   16b =   2B
@@ -144,7 +144,6 @@ pub mod sizes {
 ///                                                                                  |  512b =  64B
 ///                                                                                  | 1024b = 128B
 /// ```
-/// 0. `No`: a special prefix for the [`NoData`][all::NoData] type.
 /// 1. `Data`: the *pivotal core*.
 /// 2. `<Type|Cell|Bare>`: encapsulates 1) only the data type,
 ///    2) both the data type and the data, or 3) only the data.
@@ -204,7 +203,7 @@ pub mod sizes {
 ///
 /// Internally, all non-`With` versions are convenient type aliases to the
 /// corresponding `With` version (having the same size and `Copy` semantics),
-/// using the the zero-sized [`NoData`][all::NoData] type. E.g.:
+/// using the zero-sized [`()`] unit type. E.g.:
 /// [`DataType32Byte`][all::DataType32Byte]
 pub mod units {
     /// Data *Bares* (just the unsafe bare data).
