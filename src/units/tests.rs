@@ -3,7 +3,7 @@
 //!
 
 use crate::all::*;
-use core::mem::{size_of, size_of_val};
+use core::mem::size_of;
 
 /// Checks the sizes of types without an active `With` variant.
 #[test]
