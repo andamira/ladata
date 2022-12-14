@@ -37,15 +37,6 @@
 //! corresponding `DataType…`s separately. At the moment they only support
 //! `Copy` types, and they can't host any custom types (lacking a `With` field).
 //!
-//! ## Lines
-//!
-//! See the [`lines`] module for more information.
-//!
-//! The fundamental linear abstractions are:
-//! - `DataLine…` structs, based on an array `[DataCell*; const usize]`.
-//! - `DataLineGrow…` structs, growable, based on a vector `Vec<DataCell*>`.
-//! - `DataLineCompact*…` structs, uses `DataBare*` plus `DataType*`.
-//!
 //! ## External dependencies
 //!
 //! The standard library is enabled by default. You can remove it independently
@@ -122,37 +113,4 @@ pub mod all {
 /// Everything is available in here, organized by size.
 pub mod sizes {
     crate::reexport![mod_sizes, crate::built; all_sizes];
-}
-
-/// Data *Lines* (sequences of *cells*).
-///
-/// # Linear types: Data `Line*`
-///
-/// Linear (AKA sequential) data structures, leverages Rust arrays and vecs to
-/// contain sequences of unitary types.
-///
-/// The concrete implementations of **linear types** observes the following naming schema:
-/// ```txt
-/// -) Data Line [Grow] [Dense|Buffer] <Size> [Copy] [With]            Legend       |     Sizes
-///                                                                 --------------- | -------------
-///                                                                 <> : required   |   1B  =    8b
-///                                                                 [] : optional   |   2B  =   16b
-///                                                                  | : either or  |   4B  =   32b
-///                                                                  = : alias      |   8B  =   64b
-///                                                                                 |  16B  =  128b
-///                                                                                 |  32B  =  256b
-///                                                                                 |  64B  =  512b
-///                                                                                 | 128B  = 1024b
-/// ```
-/// 1. `Data`: the *pivotal core*.
-/// 2. `Line`: a sequence of `DataCell`s.
-/// 3. `[Dense|Buffer]`: internally stores the cells as a sequence of `DataType`s
-///     plus a sequence of 1) `DataBare`s or 2) Byte slices.
-/// 4. `<Size>`: confines the maximum size of each collected cell.
-/// 5. `[Copy]`: indicates that all the included data types are `Copy`.
-/// 6. `[With]`: allows to embed a custom implementation of a data type or cell
-///     in its `With` variant.
-///
-pub mod lines {
-    crate::reexport![mod_lines, crate::built; all_sizes];
 }

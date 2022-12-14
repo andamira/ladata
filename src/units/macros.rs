@@ -10,7 +10,6 @@
 // - define_type
 // - define_cell
 // - define_bare
-// - define_line
 //
 // - type_aliases
 //
@@ -821,7 +820,7 @@ macro_rules! define_all_sizes {
 }
 pub(crate) use define_all_sizes;
 
-/// for defining in one pass: DataType*, DataCell*, DataBare*, DataLine*
+/// for defining in one pass: DataType*, DataCell*, DataBare*
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -922,11 +921,6 @@ macro_rules! define_single_size {
             noncopy_variants_psize_dep:
                 $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
-        }
-
-        // WIP:DATALINE
-        define_line!{
-            c: $cname, t:$tname, b:$bname, size: $B, $b,
         }
     };
 }
@@ -1504,152 +1498,6 @@ macro_rules! define_bare {
 }
 pub(crate) use define_bare;
 
-/// for defining DataLine*
-// WIP:DATALINE: define copy types
-macro_rules! define_line {
-    (
-        c: $cname:ident, t: $tname:ident, b: $bname:ident,
-        size: $B:literal, $b:literal,
-    ) => {
-        paste::paste! {
-            // DEFINE DataLine*
-
-            // array, Copy
-            #[doc = "An **array** of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
-            #[derive(Clone, Copy, Debug)]
-            pub struct [< DataLine $B Byte Copy With >]<C: DataCellCopy, const LEN: usize> {
-                cells: [[< $cname $B Byte Copy With >]<C>; LEN]
-            }
-            // array, Copy, non-With
-            #[doc = "An **array** of [`"
-            [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
-            pub type [< DataLine $B Byte Copy >]<const LEN: usize> =
-                [< DataLine $B Byte Copy With >]<(), LEN>;
-
-            // array, non-Copy
-            #[doc = "An **array** of [`"
-            [< $cname $B Byte With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
-            #[derive(Debug)]
-            pub struct [< DataLine $B Byte With >]<C: DataCell, const LEN: usize> {
-                cells: [[< $cname $B Byte With >]<C>; LEN]
-            }
-            // array, non-Copy, non-With
-            #[doc = "An array of [`" [< $cname $B Byte >] "`][crate::all::" [< $cname $B Byte >] "]" ]
-            pub type [< DataLine $B Byte >]<const LEN: usize> =
-                [< DataLine $B Byte With >]<(), LEN>;
-
-            // WIP:DATALINE
-            // type_aliases![l: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
-
-            // DEFINE DataLineGrow*
-
-            // vec, Copy
-            #[doc = "A **vector** of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte Copy With >] "]" ]
-            #[cfg(feature = "std" )]
-            #[derive(Clone, Debug)]
-            pub struct [< DataLineGrow $B Byte Copy With >]<C: DataCellCopy> {
-                cells: Vec<[< $cname $B Byte Copy With >]<C>>
-            }
-            // vec, Copy, non-With
-            #[cfg(feature = "std" )]
-            #[doc = "A **vector** of [`" [< $cname $B Byte Copy >] "`][crate::all::" [< $cname $B Byte Copy >] "]" ]
-            pub type [< DataLineGrow $B Byte Copy >] = [< DataLineGrow $B Byte Copy With >]<()>;
-
-            // vec, non-Copy
-            #[cfg(feature = "std" )]
-            #[doc = "A **vector** of [`"
-            [< $cname $B Byte Copy With >] "`][crate::all::" [< $cname $B Byte With >] "]" ]
-            #[derive(Debug)]
-            pub struct [< DataLineGrow $B Byte With >]<C: DataCell> {
-                cells: Vec<[< $cname $B Byte With >]<C>>
-            }
-            // vec, non-Copy, non-With
-            #[cfg(feature = "std" )]
-            #[doc = "A **vector** of [`" [< $cname $B Byte>] "`][crate::all::" [< $cname $B Byte >] "]" ]
-            pub type [< DataLineGrow $B Byte >] = [< DataLineGrow $B Byte With >]<()>;
-
-            // DEFINE DataLineCompact*
-
-            // compact array, Copy
-            #[doc = "A dense **array** of [`"
-            [< $bname $B Byte Copy >] "`][crate::all::" [< $bname $B Byte Copy >] "]\n" ]
-            ///
-            #[derive(Clone, Copy, Debug)]
-            pub struct [< DataLineCompact $B Byte Copy >]<const LEN: usize> {
-                // WIP
-                _types: [[< $tname $B Byte Copy >]; LEN],
-                _cells: [[< $bname $B Byte Copy >]; LEN]
-            }
-
-            // From/Into Array, Copy
-            impl<C: DataCellCopy, const LEN: usize> From< [<DataLine $B Byte Copy With>]<C, LEN> >
-                for [[<$cname $B Byte Copy With>]<C>; LEN] {
-                fn from(from: [<DataLine $B Byte Copy With>]<C, LEN>) -> Self {
-                    from.cells
-                }
-            }
-            impl<C: DataCellCopy, const LEN: usize> From<[[<$cname $B Byte Copy With>]<C>; LEN]>
-                for [<DataLine $B Byte Copy With>]<C, LEN> {
-                fn from(from: [[<$cname $B Byte Copy With>]<C>; LEN] ) -> Self {
-                    [<DataLine $B Byte Copy With>] {
-                        cells: from
-                    }
-                }
-            }
-            // From/Into Array, non-Copy
-            impl<C: DataCell, const LEN: usize> From< [<DataLine $B Byte With>]<C, LEN> >
-                for [[<$cname $B Byte With>]<C>; LEN] {
-                fn from(from: [<DataLine $B Byte With>]<C, LEN>) -> Self {
-                    from.cells
-                }
-            }
-            impl<C: DataCell, const LEN: usize> From<[[<$cname $B Byte With>]<C>; LEN]>
-                for [<DataLine $B Byte With>]<C, LEN> {
-                fn from(from: [[<$cname $B Byte With>]<C>; LEN] ) -> Self {
-                    [<DataLine $B Byte With>] {
-                        cells: from
-                    }
-                }
-            }
-
-            // From/Into Vec, Copy
-            #[cfg(feature = "std" )]
-            impl<C: DataCellCopy> From< [<DataLineGrow $B Byte Copy With>]<C> > for Vec< [<$cname $B Byte Copy With>]<C> > {
-                fn from(from: [<DataLineGrow $B Byte Copy With>]<C>) -> Self {
-                    from.cells
-                }
-            }
-            #[cfg(feature = "std" )]
-            impl<C: DataCellCopy> From< Vec<[<$cname $B Byte Copy With>]<C>> > for [<DataLineGrow $B Byte Copy With>]<C> {
-                fn from(from: Vec< [<$cname $B Byte Copy With>]<C> > ) -> Self {
-                    [<DataLineGrow $B Byte Copy With>] {
-                        cells: from
-                    }
-                }
-            }
-
-            // From/Into Vec, non-Copy
-            #[cfg(feature = "std" )]
-            impl<C: DataCell> From< [<DataLineGrow $B Byte With>]<C> > for Vec< [<$cname $B Byte With>]<C> > {
-                fn from(from: [<DataLineGrow $B Byte With>]<C>) -> Self {
-                    from.cells
-                }
-            }
-            #[cfg(feature = "std" )]
-            impl<C: DataCell> From< Vec<[<$cname $B Byte With>]<C>> > for [<DataLineGrow $B Byte With>]<C> {
-                fn from(from: Vec< [<$cname $B Byte With>]<C> > ) -> Self {
-                    [<DataLineGrow $B Byte With>] {
-                        cells: from
-                    }
-                }
-            }
-        }
-    };
-}
-pub(crate) use define_line;
-
 // -----------------------------------------------------------------------------
 
 /// define: types aliases
@@ -1900,7 +1748,6 @@ macro_rules! reexport {
                 pub use super::[< b $b >];
                 $crate::reexport![@CellType $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
                 $crate::reexport![@Bare $path; size: $B; ByteCopy ];
-                $crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
             }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
@@ -1908,18 +1755,7 @@ macro_rules! reexport {
                 pub use super::[< B $B >];
                 $crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
                 $crate::reexport![@Bare $path; size: $b; bitCopy ];
-                // WIP:DATALINE
-                // $crate::reexport![@line $path; size: $b; bit bitWith bitCopy bitCopyWith ];
             }
-        }
-    };
-
-    // `::lines::` reexports, single size
-    (mod_lines $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
-            $crate::reexport![@Line $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-            // WIP:DATALINE
-            // $crate::reexport![@Line $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
 
@@ -1972,13 +1808,6 @@ macro_rules! reexport {
         $crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
         // NOTE DataBare can't accept non-copy (for now) so must be treated separately
         // $crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
-    };
-
-    // re-exports DataLine
-    (@Line $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::reexport![@ $path; DataLine; size: $size ; $( $suf )+ ];
-        #[cfg(feature = "std" )]
-        $crate::reexport![@ $path; DataLineGrow; size: $size ; $( $suf )+ ];
     };
 
     // generic re-export
