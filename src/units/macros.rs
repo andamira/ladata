@@ -965,14 +965,14 @@ macro_rules! define_type {
         paste::paste!{
             // ## copy version (DataType)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte / " $b "-bit " "data **Type** (extendable) (Copy)"]
+            #[doc = $b "-bit / " $B "-Byte " "data **Type** (extendable) (Copy)" ]
             ///
             /// See also:
-            #[doc = "- [" [<$tname $B ByteWith>]  "][" [<$tname $B ByteWith>] "] -Copy" ]
-            #[doc = "- [" [<$tname $B ByteCopy>] "][" [<$tname $B ByteCopy>] "] -With" ]
-            #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -Copy -With" ]
+            #[doc = "- [" [<$tname $b bit With>]  "][" [<$tname $b bit With>] "] -Copy" ]
+            #[doc = "- [" [<$tname $b bit Copy>]  "][" [<$tname $b bit Copy>] "] -With" ]
+            #[doc = "- [" [<$tname $b bit>]  "][" [<$tname $b bit>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $B Byte Copy With >]<T: DataTypesCopy> {
+            pub enum [< $tname $b bit Copy With >]<T: DataTypesCopy> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -1002,8 +1002,17 @@ macro_rules! define_type {
                 )*
 
             }
-            type_aliases![t: $tname, size: $B, $b, "Copy", "data **Type**", "(Copy)" ];
-            impl_data_types![ [< $tname $B Byte Copy With >], DataTypesCopy,
+
+            // DataType Copy (-With) alias
+            #[doc = $b "-bit/" $B "-Byte " "data **Type** (Copy)"]
+            ///
+            /// See also:
+            #[doc = "- [" [<$tname $b bit>] "][" [<$tname $b bit>] "] -Copy" ]
+            #[doc = "- [" [<$tname $b bit Copy With>] "][" [<$tname $b bit Copy With>] "] +With" ]
+            #[doc = "- [" [<$tname $b bit With>] "][" [<$tname $b bit With>] "] -Copy +With" ]
+            pub type [<$tname $b bit Copy>] = [< $tname $b bit Copy With>]<()>;
+
+            impl_data_types![ [< $tname $b bit Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1018,18 +1027,18 @@ macro_rules! define_type {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            impl<T: DataTypesCopy> DataTypesCopy for [< $tname $B Byte Copy With >]<T> { }
+            impl<T: DataTypesCopy> DataTypesCopy for [< $tname $b bit Copy With >]<T> { }
 
             // ## non-copy version (DataType)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte / " $b "-bit " "data **Type** (extendable)"]
+            #[doc = $b "-bit / " $B "-Byte " "data **Type** (extendable)"]
             ///
             /// See also:
-            #[doc = "- [" [<$tname $B ByteCopyWith>] "][" [<$tname $B ByteCopyWith>] "] +Copy" ]
-            #[doc = "- [" [<$tname $B ByteCopy>]  "][" [<$tname $B ByteCopy>] "] +Copy -With" ]
-            #[doc = "- [" [<$tname $B Byte >] "][" [<$tname $B Byte >] "] -With" ]
+            #[doc = "- [" [<$tname $b bit Copy With>] "][" [<$tname $b bit Copy With>] "] +Copy" ]
+            #[doc = "- [" [<$tname $b bit>] "][" [<$tname $b bit>] "] -With" ]
+            #[doc = "- [" [<$tname $b bit Copy>] "][" [<$tname $b bit Copy>] "] +Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $B Byte With >]<T: DataTypes> {
+            pub enum [< $tname $b bit With >]<T: DataTypes> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -1076,8 +1085,17 @@ macro_rules! define_type {
                 )*
 
             }
-            type_aliases![t: $tname, size: $B, $b, "", "data **Type**", ""];
-            impl_data_types![ [< $tname $B Byte With >], DataTypes,
+
+            // DataType (-With) alias
+            #[doc = $b "-bit/" $B "-Byte " "data **Type**"]
+            ///
+            /// See also:
+            #[doc = "- [" [<$tname $b bit Copy>] "][" [<$tname $b bit Copy>] "] +Copy" ]
+            #[doc = "- [" [<$tname $b bit With>] "][" [<$tname $b bit With>] "] +With" ]
+            #[doc = "- [" [<$tname $b bit Copy With>] "][" [<$tname $b bit Copy With>] "] +Copy +With" ]
+            pub type [<$tname $b bit>] = [< $tname $b bit With>]<()>;
+
+            impl_data_types![ [< $tname $b bit With >], DataTypes,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1141,20 +1159,20 @@ macro_rules! define_cell {
         paste::paste!{
             // ## copy version (DataCell)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable) (Copy)"]
+            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (extendable) (Copy)"]
             ///
             /// See also:
-            #[doc = "- [" [<$cname $B ByteWith>] "][" [<$cname $B ByteWith>] "] -Copy" ]
-            #[doc = "- [" [<$cname $B ByteCopy>] "][" [<$cname $B ByteCopy>] "] -With" ]
-            #[doc = "- [" [<$cname $B Byte>]  "][" [<$cname $B Byte>] "] -Copy -With" ]
+            #[doc = "- [" [<$cname $b bit With>] "][" [<$cname $b bit With>] "] -Copy" ]
+            #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] -With" ]
+            #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            // pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy, T: DataTypesCopy> {
-            pub enum [<$cname $B Byte Copy With>]<C: DataCellsCopy> {
+            // pub enum [<$cname $b bit Copy With>]<C: DataCellsCopy, T: DataTypesCopy> { // MAYBE
+            pub enum [<$cname $b bit Copy With>]<C: DataCellsCopy> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
                 With(C),
-                // _data_type(core::marker::PhantomData<*const T>), // WIP
+                // _data_type(core::marker::PhantomData<*const T>), // MAYBE
 
                 $( // fundamental types
                     #[doc = $cvdoc]
@@ -1181,10 +1199,19 @@ macro_rules! define_cell {
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
             }
-            type_aliases![c: $cname, size: $B, $b, "Copy", "data **Cell**", "(Copy)"];
+
+            // alias DataCell Copy
+            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (Copy)"]
+            ///
+            /// See also:
+            #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Copy" ]
+            #[doc = "- [" [<$cname $b bit Copy With>] "][" [<$cname $b bit Copy With>] "] +With" ]
+            #[doc = "- [" [<$cname $b bit With>] "][" [<$cname $b bit With>] "] -Copy +With" ]
+            pub type [<$cname $b bit Copy>] = [< $cname $b bit With>]<()>;
+
             impl_data_cells![
-                c: [< $cname $B Byte Copy With >], DataCellsCopy,
-                t: [< $tname $B Byte Copy With >], DataTypesCopy,
+                c: [< $cname $b bit Copy With >], DataCellsCopy,
+                t: [< $tname $b bit Copy With >], DataTypesCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1199,25 +1226,26 @@ macro_rules! define_cell {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C, T> { }
-            impl<C: DataCellsCopy> DataCellsCopy for [< $cname $B Byte Copy With >]<C> { }
+            // MAYBE
+            // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $b bit Copy With >]<C, T> { }
+            impl<C: DataCellsCopy> DataCellsCopy for [< $cname $b bit Copy With >]<C> { }
 
             // ## non-copy version (DataCell)
             // -----------------------------------------------------------------
-            #[doc = $B "-Byte/" $b "-bit " "data **Cell** (extendable)"]
+            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (extendable)"]
             ///
             /// See also:
-            #[doc = "- [" [<$cname $B ByteCopyWith>] "][" [<$cname $B ByteCopyWith>] "] +Copy" ]
-            #[doc = "- [" [<$cname $B ByteCopy>]  "][" [<$cname $B ByteCopy>] "] +Copy -With" ]
-            #[doc = "- [" [<$cname $B Byte >] "][" [<$cname $B Byte >] "] -With" ]
+            #[doc = "- [" [<$cname $b bit Copy With>] "][" [<$cname $b bit Copy With>] "] +Copy" ]
+            #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Width" ]
+            #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] +Copy -Width" ]
             #[derive(Debug)]
-            // pub enum [<$cname $B Byte With>]<C: DataCells, T: DataTypes> {
-            pub enum [<$cname $B Byte With>]<C: DataCells> {
+            // pub enum [<$cname $b bit With>]<C: DataCells, T: DataTypes> { // MAYBE
+            pub enum [<$cname $b bit With>]<C: DataCells> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
                 With(C),
-                // _data_type(core::marker::PhantomData<*const T>), // WIP
+                // _data_type(core::marker::PhantomData<*const T>), // MAYBE
 
                 $( // fundamental types
                     #[doc = $cvdoc]
@@ -1261,12 +1289,19 @@ macro_rules! define_cell {
                 )*
             }
 
-            type_aliases![c: $cname, size: $B, $b, "", "data **Cell**", ""];
+            // alias DataCell
+            #[doc = $b "-bit/" $B "-Byte " "data **Cell**"]
+            ///
+            /// See also:
+            #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] +Copy" ]
+            #[doc = "- [" [<$cname $b bit With>] "][" [<$cname $b bit With>] "] +With" ]
+            #[doc = "- [" [<$cname $b bit Copy With>] "][" [<$cname $b bit Copy With>] "] +Copy +With" ]
+            pub type [<$cname $b bit>] = [< $cname $b bit With>]<()>;
 
             // implement the DataCells trait
             impl_data_cells![
-                c: [< $cname $B Byte With >], DataCells,
-                t: [< $tname $B Byte With >], DataTypes,
+                c: [< $cname $b bit With >], DataCells,
+                t: [< $tname $b bit With >], DataTypes,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1289,11 +1324,11 @@ macro_rules! define_cell {
             // implement `TryFrom`<`DataCell`> for *contained-value*:
 
             $( // Copy
-                impl<C: DataCellsCopy> TryFrom<[<$cname $B Byte Copy With>]<C>> for $cvtype {
+                impl<C: DataCellsCopy> TryFrom<[<$cname $b bit Copy With>]<C>> for $cvtype {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte Copy With>]<C>) -> Result<Self, Self::Error> {
+                    fn try_from(c: [<$cname $b bit Copy With>]<C>) -> Result<Self, Self::Error> {
                         match c {
-                            [<$cname $B Byte Copy With>]::$cvname(c) => Ok(c),
+                            [<$cname $b bit Copy With>]::$cvname(c) => Ok(c),
                             _ => Err(()),
                         }
                     }
@@ -1302,11 +1337,11 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $cvtype_dep {
+                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $cvtype_dep {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
+                    fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
-                            [<$cname $B Byte With>]::$cvname_dep(c) => Ok(c),
+                            [<$cname $b bit With>]::$cvname_dep(c) => Ok(c),
                             _ => Err(()),
                         }
                     }
@@ -1314,11 +1349,11 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype {
+                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $vtype {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
+                    fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
-                            [<$cname $B Byte With>]::$vname(c) => Ok(c),
+                            [<$cname $b bit With>]::$vname(c) => Ok(c),
                             _ => Err(()),
                         }
                     }
@@ -1327,11 +1362,11 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $B Byte With>]<C>> for $vtype_dep {
+                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $vtype_dep {
                     type Error = ();
-                    fn try_from(c: [<$cname $B Byte With>]<C>) -> Result<Self, Self::Error> {
+                    fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
-                            [<$cname $B Byte With>]::$vname_dep(c) => Ok(c),
+                            [<$cname $b bit With>]::$vname_dep(c) => Ok(c),
                             _ => Err(()),
                         }
                     }
@@ -1342,59 +1377,59 @@ macro_rules! define_cell {
             // implement `From`<*contained-value*> for `DataCell`:
 
             $( // Copy
-                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $B Byte Copy With>]<C> {
+                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $b bit Copy With>]<C> {
                     fn from(v: $cvtype) -> Self {
-                        [<$cname $B Byte Copy With>]::$cvname(v)
+                        [<$cname $b bit Copy With>]::$cvname(v)
                     }
 
                 }
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $B Byte Copy With>]<C> {
+                impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $b bit Copy With>]<C> {
                     fn from(v: $cvtype_dep) -> Self {
-                        [<$cname $B Byte Copy With>]::$cvname_dep(v)
+                        [<$cname $b bit Copy With>]::$cvname_dep(v)
                     }
 
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> From<$vtype> for [<$cname $B Byte With>]<C> {
+                impl<C: DataCells> From<$vtype> for [<$cname $b bit With>]<C> {
                     fn from(v: $vtype) -> Self {
-                        [<$cname $B Byte With>]::$vname(v)
+                        [<$cname $b bit With>]::$vname(v)
                     }
 
                 }
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> From<$vtype_dep> for [<$cname $B Byte With>]<C> {
+                impl<C: DataCells> From<$vtype_dep> for [<$cname $b bit With>]<C> {
                     fn from(v: $vtype_dep) -> Self {
-                        [<$cname $B Byte With>]::$vname_dep(v)
+                        [<$cname $b bit With>]::$vname_dep(v)
                     }
 
                 }
             )*
 
             // from DataCell to DataBare
-            impl<C: DataCellsCopy> From<[<$cname $B Byte Copy With>]<C>> for [<$bname $B Byte Copy>] {
-                fn from(cell: [<$cname $B Byte Copy With>]<C>) -> Self {
+            impl<C: DataCellsCopy> From<[<$cname $b bit Copy With>]<C>> for [<$bname $b bit Copy>] {
+                fn from(cell: [<$cname $b bit Copy With>]<C>) -> Self {
                     match cell {
-                        [<$cname $B Byte Copy With>]::None => Self { None: () },
-                        [<$cname $B Byte Copy With>]::With(_) => Self { None: () },
+                        [<$cname $b bit Copy With>]::None => Self { None: () },
+                        [<$cname $b bit Copy With>]::With(_) => Self { None: () },
 
                         $( // fundamental types
-                            [<$cname $B Byte Copy With>]::$cvname(v) => Self { $cvname: v },
+                            [<$cname $b bit Copy With>]::$cvname(v) => Self { $cvname: v },
                         )*
 
                         $( // pointer-size dependant
                             #[cfg($cvpsize_psize)]
-                            [<$cname $B Byte Copy With>]::$cvname_psize(c) => Self { $cvname_psize: c },
+                            [<$cname $b bit Copy With>]::$cvname_psize(c) => Self { $cvname_psize: c },
                         )*
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
-                            [<$cname $B Byte Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
+                            [<$cname $b bit Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
                         )*
                     }
                 }
@@ -1449,7 +1484,7 @@ macro_rules! define_bare {
             #[repr(C)]
             #[doc = $B "Byte / " $b "bit untyped *bare* data (Copy)"]
             #[derive(Copy, Clone)]
-            pub union [<$bname $B Byte Copy>] {
+            pub union [<$bname $b bit Copy>] {
                 /// Represents the absence of *data*.
                 pub None: (),
 
@@ -1478,20 +1513,19 @@ macro_rules! define_bare {
                 )*
             }
             // type aliases:
-            #[doc = $B "Byte / " $b "bit *untyped (bare)* data"]
-            pub type [< $bname $b bit Copy >] = [< $bname $B Byte Copy >];
-            // TODO: unify with type_aliases
-            // type_aliases![c: $bname, size: $B, $b, "Copy", "data cell", "(Copy)"];
+            // TODO
+            // #[doc = $B "Byte / " $b "bit *untyped (bare)* data"]
+            // pub type [< $bname $b bit Copy >] = [< $bname $b bit Copy >];
 
             // Debug
-            impl core::fmt::Debug for [<$bname $B Byte Copy>] {
+            impl core::fmt::Debug for [<$bname $b bit Copy>] {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-                    write!(f, "{} {{...}}", stringify!{[< $bname $B Byte Copy >]})
+                    write!(f, "{} {{...}}", stringify!{[< $bname $b bit Copy >]})
                 }
             }
 
             impl_data_bares![
-                b: [< $bname $B Byte Copy >],
+                b: [< $bname $b bit Copy >],
             ];
         }
     };
@@ -1499,80 +1533,6 @@ macro_rules! define_bare {
 pub(crate) use define_bare;
 
 // -----------------------------------------------------------------------------
-
-/// define: types aliases
-macro_rules! type_aliases {
-    // DataCell aliases
-    ( c: $name:ident, size: $B:literal, $b:literal,
-      $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
-    ) => {
-        paste::paste!{
-            // byte version without `With`:
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] +With" ]
-            #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] as bit +With" ]
-            #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] as bit" ]
-            // pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<(), ()>;
-            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
-
-            // bit version without `With`:
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] +With" ]
-            #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte" ]
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte +With" ]
-            // pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<(), ()>;
-            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
-
-            // bit version:
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " (extendable) " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] -With" ]
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte" ]
-            #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte -With" ]
-            // pub type [< $name $b bit $nsuf With >]<C, T> = [< $name $B Byte $nsuf With >]<C, T>;
-            pub type [< $name $b bit $nsuf With >]<C> = [< $name $B Byte $nsuf With >]<C>;
-        }
-    };
-    // DataType aliases
-    ( t: $name:ident, size: $B:literal, $b:literal,
-      $nsuf:literal, $dsuf1:literal, $dsuf2:literal // name & doc suffixes
-    ) => {
-        paste::paste!{
-            // without `With` byte version:
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] +With" ]
-            #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] as bit +With" ]
-            #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] as bit" ]
-            pub type [< $name $B Byte $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
-
-            // without `With` bit version
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $b bit $nsuf With>] "][" [<$name $b bit $nsuf With>] "] +With" ]
-            #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte" ]
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte +With" ]
-            pub type [< $name $b bit $nsuf >] = [< $name $B Byte $nsuf With >]<()>;
-
-            // bit version:
-            #[doc = $B "-Byte / " $b "-bit " $dsuf1 " (extendable) " $dsuf2 ]
-            ///
-            /// See also:
-            #[doc = "- [" [<$name $b bit $nsuf>] "][" [<$name $b bit $nsuf>] "] -With" ]
-            #[doc = "- [" [<$name $B Byte $nsuf With>] "][" [<$name $B Byte $nsuf With>] "] as Byte" ]
-            #[doc = "- [" [<$name $B Byte $nsuf>] "][" [<$name $B Byte $nsuf>] "] as Byte -With" ]
-            pub type [< $name $b bit $nsuf With >]<T> = [< $name $B Byte $nsuf With >]<T>;
-        }
-    };
-}
-pub(crate) use type_aliases;
 
 /// implement: DataTypes trait
 macro_rules! impl_data_types {
@@ -1739,20 +1699,11 @@ macro_rules! reexport {
         reexport![$mod $path; 128, 1024];
     };
 
-    // `::sizes::` sub-modules reexports, single size.
-    (mod_sizes $path:path; $B:literal, $b:literal ) => {
+    // `::size::` sub-modules reexports, single size.
+    (mod_size $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            #[doc = $B " Byte data (== " $b " bit)" ]
-            pub mod [< B $B >] {
-                #[doc(inline)]
-                pub use super::[< b $b >];
-                $crate::reexport![@CellType $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
-                $crate::reexport![@Bare $path; size: $B; ByteCopy ];
-            }
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
-                #[doc(inline)]
-                pub use super::[< B $B >];
                 $crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
                 $crate::reexport![@Bare $path; size: $b; bitCopy ];
             }
@@ -1762,14 +1713,12 @@ macro_rules! reexport {
     // `::cells::` reexports, single size
     (mod_cells $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            $crate::reexport![@Cell $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
             $crate::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::types::` reexports, single size
     (mod_types $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            $crate::reexport![@Type $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
             $crate::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
@@ -1777,9 +1726,7 @@ macro_rules! reexport {
     (mod_bares $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             // WIP
-            $crate::reexport![@Bare $path; size: $B; ByteCopy ];
             $crate::reexport![@Bare $path; size: $b; bitCopy ];
-            // $crate::reexport![@Bare $path; size: $B; Byte ByteWith ByteCopy ByteCopyWith ];
             // $crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };

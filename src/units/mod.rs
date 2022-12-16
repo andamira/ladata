@@ -52,18 +52,13 @@
 ///
 /// ### *`<Size>`*
 ///
-/// Indicates the specific size of the data representation in memory. Can be
-/// written using either bytes (**`N`**`Bytes`) or bits (**`N`**`bits`).
+/// Indicates the specific size of the data representation in memory, in bits.
 ///
 /// Specifically tells the maximum size of the data. Smaller-sized variants
 /// are also available in bigger-sized cells. For example the `U16(u16)` variant
-/// is present in `DataCell2Byte` and `DataCell4Byte` but not in `DataCell1Byte`.
+/// is present in `DataCell16bit` and `DataCell32bit` but not in `DataCell8bit`.
 ///
-/// There are also convenience aliases in bit sizes to byte sizes. E.g.:
-/// [`DataType32bit`][crate::all::DataType32bit] ==
-/// [`DataType4Byte`][crate::all::DataType4Byte]
-///
-/// Types can be found classified by size in the [`sizes`][crate::sizes] module.
+/// Types can be found classified by size in the [`size`][crate::size] module.
 ///
 /// ### `[With]`
 ///
@@ -78,7 +73,7 @@
 /// Internally, all non-`With` versions are convenient type aliases to the
 /// corresponding `With` version (having the same size and `Copy` semantics),
 /// using the zero-sized [`()`] unit type. E.g.:
-/// [`DataType32Byte`][crate::all::DataType32Byte]
+/// [`DataType256bit`][crate::all::DataType256bit]
 ///
 /// [`DataTypes`]: crate::DataTypes
 /// [`DataTypesCopy`]: crate::DataTypesCopy

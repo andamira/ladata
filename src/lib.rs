@@ -19,15 +19,15 @@
 //! - the possibility of embedding a custom type in the `With` variant.
 //!
 //! For example, these are concrete parallel implementations:
-//! - [`DataType2ByteCopy`][all::DataType2ByteCopy] represents a 2-byte sized
+//! - [`DataType16bitCopy`][all::DataType16bitCopy] represents a 2-byte sized
 //!   `Copy` type (== 1 byte).
-//! - [`DataCell2ByteCopy`][all::DataCell2ByteWith] represents the corresponding
+//! - [`DataCell16bitCopy`][all::DataCell16bitWith] represents the corresponding
 //!   2-Byte sized type + data (== 4 bytes).
-//! - [`DataBare2ByteCopy`][all::DataBare2ByteCopy] represents the
+//! - [`DataBare16bitCopy`][all::DataBare16bitCopy] represents the
 //!   corresponding 2-Byte sized data without the type (== 2 bytes).
-//! - [`DataType2ByteCopyWith`][all::DataCell2ByteCopyWith] represents the
+//! - [`DataType16bitCopyWith`][all::DataCell16bitCopyWith] represents the
 //!   corresponding 2-Byte sized type, with a custom type embedded (>= 2 bytes).
-//! - [`DataCell2ByteCopyWith`][all::DataCell2ByteCopyWith] represents the
+//! - [`DataCell16bitCopyWith`][all::DataCell16bitCopyWith] represents the
 //!   corresponding 2-Byte sized type + data, with a custom type embedded
 //!   (>= 4 bytes).
 //!
@@ -111,6 +111,6 @@ pub mod all {
     pub use crate::built::*;
 }
 /// Everything is available in here, organized by size.
-pub mod sizes {
-    crate::reexport![mod_sizes, crate::built; all_sizes];
+pub mod size {
+    crate::reexport![mod_size, crate::built; all_sizes];
 }
