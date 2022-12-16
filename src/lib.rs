@@ -4,7 +4,7 @@
 //!
 //! ## Units
 //!
-//! See the [`unit`][mod@unit] module for more information.
+//! See the [`units`] module for more information.
 //!
 //! The fundamental unitary abstractions are:
 //! - `DataCell…` enums that contains both the data and the type information.
@@ -82,30 +82,21 @@
 //! See the [`customize.rs`](https://github.com/andamira/ladata/blob/main/examples/customize.rs)
 //! example on how to use custom data types.
 //!
-//! # Status
-//! - This is an experimental work in progress. The API can and will keep changing.
-//! - Currently waiting for [GAT stabilization] to keep improving the traits.
-//!
-//! [Gat stabilization]: https://github.com/rust-lang/rust/issues/44265
-//!
+//! [`DataCells`]: units::DataCells
+//! [`DataTypes`]: units::DataTypes
+//! [`DataBares`]: units::DataBares
+
 #![allow(non_snake_case, non_camel_case_types)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod unit;
-
-pub(crate) mod traits;
-#[doc(inline)]
-pub use traits::*;
-
-pub mod other;
+pub mod structs;
+pub mod units;
 
 /// Everything is directly available in here.
 pub mod all {
     #[doc(inline)]
-    pub use super::other::*;
+    pub use super::structs::*;
     #[doc(inline)]
-    pub use super::traits::*;
-    #[doc(inline)]
-    pub use crate::unit::{bares::*, cells::*, types::*};
+    pub use crate::units::{bares::*, cells::*, traits::*, types::*};
 }

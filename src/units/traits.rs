@@ -1,17 +1,14 @@
-// ladata::traits
+// ladata::units::traits
 //
-//!
+//! The traits for unitary data.
 //
-
-use core::fmt::Debug;
-
-// TRAITS
-// -------------------------------------------------------------------------
 // - DataTypes
 // - DataTypesCopy
 // - DataCells
 // - DataCellsCopy
 // - DataBares
+
+use core::fmt::Debug;
 
 /// Common trait for *data types*.
 ///

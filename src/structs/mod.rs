@@ -1,12 +1,12 @@
-// ladata::other
+// ladata:structs
 //
-//! Other types of data.
+//! Data structures.
 //
 
-pub(crate) mod nodata;
-pub use nodata::*;
+/* external */
 
 #[cfg(feature = "bv")]
 pub(crate) mod bit_array;
 #[cfg(feature = "bv")]
 pub use bit_array::*;
+

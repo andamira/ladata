@@ -1,6 +1,7 @@
-// ladata::other::bit_array
+// ladata::struct::bit_array
 //
 //!
+//
 
 use bv::Bits;
 

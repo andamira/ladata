@@ -6,7 +6,7 @@
 
 use core::mem::{align_of, size_of};
 
-use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
 impl DataTypes for () {
     #[inline]

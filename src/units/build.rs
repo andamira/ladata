@@ -1,4 +1,4 @@
-// ladata::builder::built
+// ladata::builder::build
 //
 //! All the types are built here
 //!
@@ -11,7 +11,7 @@
 //
 
 use super::macros::*;
-use crate::traits::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
 // 1. Mockups for substituting unused dependencies
 // -----------------------------------------------------------------------------
