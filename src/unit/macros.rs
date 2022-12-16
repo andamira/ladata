@@ -1688,7 +1688,7 @@ macro_rules! reexport {
 
     // reexports all the sizes
     ($mod:ident, $path:path; all_sizes) => {
-        use $crate::reexport;
+        use $crate::unit::macros::reexport;
         reexport![$mod $path; 1, 8];
         reexport![$mod $path; 2, 16];
         reexport![$mod $path; 4, 32];
@@ -1704,8 +1704,8 @@ macro_rules! reexport {
         paste::paste!{
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
-                $crate::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
-                $crate::reexport![@Bare $path; size: $b; bitCopy ];
+                $crate::unit::macros::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+                $crate::unit::macros::reexport![@Bare $path; size: $b; bitCopy ];
             }
         }
     };
@@ -1713,21 +1713,21 @@ macro_rules! reexport {
     // `::cells::` reexports, single size
     (mod_cells $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            $crate::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            $crate::unit::macros::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::types::` reexports, single size
     (mod_types $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            $crate::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            $crate::unit::macros::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::bares::` reexports, single size
     (mod_bares $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             // WIP
-            $crate::reexport![@Bare $path; size: $b; bitCopy ];
-            // $crate::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            $crate::unit::macros::reexport![@Bare $path; size: $b; bitCopy ];
+            // $crate::unit::macros::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
 
@@ -1736,25 +1736,25 @@ macro_rules! reexport {
 
     // re-exports DataCell
     (@Cell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+        $crate::unit::macros::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataType
     (@Type $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
+        $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataBare
     (@Bare $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+        $crate::unit::macros::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
     };
 
     // re-exports both DataCell & DataType
     (@CellType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
-        $crate::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
+        $crate::unit::macros::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+        $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
         // NOTE DataBare can't accept non-copy (for now) so must be treated separately
-        // $crate::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+        // $crate::unit::macros::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
     };
 
     // generic re-export

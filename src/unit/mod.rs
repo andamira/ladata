@@ -58,7 +58,7 @@
 /// are also available in bigger-sized cells. For example the `U16(u16)` variant
 /// is present in `DataCell16bit` and `DataCell32bit` but not in `DataCell8bit`.
 ///
-/// Types can be found classified by size in the [`size`][crate::size] module.
+/// Types can be found classified by size in the [`size`] module.
 ///
 /// ### `[With]`
 ///
@@ -84,22 +84,29 @@
 
 /// Data *Bares* (just the unsafe bare data).
 pub mod bares {
-    crate::reexport![mod_bares, crate::built; all_sizes];
+    super::macros::reexport![mod_bares, crate::unit::built; all_sizes];
 }
 
 /// Data *Cells* (the encapsulation of *data* plus *type*).
 pub mod cells {
-    crate::reexport![mod_cells, crate::built; all_sizes];
+    super::macros::reexport![mod_cells, crate::unit::built; all_sizes];
 }
 
 /// Data *Types* (just the *type* of the data).
 pub mod types {
-    crate::reexport![mod_types, crate::built; all_sizes];
+    super::macros::reexport![mod_types, crate::unit::built; all_sizes];
 }
+
+/// Every unitary type, organized by size.
+pub mod size {
+    super::macros::reexport![mod_size, crate::unit::built; all_sizes];
+}
+
 #[doc(inline)]
 pub use {bares::*, cells::*, types::*};
 
-pub(crate) mod built;
-pub(crate) mod macros;
+mod built;
+mod macros;
+
 #[cfg(test)]
 mod tests;
