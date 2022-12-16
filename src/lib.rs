@@ -4,7 +4,7 @@
 //!
 //! ## Units
 //!
-//! See the [`units`] module for more information.
+//! See the [`unit`][mod@unit] module for more information.
 //!
 //! The fundamental unitary abstractions are:
 //! - `DataCell…` enums that contains both the data and the type information.
@@ -92,8 +92,8 @@
 //
 #![cfg_attr(not(feature = "std"), no_std)]
 
-pub mod units;
-use units::{built, macros::reexport};
+pub mod unit;
+use unit::{built, macros::reexport};
 
 pub(crate) mod traits;
 #[doc(inline)]
