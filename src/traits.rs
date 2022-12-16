@@ -7,21 +7,21 @@ use core::fmt::Debug;
 
 // TRAITS
 // -------------------------------------------------------------------------
-// - DataType
-// - DataTypeCopy
-// - DataCell
-// - DataCellCopy
-// - DataBare
+// - DataTypes
+// - DataTypesCopy
+// - DataCells
+// - DataCellsCopy
+// - DataBares
 
 /// Common trait for *data types*.
 ///
 /// Allows extending `DataType*`**`With`** versions with custom *types*.
 ///
 /// # See also
-/// - [`DataTypeCopy`]
-/// - [`DataCellCopy`]
-/// - [`DataCell`]
-pub trait DataType: Copy + Debug {
+/// - [`DataTypesCopy`]
+/// - [`DataCellsCopy`]
+/// - [`DataCells`]
+pub trait DataTypes: Copy + Debug {
     /// Returns the alignment of the data represented by the current type.
     fn data_align(&self) -> usize;
 
@@ -38,24 +38,24 @@ pub trait DataType: Copy + Debug {
 ///
 /// # Coherence
 ///
-/// The `DataType::`[`is_copy`][DataType#method.is_copy]
-/// super-trait method should return `true` as well.
+/// The `DataTypes::`[`is_copy`][DataTypes#method.is_copy]
+/// super-trait method should probably return `true` as well.
 ///
 /// # See also
-/// - [`DataType`]
-/// - [`DataCell`]
-/// - [`DataCellCopy`]
-pub trait DataTypeCopy: DataType {}
+/// - [`DataTypes`]
+/// - [`DataCells`]
+/// - [`DataCellsCopy`]
+pub trait DataTypesCopy: DataTypes {}
 
 /// Common trait for *data cells*.
 ///
 /// Allows extending `DataCell*`**`With`** versions.
 ///
 /// See also:
-/// - [`DataCellCopy`]
-/// - [`DataTypeCopy`]
-/// - [`DataType`]
-pub trait DataCell: Debug {
+/// - [`DataCellsCopy`]
+/// - [`DataTypesCopy`]
+/// - [`DataTypes`]
+pub trait DataCells: Debug {
     /// Whether the data type in the current variant is [`Copy`].
     fn is_copy(&self) -> bool;
 }
@@ -66,25 +66,25 @@ pub trait DataCell: Debug {
 ///
 /// # Coherence
 ///
-/// The `DataCell::`[`is_copy`][DataCell#method.is_copy]
-/// super-trait method should return `true` as well.
+/// The `DataCells::`[`is_copy`][DataCells#method.is_copy]
+/// super-trait method should probably return `true` as well.
 ///
 /// # See also
-/// - [`DataCell`]
-/// - [`DataType`]
-/// - [`DataTypeCopy`]
-pub trait DataCellCopy: DataCell + Copy {}
+/// - [`DataCells`]
+/// - [`DataTypes`]
+/// - [`DataTypesCopy`]
+pub trait DataCellsCopy: DataCells + Copy {}
 
 /// Common trait for *unsafe data cells*.
 ///
 /// # Safety
 /// TODO
 ///
-pub unsafe trait DataBare {}
+pub unsafe trait DataBares {}
 
 /// Comon (marker) trait for *unsafe* `Copy` *data cells*.
 ///
 /// # Safety
 /// TODO
 ///
-pub unsafe trait DataBareCopy: DataBare + Copy {}
+pub unsafe trait DataBaresCopy: DataBares + Copy {}

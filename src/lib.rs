@@ -11,7 +11,7 @@
 //! - `DataType…` enums that only contains type information, not the data itself.
 //! - `DataBare…` unions that only contains the data, not the type of the data.
 //!
-//! They implement the [`DataCell`], [`DataType`] and [`DataBare`] traits.
+//! They implement the [`DataCells`], [`DataTypes`] and [`DataBares`] traits.
 //!
 //! Each one has many concrete implementations differentiated by:
 //! - the maximum `size` of the represented data.

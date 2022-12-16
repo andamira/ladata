@@ -29,17 +29,17 @@
 /// ### `<Type|Cell|Bare>`
 ///
 /// - `Type` indicates the categorization of the data type information.
-/// All *`DataType*`s* must implement the [`DataType`] trait, and
+/// All *`DataType*`s* must implement the [`DataTypes`] trait, and
 /// *`DataType*Copy*`* *types* must additionally implement the
-/// [`DataTypeCopy`] trait.
+/// [`DataTypesCopy`] trait.
 ///
 /// - `Cell` indicates the encapsulation of the data and the type information.
-/// All *`DataCell*`s* must implement the [`DataCell`] trait, and
+/// All *`DataCell*`s* must implement the [`DataCells`] trait, and
 /// *`DataCell*Copy*`* *cells* must additionally implement the
-/// [`DataCellCopy`] trait.
+/// [`DataCellsCopy`] trait.
 ///
 /// - `Bare` indicates the encapsulation of data without the type information.
-/// All *`DataBare`s* implements the (marker) [`DataBare`] trait.
+/// All *`DataBare`s* implements the (marker) [`DataBares`] trait.
 ///
 /// ### `[Copy]`
 ///
@@ -68,24 +68,24 @@
 /// ### `[With]`
 ///
 /// **`DataType*With`** enums can be extended generically by storing a type
-/// implementing [`DataType`] in its `With` variant (or [`DataTypeCopy`]
+/// implementing [`DataTypes`] in its `With` variant (or [`DataTypesCopy`]
 /// in the case of `DataType*CopyWith`.
 ///
 /// In the same way, **`DataCell*With`** enums can be extended generically by
-/// storing a type implementing [`DataCell`] in its `With` variant
-/// (or [`DataCellCopy`] in the case of `DataCell*CopyWith`.
+/// storing a type implementing [`DataCells`] in its `With` variant
+/// (or [`DataCellsCopy`] in the case of `DataCell*CopyWith`.
 ///
 /// Internally, all non-`With` versions are convenient type aliases to the
 /// corresponding `With` version (having the same size and `Copy` semantics),
 /// using the zero-sized [`()`] unit type. E.g.:
 /// [`DataType32Byte`][crate::all::DataType32Byte]
 ///
-/// [`DataType`]: crate::DataType
-/// [`DataTypeCopy`]: crate::DataTypeCopy
-/// [`DataCell`]: crate::DataCell
-/// [`DataCellCopy`]: crate::DataCellCopy
-/// [`DataBare`]: crate::DataBare
-/// [`DataBareCopy`]: crate::DataBareCopy
+/// [`DataTypes`]: crate::DataTypes
+/// [`DataTypesCopy`]: crate::DataTypesCopy
+/// [`DataCells`]: crate::DataCells
+/// [`DataCellsCopy`]: crate::DataCellsCopy
+/// [`DataBares`]: crate::DataBares
+/// [`DataBaresCopy`]: crate::DataBaresCopy
 
 /// Data *Bares* (just the unsafe bare data).
 pub mod bares {

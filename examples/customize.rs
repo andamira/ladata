@@ -12,12 +12,12 @@ enum MyCell {
     B(f64),
 }
 
-impl DataCell for MyCell {
+impl DataCells for MyCell {
     fn is_copy(&self) -> bool {
         true
     }
 }
-impl DataCellCopy for MyCell {}
+impl DataCellsCopy for MyCell {}
 
 fn main() {
     // Standalone custom data:
