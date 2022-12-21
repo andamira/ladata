@@ -4,7 +4,8 @@ description = "A simple & modular data model."
 version = "0.0.20"
 edition = "2021"
 resolver = "2"
-rust-version = "1.65"
+# MSRV because: GATs, let-else
+rust-version = "1.65" # https://releases.rs/docs/1.65.0/
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
 repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
@@ -21,6 +22,7 @@ publish = true
 
 [dependencies]
 paste = "1.0.10"
+nonmax = "0.5.3"
 
 # feature: "deps_continuous" (continuous numbers):
 half = { version = "2.0.0", optional = true, default-features = false } # F16 BF16
@@ -60,14 +62,14 @@ deps_default = [
 			"time", # !"fugit",
 ]
 
-deps_numerical= [ "deps_continuous", "deps_discrete" ]
-deps_continuous = [ "half", "twofloat" ]
-deps_discrete = [ "num-rational", "num-bigint", "rust_decimal" ]
+deps_numerical= ["deps_continuous", "deps_discrete"]
+deps_continuous = ["half", "twofloat"]
+deps_discrete = ["num-rational", "num-bigint", "rust_decimal"]
 
-deps_categorical = [ "deps_bit", "deps_datetime", "deps_string" ]
-deps_bit = [ "bv" ]
-deps_datetime = [ "fugit", "time" ]
-deps_string =  [ "arraystring" ]
+deps_categorical = ["deps_bit", "deps_datetime", "deps_string"]
+deps_bit = ["bv"]
+deps_datetime = ["fugit", "time"]
+deps_string =  ["arraystring"]
 
 [dev-dependencies]
 

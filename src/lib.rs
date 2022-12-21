@@ -90,13 +90,16 @@
 //
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod storage;
 pub mod structs;
 pub mod units;
 
 /// Everything is directly available in here.
 pub mod all {
     #[doc(inline)]
-    pub use super::structs::*;
+    pub use super::storage::*;
+    #[doc(inline)]
+    pub use super::structs::{bits::*, list::*};
     #[doc(inline)]
     pub use crate::units::{bares::*, cells::*, traits::*, types::*};
 }
