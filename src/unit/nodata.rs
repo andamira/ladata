@@ -1,4 +1,4 @@
-// ladata::other::nodata
+// ladata::unit::nodata
 //
 //! Treating the unit type [`()`] to represent the absence of data.
 //!

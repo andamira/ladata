@@ -1,8 +1,8 @@
-// ladata::storage::lac
+// ladata::mem::raw
 //
-//!
+//! Raw storage doesn't affect its content.
 //
-// NOTE: based on https://doc.rust-lang.org/std/boxed/struct.Box.html
+// API based on https://doc.rust-lang.org/std/boxed/struct.Box.html
 
 use core::{cmp, fmt, hash, ops};
 
@@ -10,69 +10,73 @@ use core::{cmp, fmt, hash, ops};
 ///
 /// # Examples
 /// ```
-/// use ladata::storage::Lac;
+/// use ladata::mem::Raw;
 ///
-/// let lac = Lac::new(0_u8);
-///
+/// let lac = Raw::new(0_u8);
 /// ```
-pub struct Lac<T>(pub T);
-impl<T> ops::Deref for Lac<T> {
+pub struct Raw<T>(pub T);
+
+impl<T> ops::Deref for Raw<T> {
     type Target = T;
     #[inline]
     fn deref(&self) -> &T {
         &self.0
     }
 }
-impl<T> Lac<T> {
+
+impl<T> Raw<T> {
     #[inline]
     pub const fn new(t: T) -> Self {
-        Lac(t)
+        Raw(t)
     }
 }
-impl<T> ops::DerefMut for Lac<T> {
+
+impl<T> ops::DerefMut for Raw<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut T {
         &mut self.0
     }
 }
-impl<T> From<T> for Lac<T> {
+
+impl<T> From<T> for Raw<T> {
     #[inline]
     fn from(t: T) -> Self {
-        Lac(t)
+        Raw(t)
     }
 }
-impl<T: Clone> Clone for Lac<T> {
+
+impl<T: Clone> Clone for Raw<T> {
     #[inline]
     fn clone(&self) -> Self {
-        Lac(self.0.clone())
+        Raw(self.0.clone())
     }
 }
-impl<T: Copy> Copy for Lac<T> {}
+impl<T: Copy> Copy for Raw<T> {}
 
-impl<T: Default> Default for Lac<T> {
+impl<T: Default> Default for Raw<T> {
     #[inline]
     fn default() -> Self {
-        Lac(T::default())
+        Raw(T::default())
     }
 }
 
-impl<T: PartialEq> PartialEq for Lac<T> {
+impl<T: PartialEq> PartialEq for Raw<T> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.0.eq(&other.0)
         // PartialEq::eq(&**self, &**other)
     }
 }
-impl<T: Eq> Eq for Lac<T> {}
+impl<T: Eq> Eq for Raw<T> {}
 
-impl<T: PartialOrd> PartialOrd for Lac<T> {
+impl<T: PartialOrd> PartialOrd for Raw<T> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
         self.0.partial_cmp(&other.0)
         // PartialOrd::partial_cmp(&**self, &**other)
     }
 }
-impl<T: Ord> Ord for Lac<T> {
+impl<T: Ord> Ord for Raw<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> cmp::Ordering {
         self.0.cmp(&other.0)
@@ -80,14 +84,14 @@ impl<T: Ord> Ord for Lac<T> {
     }
 }
 
-impl<T: fmt::Debug> fmt::Debug for Lac<T> {
+impl<T: fmt::Debug> fmt::Debug for Raw<T> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // fmt::Debug::fmt(&**self, f)
-        fmt::Debug::fmt(&self, f)
+        fmt::Debug::fmt(&self.0, f)
     }
 }
-impl<T: fmt::Display> fmt::Display for Lac<T> {
+impl<T: fmt::Display> fmt::Display for Raw<T> {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // fmt::Display::fmt(&**self, f)
@@ -95,14 +99,14 @@ impl<T: fmt::Display> fmt::Display for Lac<T> {
     }
 }
 
-impl<T: hash::Hash> hash::Hash for Lac<T> {
+impl<T: hash::Hash> hash::Hash for Raw<T> {
     #[inline]
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         // (**self).hash(state);
         self.0.hash(state);
     }
 }
-impl<T: hash::Hasher> hash::Hasher for Lac<T> {
+impl<T: hash::Hasher> hash::Hasher for Raw<T> {
     #[inline]
     fn finish(&self) -> u64 {
         // (**self).finish()
@@ -115,7 +119,7 @@ impl<T: hash::Hasher> hash::Hasher for Lac<T> {
     }
 }
 
-impl<I: Iterator> Iterator for Lac<I> {
+impl<I: Iterator> Iterator for Raw<I> {
     type Item = I::Item;
     fn next(&mut self) -> Option<I::Item> {
         (**self).next()
@@ -127,16 +131,16 @@ impl<I: Iterator> Iterator for Lac<I> {
         (**self).nth(n)
     }
     // fn last(self) -> Option<I::Item> {
-    //     LacIter::last(self)
+    //     RawIter::last(self)
     // }
 }
 
-// trait LacIter {
+// trait RawIter {
 //     type Item;
 //     fn last(self) -> Option<Self::Item>;
 // }
 //
-// impl<I: Iterator> LacIter for Lac<I> {
+// impl<I: Iterator> RawIter for Raw<I> {
 //     type Item = I::Item;
 //     fn last(self) -> Option<I::Item> {
 //         #[inline]

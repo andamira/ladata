@@ -1,4 +1,4 @@
-// ladata::units::traits
+// ladata::unit::traits
 //
 //! The traits for unitary data.
 //

@@ -1,4 +1,4 @@
-// ladata::structs::list::double
+// ladata::line::link::builder
 //
 //! Linked lists.
 //
@@ -10,17 +10,15 @@
 //      [0]      [1]      [2]      [3]
 //    !←P,S→1  0←P,S→2  1←P,S→3  2←P,S→!
 //
-// each node has a successor and a predecessor
+// each node has a successor (next), pointing towards the back,
+// and a predecessor (prev), pointing towards the front.
 // ```
 
 #![allow(dead_code)] // TEMP
 
-use core::{
-    fmt,
-    mem::{self, MaybeUninit},
-};
+use core::{fmt, mem::{self, MaybeUninit}, ptr};
 
-use crate::storage::{Boxed, Storage};
+use crate::mem::{Boxed, Storage};
 
 /// Generates a doubly linked list tied to an array, with fixed-size index size.
 macro_rules! linked_list_array {
@@ -29,9 +27,6 @@ macro_rules! linked_list_array {
     // $b : bit size
     // $t : inner index type
     // $nmt: nonmax inner index type
-    // ;
-    // $size128:  byte size for 128 × i32 nodes
-    // $size128z: byte size for 128 × i32 nodes with zero-sized option.
     ( $name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { paste::paste! {
 
         // Index ---------------------------------------------------------------
@@ -184,10 +179,10 @@ macro_rules! linked_list_array {
         impl<T: fmt::Debug> fmt::Debug for [<$name$b Node>]<T> {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 f.debug_struct(stringify![[<$name$b Node>]])
-                 .field("prev", &self.prev)
-                 .field("next", &self.next)
-                 .field("data", &self.data)
-                 .finish()
+                .field("prev", &self.prev)
+                .field("next", &self.next)
+                .field("data", &self.data)
+                .finish()
             }
         }
 
@@ -312,11 +307,11 @@ macro_rules! linked_list_array {
                 }
             }
 
-            // T:Copy
+            /// `T:Copy`
             impl<T: Copy, S: Storage, const LEN: usize> Copy for [<$name$b>]<T, S, LEN>
                 where S::Container<[[<$name$b Node>]<T>; LEN]>: Copy {}
 
-            // T:Debug
+            /// `T:Debug`
             impl<T: fmt::Debug, S: Storage, const LEN: usize> fmt::Debug for [<$name$b>]<T, S, LEN>
                 where S::Container<[[<$name$b Node>]<T>; LEN]>: fmt::Debug {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -333,11 +328,12 @@ macro_rules! linked_list_array {
                         // IMPROVE: show first 3 and last 3
                         debug.field("nodes { ... }", &());
                     }
+
                     debug.finish()
                 }
             }
 
-            // S:() + T:Default
+            /// `S=(); T:Default`
             impl<T: Default, const LEN: usize> Default for [<$name$b>]<T, (), LEN> {
                 /// Returns an empty, non-circular, doubly linked list.
                 ///
@@ -364,7 +360,7 @@ macro_rules! linked_list_array {
                 }
             }
 
-            // S:Boxed + T:Default
+            /// `S=Boxed; T:Default`
             impl<T: Default, const LEN: usize> Default for [<$name$b>]<T, Boxed, LEN> {
                 /// Returns an empty, non-circular, doubly linked list.
                 ///
@@ -396,7 +392,7 @@ macro_rules! linked_list_array {
             }
         }
 
-        /// # `S:() + T:Clone`
+        /// `S=(); T:Clone`
         impl<T: Clone, const LEN: usize> [<$name$b>]<T, (), LEN> {
             /// Returns a doubly linked list, filled with unlinked `value` elements.
             ///
@@ -430,7 +426,7 @@ macro_rules! linked_list_array {
             }
         }
 
-        /// # `S:Boxed + T:Clone`
+        /// `S:Boxed + T:Clone`
         impl<T: Clone, const LEN: usize> [<$name$b>]<T, Boxed, LEN> {
             /// Returns a doubly linked list, filled with unlinked `value` elements.
             ///
@@ -461,18 +457,18 @@ macro_rules! linked_list_array {
             }
         }
 
-        /// # `T:Clone`
+        /// `T:Clone`
         impl<T: Clone, S: Storage, const LEN: usize> [<$name$b>]<T, S, LEN> {
             /// Resets the list, unlinking all elements and setting them to `value`.
             pub fn reset(&mut self, value: T) {
                 self.count = 0.into();
                 self.front = None.into();
                 self.back = None.into();
-                self.reset_nodes(value);
+                self.reset_all_nodes(value);
             }
         }
 
-        /// # ``
+        /// `*`
         impl<T, S: Storage, const LEN: usize> [<$name$b>]<T, S, LEN> {
             /// Returns the number of elements.
             pub const fn len(&self) -> $t {
@@ -508,10 +504,10 @@ macro_rules! linked_list_array {
                 self.count = 0.into();
                 self.front = None.into();
                 self.back = None.into();
-                self.unlink_nodes();
+                self.unlink_all_nodes();
             }
 
-            /* front & back*/
+            /* front & back */
 
             /// Returns the index of the first element,
             /// or `None` if the list is empty.
@@ -610,7 +606,7 @@ macro_rules! linked_list_array {
                     // create the new element to put at the front.
                     let element = [<$name$b Node>]::new_front(self.front, value);
 
-                    // where the new element will be inserted.
+                    // find where the new element will be inserted.
                     let element_idx = self.count;
 
                     // the first front element is also the back element.
@@ -622,7 +618,7 @@ macro_rules! linked_list_array {
                         self.set_prev_at(self.front, element_idx)?;
                     }
 
-                    // update the element count
+                    // update the element count.
                     self.count.increment()?;
 
                     // insert the new element
@@ -728,12 +724,13 @@ macro_rules! linked_list_array {
                 Some(())
             }
 
-            /// Returns the `next` index of the node at `index`,
-            /// or `None` if either the index is `None`, or it overflows.
+            /// Returns the `next` node-index of the provided node-`index`,
+            /// or `None` if either the `index` is `None`, or it overflows.
             fn next_at(&self, index: [<$name$b Index>]) -> Option<[<$name$b Index>]> {
                 Some(self.ref_node_at(index)?.next())
             }
-            /// Sets the `next` index of the node at `index` with `new_next`.
+            /// Sets the `next` node-index of the provided node-`index`,
+            /// with `new_next`.
             ///
             /// Returns `None` if either the index is `None`, or it overflows.
             fn set_next_at(&mut self, index: [<$name$b Index>], new_next: [<$name$b Index>])
@@ -743,10 +740,8 @@ macro_rules! linked_list_array {
             }
 
             /// Unlinks all the nodes.
-            ///
-            /// Uses `value` to fill each node.
             #[inline]
-            fn unlink_nodes(&mut self) {
+            fn unlink_all_nodes(&mut self) {
                 if LEN == 0 {
                     return;
                 }
@@ -760,9 +755,9 @@ macro_rules! linked_list_array {
         impl<T: Clone, S: Storage, const LEN: usize> [<$name$b>]<T, S, LEN> {
             /// Resets all the nodes with the provided value, and unlinks them.
             ///
-            /// Uses `value` to fill each node.
+            /// Uses `value` to fill the data of each node.
             #[inline]
-            fn reset_nodes(&mut self, value: T) {
+            fn reset_all_nodes(&mut self, value: T) {
                 if LEN == 0 {
                     return;
                 }
@@ -810,7 +805,6 @@ mod tests {
         /* 8-bit index list */
 
         assert_eq!(1, size_of::<LinkedList8Index>());
-        let index8 = 1;
 
         // the size of a node is the sum of:
         // - the size of its 2 indexes (2 * 1)
@@ -822,10 +816,6 @@ mod tests {
         assert_eq![2 + 4 + 2, size_of::<LinkedList8Node::<u32>>()];
         assert_eq![2 + 8 + 6, size_of::<LinkedList8Node::<u64>>()];
         assert_eq![2 + 16 + 6, size_of::<LinkedList8Node::<u128>>()];
-
-        // the size of a list of 10 × u8:
-        assert_eq![33, size_of::<LinkedList8::<u8, (), 10>>()];
-        assert_eq![33, 3 * index8 + (2 * index8 + size_of::<u8>()) * 10];
 
         // the size of a list of 0 elements:
         assert_eq![3, size_of::<LinkedList8::<u8, (), 0>>()];
@@ -848,7 +838,6 @@ mod tests {
         /* 16-bit index list */
 
         assert_eq!(2, size_of::<LinkedList16Index>());
-        let index16 = 2;
 
         // the size of a node is the sum of:
         // - the size of its 2 indexes (2 * 2)
@@ -860,10 +849,6 @@ mod tests {
         assert_eq![4 + 4 + 0, size_of::<LinkedList16Node::<u32>>()];
         assert_eq![4 + 8 + 4, size_of::<LinkedList16Node::<u64>>()];
         assert_eq![4 + 16 + 4, size_of::<LinkedList16Node::<u128>>()];
-
-        // the size of a list of 10 × u16:
-        assert_eq![66, size_of::<LinkedList16::<u16, (), 10>>()];
-        assert_eq![66, 3 * index16 + (2 * index16 + size_of::<u16>()) * 10];
 
         // the size of a list of 0 elements:
         assert_eq![6, size_of::<LinkedList16::<u8, (), 0>>()];
@@ -879,6 +864,13 @@ mod tests {
         assert_eq![8 + 8 + 8, size_of::<LinkedList16::<u64, (), 1>>()];
         assert_eq![8 + 16 + 8, size_of::<LinkedList16::<u128, (), 1>>()];
 
+        // the size of a list of 10 elements:
+        assert_eq![6 + (1 + 5) * 10, size_of::<LinkedList16::<u8, (), 10>>()];
+        assert_eq![6 + (2 + 4) * 10, size_of::<LinkedList16::<u16, (), 10>>()];
+        assert_eq![8 + (4 + 4) * 10, size_of::<LinkedList16::<u32, (), 10>>()];
+        assert_eq![8 + (8 + 8) * 10, size_of::<LinkedList16::<u64, (), 10>>()];
+        assert_eq![8 + (16 + 8) * 10, size_of::<LinkedList16::<u128, (), 10>>()];
+
         // on the heap
         assert_eq![16, size_of::<LinkedList16::<u8, Boxed, 10>>()];
         assert_eq![16, size_of::<LinkedList16::<u128, Boxed, 10>>()];
@@ -887,7 +879,6 @@ mod tests {
         /* 32-bit index list */
 
         assert_eq!(4, size_of::<LinkedList32Index>());
-        let index16 = 4;
 
         assert_eq!(8 + 0 + 0, size_of::<LinkedList32Node<()>>());
         assert_eq![8 + 1 + 3, size_of::<LinkedList32Node::<u8>>()];

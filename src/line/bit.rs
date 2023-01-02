@@ -1,6 +1,8 @@
-// ladata::struct::bits
+// ladata::struct::bit
 //
+//! Bit arrays.
 //!
+//! <https://en.wikipedia.org/wiki/Bit_array>
 //
 
 use bv::{Bits, BitsMut};
