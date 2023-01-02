@@ -6,7 +6,10 @@
 
 use core::mem::{align_of, size_of};
 
-use super::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+
+#[cfg(not(feature = "no_unsafe"))]
+use super::DataBares;
 
 impl DataTypes for () {
     #[inline]
@@ -33,4 +36,5 @@ impl DataTypesCopy for () {}
 
 impl DataCellsCopy for () {}
 
+#[cfg(not(feature = "no_unsafe"))]
 unsafe impl DataBares for () {}

@@ -11,7 +11,10 @@
 //
 
 use super::macros::*;
-use super::{DataBares, DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+
+#[cfg(not(feature = "no_unsafe"))]
+use super::DataBares;
 
 // 1. Mockups for substituting unused dependencies
 // -----------------------------------------------------------------------------

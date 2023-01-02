@@ -14,11 +14,15 @@
 // and a predecessor (prev), pointing towards the front.
 // ```
 
-#![allow(dead_code)] // TEMP
+use core::fmt;
 
-use core::{fmt, mem::{self, MaybeUninit}, ptr};
+#[cfg(not(feature = "no_unsafe"))]
+use core::{mem::{self, MaybeUninit}, ptr};
 
-use crate::mem::{Boxed, Storage};
+use crate::mem::{Raw, Storage};
+
+#[cfg(feature = "std")]
+use crate::mem::Boxed;
 
 /// Generates a doubly linked list tied to an array, with fixed-size index size.
 macro_rules! linked_list_array {
@@ -43,6 +47,7 @@ macro_rules! linked_list_array {
             }
         }
 
+        #[allow(dead_code)]
         impl [<$name$b Index>] {
             /// Returns a new index pointing to some node.
             ///
@@ -186,6 +191,7 @@ macro_rules! linked_list_array {
             }
         }
 
+        #[allow(dead_code)]
         impl<T> [<$name$b Node>]<T> {
             /// Returns a new node, with `data`, and custom `prev`ious and `next` indices.
             #[inline]
@@ -341,7 +347,8 @@ macro_rules! linked_list_array {
                 #[doc = "Panics if `LEN` is > [`" $t "::MAX`]."]
                 fn default() -> Self {
                     assert![LEN < $t::MAX as usize];
-                    let data = {
+                    #[cfg(not(feature = "no_unsafe"))]
+                    let data = Raw::new({
                         let mut arr: [MaybeUninit<[<$name$b Node>]<T>>; LEN] = unsafe {
                             MaybeUninit::uninit().assume_init()
                         };
@@ -349,18 +356,22 @@ macro_rules! linked_list_array {
                             let _ = i.write([<$name$b Node>]::new_unlinked(T::default()));
                         }
                         unsafe { mem::transmute_copy::<_, [ [<$name$b Node>]<T>; LEN]>(&arr) }
-                    };
+                    });
+                    #[cfg(feature = "no_unsafe")]
+                    let data = Raw::new(
+                        core::array::from_fn(|_| [<$name$b Node>]::new_unlinked(T::default())));
 
                     Self {
                         count: 0.into(),
                         front: None.into(),
                         back: None.into(),
-                        nodes: data.into(),
+                        nodes: data,
                     }
                 }
             }
 
             /// `S=Boxed; T:Default`
+            #[cfg(feature = "std")]
             impl<T: Default, const LEN: usize> Default for [<$name$b>]<T, Boxed, LEN> {
                 /// Returns an empty, non-circular, doubly linked list.
                 ///
@@ -401,6 +412,7 @@ macro_rules! linked_list_array {
             pub fn new(value: T) -> Self {
                 assert![LEN < $t::MAX as usize];
 
+                #[cfg(not(feature = "no_unsafe"))]
                 let data = {
                     let mut arr: [MaybeUninit<[<$name$b Node>]<T>>; LEN] = unsafe {
                         MaybeUninit::uninit().assume_init()
@@ -415,18 +427,23 @@ macro_rules! linked_list_array {
                     // - https://github.com/rust-lang/rust/issues/61956
                     // unsafe { mem::transmute::<_, [ [<$name$b Node>]<T>; LEN]>(&arr) }
                     unsafe { mem::transmute_copy::<_, [ [<$name$b Node>]<T>; LEN]>(&arr) }
-                };
+                }.into();
+
+                #[cfg(feature = "no_unsafe")]
+                let data = Raw::new(
+                    core::array::from_fn(|_| [<$name$b Node>]::new_unlinked(value.clone())));
 
                 Self {
                     count: 0.into(),
                     front: None.into(),
                     back: None.into(),
-                    nodes: data.into(),
+                    nodes: data,
                 }
             }
         }
 
         /// `S:Boxed + T:Clone`
+        #[cfg(feature = "std")]
         impl<T: Clone, const LEN: usize> [<$name$b>]<T, Boxed, LEN> {
             /// Returns a doubly linked list, filled with unlinked `value` elements.
             ///
@@ -636,6 +653,8 @@ macro_rules! linked_list_array {
             ///
             /// Returns `None` if the list is empty.
             // TODO WIP
+            #[allow(warnings)] // TEMP
+            #[cfg(not(feature = "no_unsafe"))]
             pub fn pop_front(&mut self) -> Option<T> {
                 if self.front.is_none() {
                     return None;
@@ -673,6 +692,7 @@ macro_rules! linked_list_array {
         //
 
         /// Private utility methods
+        #[allow(dead_code)]
         impl<T, S: Storage, const LEN: usize> [<$name$b>]<T, S, LEN> {
             /// Returns a reference to the node at `index`,
             /// or `None` if either the index is `None`, or overflows.
@@ -875,7 +895,6 @@ mod tests {
         assert_eq![16, size_of::<LinkedList16::<u8, Boxed, 10>>()];
         assert_eq![16, size_of::<LinkedList16::<u128, Boxed, 10>>()];
 
-
         /* 32-bit index list */
 
         assert_eq!(4, size_of::<LinkedList32Index>());
@@ -908,18 +927,29 @@ mod tests {
         /* misc. list sizes */
 
         // max 8-bit len with a byte per node occupies ± 0.75 KiB
-        assert_eq![765, size_of::<LinkedList8::<u8, (), { u8::MAX as usize - 1 }>>()];
+        assert_eq![
+            765,
+            size_of::<LinkedList8::<u8, (), { u8::MAX as usize - 1 }>>()
+        ];
         // to store one node more we need 16-bit indexes, occupping 1.5 KiB
-        assert_eq![1536, size_of::<LinkedList16::<u8, (), { u8::MAX as usize }>>()];
+        assert_eq![
+            1536,
+            size_of::<LinkedList16::<u8, (), { u8::MAX as usize }>>()
+        ];
         // max 16-bit len with a byte per node occupies ± 384 KiB)
-        assert_eq![393_210, size_of::<LinkedList16::<u8, (), { u16::MAX as usize - 1 }>>()];
+        assert_eq![
+            393_210,
+            size_of::<LinkedList16::<u8, (), { u16::MAX as usize - 1 }>>()
+        ];
         // to store one node more we need 32-bit indexes, occupping 768 KiB
-        assert_eq![786_432, size_of::<LinkedList32::<u8, (), { u16::MAX as usize }>>()];
+        assert_eq![
+            786_432,
+            size_of::<LinkedList32::<u8, (), { u16::MAX as usize }>>()
+        ];
         // max 32-bit len with a byte per node occupies ± 48 GiB)
-        assert_eq![51_539_607_540, size_of::<LinkedList32::<u8, (), { u32::MAX as usize - 1 }>>()];
-    }
-
-    #[test]
-    fn WIP() {
+        assert_eq![
+            51_539_607_540,
+            size_of::<LinkedList32::<u8, (), { u32::MAX as usize - 1 }>>()
+        ];
     }
 }

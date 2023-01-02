@@ -13,7 +13,6 @@ pub mod link;
 #[doc(inline)]
 pub use link::*;
 
-// pub mod stack;
-// #[doc(inline)]
-// pub use stack::*;
-
+pub mod stack;
+#[doc(inline)]
+pub use stack::*;

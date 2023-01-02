@@ -46,6 +46,8 @@ bv = { version = "0.11.1", optional = true } # BitArray* (impl `Bits`)
 [features]
 default = [ "std", "deps_default" ]
 std = [ "half?/std" ]
+no_unsafe = []
+
 deps_all = [
 	"deps_numerical",
 	"deps_categorical",

@@ -1676,6 +1676,8 @@ macro_rules! impl_data_bares {
         //     fn is_copy(&self) -> bool { true }
         // }
         // impl DataCellsCopy for $bname {}
+
+        #[cfg(not(feature = "no_unsafe"))]
         unsafe impl DataBares for $bname {}
     };
 }

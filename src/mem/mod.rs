@@ -1,6 +1,6 @@
 // ladata::mem
 //
-//! Memory-management data structures.
+//! Memory-management structures.
 //!
 //! The trait [`Storage`] allows data structure implementations to have
 //! methods (specially constructors) be specialized by storage type.
@@ -59,7 +59,10 @@ pub trait Storage {
 }
 
 /// A storage that wraps its data in a [`Box`].
+#[cfg(feature = "std")]
 pub struct Boxed;
+
+#[cfg(feature = "std")]
 impl Storage for Boxed {
     type Container<T> = Box<T>;
 }
