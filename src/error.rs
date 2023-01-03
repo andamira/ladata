@@ -22,10 +22,11 @@ pub enum LadataError {
 
     /// There is not enough free space for the operation.
     ///
-    /// Contains the minimum number of free space needed for new elements.
-    NotEnoughSpace(usize),
-    // /// The key already exists.
-    // KeyAlreadyExists,
+    /// Optionally contains the number of free spaces needed.
+    NotEnoughSpace(Option<usize>),
+
+    /// The key already exists.
+    KeyAlreadyExists,
 }
 
 /// impl Display & Error
@@ -43,11 +44,17 @@ mod std_impls {
                 LadataError::NotEnoughElements(n) => {
                     write!(f, "Not enough elements. Needs at least `{n}` elements.")
                 }
-                LadataError::NotEnoughSpace(n) => write!(
-                    f,
-                    "Not enough space. Needs at least `{n}` free space for elements."
-                ),
-                // LadataError::KeyAlreadyExists => write!(f, "The key already exists."),
+                LadataError::NotEnoughSpace(n) => {
+                    if let Some(n) = n {
+                        write!(
+                            f,
+                            "Not enough space. Needs at least `{n}` free space for elements."
+                        )
+                    } else {
+                        write!(f, "Not enough space.")
+                    }
+                }
+                LadataError::KeyAlreadyExists => write!(f, "The key already exists."),
             }
         }
     }

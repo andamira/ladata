@@ -80,11 +80,19 @@ impl<T: Default, const CAP: usize> Default for Stack<T, (), CAP> {
 impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using the default value to fill the remaining free data.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::BoxedStack;
+    ///
+    /// let mut s = BoxedStack::<i32, 100>::default();
+    /// ```
     fn default() -> Self {
+        #[cfg(feature = "no_unsafe")]
         let data = {
             let mut v = Vec::<T>::with_capacity(CAP);
 
-            for _ in 0..v.len() {
+            for _ in 0..CAP {
                 v.push(T::default());
             }
 
@@ -94,6 +102,20 @@ impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
             array
         };
 
+        #[cfg(not(feature = "no_unsafe"))]
+        let data = {
+            let mut v = Vec::<T>::with_capacity(CAP);
+
+            for _ in 0..CAP {
+                v.push(T::default());
+            }
+
+            let slice = v.into_boxed_slice();
+            let raw_slice = Box::into_raw(slice);
+            // SAFETY: pointer comes from using `into_raw`, and capacity is right.
+            unsafe { Box::from_raw(raw_slice as *mut [T; CAP]) }
+        };
+
         Self {
             stack: data,
             len: 0,
@@ -101,20 +123,41 @@ impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
     }
 }
 
-impl<T, S: Storage, const CAP: usize> From<[T; CAP]> for Stack<T, S, CAP> {
-    /// Converts an array to a [`full`][Self::is_full] stack.
+impl<T: Default, I, const CAP: usize> From<I> for Stack<T, (), CAP>
+where
+    I: IntoIterator<Item = T>,
+{
+    /// Returns a stack filled with an iterator, in the stack.
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::all::RawStack;
     ///
-    /// let s: Stack<_, (), 3> = [1, 2, 3].into();
+    /// let s: RawStack<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(arr: [T; CAP]) -> Stack<T, S, CAP> {
-        Self {
-            // CHECK
-            stack: arr.into(),
-            len: CAP,
-        }
+    fn from(iterator: I) -> Stack<T, (), CAP> {
+        let mut s = Stack::<T, (), CAP>::default();
+        let _ = s.extend(iterator);
+        s
+    }
+}
+
+#[cfg(feature = "std")]
+impl<T: Default, I, const CAP: usize> From<I> for Stack<T, Boxed, CAP>
+where
+    I: IntoIterator<Item = T>,
+{
+    /// Returns a stack filled with an iterator, in the heap.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::BoxedStack;
+    ///
+    /// let s: BoxedStack<_, 3> = [1, 2, 3].into();
+    /// ```
+    fn from(iterator: I) -> Stack<T, Boxed, CAP> {
+        let mut s = Stack::<T, Boxed, CAP>::default();
+        let _ = s.extend(iterator);
+        s
     }
 }

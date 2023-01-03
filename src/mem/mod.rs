@@ -29,7 +29,7 @@ pub use raw::Raw;
 /// # Examples
 /// ```
 /// use core::{array, mem::size_of};
-/// use ladata::mem::{Boxed, Storage};
+/// use ladata::mem::Storage;
 ///
 /// /// Generically store a generic array of generic size.
 /// pub struct MyStructure<T, S: Storage, const L: usize> {
@@ -51,7 +51,8 @@ pub use raw::Raw;
 /// assert_eq![100, size_of::<MyStructure::<u8, (), 100>>()];
 ///
 /// // The array is stored in the heap.
-/// assert_eq![8, size_of::<MyStructure::<u8, Boxed, 100>>()];
+/// #[cfg(feature = "std")]
+/// assert_eq![8, size_of::<MyStructure::<u8, ladata::mem::Boxed, 100>>()];
 ///
 /// ```
 pub trait Storage {

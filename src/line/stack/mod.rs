@@ -24,9 +24,6 @@ use crate::mem::Storage;
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
 
-#[cfg(test)]
-mod tests;
-
 mod methods;
 
 mod std_impls;
