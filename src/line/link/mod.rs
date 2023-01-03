@@ -3,6 +3,9 @@
 //! Linked lists.
 //
 
+#[cfg(test)]
+mod tests;
+
 mod builder;
 pub use builder::{LinkedList16, LinkedList32, LinkedList8};
 
