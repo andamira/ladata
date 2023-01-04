@@ -166,7 +166,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 6>::from([1, 2, 3]);
     /// q.extend_back([4, 5, 6, 7, 8]);
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 5, 6]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6])];
     /// ```
     pub fn extend_back<I>(&mut self, iterator: I) -> Result<()>
     where
@@ -196,7 +196,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 6>::from([1, 2, 3]);
     /// q.extend_front([4, 5, 6, 7, 8]);
-    /// assert_eq![q.to_vec(), vec![6, 5, 4, 1, 2, 3]];
+    /// assert_eq![q.to_array(), Some([6, 5, 4, 1, 2, 3])];
     /// ```
     pub fn extend_front<I>(&mut self, iterator: I) -> Result<()>
     where
@@ -231,7 +231,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// q.push_front(1)?;
     /// q.push_front(2)?;
     /// q.push_front(3)?;
-    /// assert_eq![q.to_vec(), vec![3, 2, 1]];
+    /// assert_eq![q.to_array(), Some([3, 2, 1])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -273,7 +273,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// q.push_back(1)?;
     /// q.push_back(2)?;
     /// q.push_back(3)?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -615,7 +615,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 8>::from([1, 2]);
     /// q.drop_back()?;
-    /// assert_eq![q.to_vec(), vec![1]];
+    /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
     /// ```
     pub fn drop_back(&mut self) -> Result<()> {
@@ -642,7 +642,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 8>::from([1, 2]);
     /// q.drop_front()?;
-    /// assert_eq![q.to_vec(), vec![2]];
+    /// assert_eq![q.to_array(), Some([2])];
     /// # Ok(()) }
     /// ```
     pub fn drop_front(&mut self) -> Result<()> {
@@ -669,7 +669,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_nth_back(3)?;
-    /// assert_eq![q.to_vec(), vec![1]];
+    /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
     /// ```
     pub fn drop_nth_back(&mut self, nth: usize) -> Result<()> {
@@ -696,7 +696,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_nth_front(3)?;
-    /// assert_eq![q.to_vec(), vec![4]];
+    /// assert_eq![q.to_array(), Some([4])];
     /// # Ok(()) }
     /// ```
     pub fn drop_nth_front(&mut self, nth: usize) -> Result<()> {
@@ -724,7 +724,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_front();
-    /// assert_eq![q.to_vec(), vec![2, 1, 3, 4]];
+    /// assert_eq![q.to_array(), Some([2, 1, 3, 4])];
     /// ```
     #[inline]
     pub fn swap_front(&mut self) -> Result<()> {
@@ -761,7 +761,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_back();
-    /// assert_eq![q.to_vec(), vec![1, 2, 4, 3]];
+    /// assert_eq![q.to_array(), Some([1, 2, 4, 3])];
     /// ```
     #[inline]
     pub fn swap_back(&mut self) -> Result<()> {
@@ -798,7 +798,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 6>::from([1, 2, 3, 4, 5]);
     /// q.swap_ends();
-    /// assert_eq![q.to_vec(), vec![5, 2, 3, 4, 1]];
+    /// assert_eq![q.to_array(), Some([5, 2, 3, 4, 1])];
     /// ```
     #[inline]
     pub fn swap_ends(&mut self) -> Result<()> {
@@ -825,7 +825,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_front();
-    /// assert_eq![q.to_vec(), vec![3, 4, 1, 2, 5, 6, 7, 8]];
+    /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 5, 6, 7, 8])];
     /// ```
     #[inline]
     pub fn swap2_front(&mut self) -> Result<()> {
@@ -868,7 +868,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_back();
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 7, 8, 5, 6]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 7, 8, 5, 6])];
     /// ```
     #[inline]
     pub fn swap2_back(&mut self) -> Result<()> {
@@ -910,7 +910,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     /// q.swap2_ends();
-    /// assert_eq![q.to_vec(), vec![8, 9, 3, 4, 5, 6, 7, 1, 2]];
+    /// assert_eq![q.to_array(), Some([8, 9, 3, 4, 5, 6, 7, 1, 2])];
     /// ```
     #[inline]
     pub fn swap2_ends(&mut self) -> Result<()> {
@@ -941,9 +941,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
     /// q.rot_right();
-    /// assert_eq![q.to_vec(), vec![4, 1, 2, 3]];
+    /// assert_eq![q.to_array(), Some([4, 1, 2, 3])];
     /// # Ok(()) }
     /// ```
     pub fn rot_right(&mut self) {
@@ -967,9 +967,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
     /// q.rot_right_nth(3);
-    /// assert_eq![q.to_vec(), vec![2, 3, 4, 1]];
+    /// assert_eq![q.to_array(), Some([2, 3, 4, 1])];
     /// # Ok(()) }
     /// ```
     pub fn rot_right_nth(&mut self, nth: usize) {
@@ -994,9 +994,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
     /// q.rot_left();
-    /// assert_eq![q.to_vec(), vec![2, 3, 4, 1]];
+    /// assert_eq![q.to_array(), Some([2, 3, 4, 1])];
     /// # Ok(()) }
     /// ```
     pub fn rot_left(&mut self) {
@@ -1020,9 +1020,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
     /// q.rot_left_nth(3);
-    /// assert_eq![q.to_vec(), vec![4, 1, 2, 3]];
+    /// assert_eq![q.to_array(), Some([4, 1, 2, 3])];
     /// # Ok(()) }
     /// ```
     pub fn rot_left_nth(&mut self, nth: usize) {
@@ -1112,7 +1112,9 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         }
     }
 
-    /// Returns the queue elements as a vector.
+    /* to_vec, to_array */
+
+    /// Returns the queued elements as a vector.
     ///
     /// # Examples
     /// ```
@@ -1126,6 +1128,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 5]];
     /// # Ok(()) }
     /// ```
+    #[cfg(feature = "std")]
     pub fn to_vec(&self) -> Vec<T> {
         let mut vec = Vec::new();
         if !self.is_empty() {
@@ -1141,6 +1144,57 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
             }
         }
         vec
+    }
+
+    /// Returns some `LEN` queued elements as an array, or `None` if the queue
+    /// is empty, or there are not at least `LEN` elements.
+    ///
+    /// This is a `no_std` alternative method to [`to_vec`][Self::to_vec].
+    ///
+    /// # Panics
+    /// Panics if the allocated array doesn't fit in the stack.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::line::RawQueue;
+    /// # fn main() -> ladata::all::LadataResult<()> {
+    ///
+    /// let mut q = RawQueue::<_, 5>::from([3, 4]);
+    /// q.push_front(2)?;
+    /// q.push_back(5)?;
+    /// q.push_front(1)?;
+    /// assert_eq![q.to_array::<5>(), Some([1, 2, 3, 4, 5])];
+    /// # Ok(()) }
+    /// ```
+    pub fn to_array<const LEN: usize>(&self) -> Option<[T; LEN]> {
+        if self.is_empty() || LEN > self.len() || LEN == 0 {
+            None
+        } else {
+            #[cfg(not(feature = "no_unsafe"))]
+            let arr = {
+                let mut unarr: [MaybeUninit<T>; LEN] =
+                    unsafe { MaybeUninit::uninit().assume_init() };
+
+                for (n, i) in unarr.iter_mut().enumerate().take(LEN) {
+                    let index = (self.front + n) % CAP;
+                    let _ = i.write(self.array[index].clone());
+                }
+
+                // TEMP:FIX: can't use transmute for now:
+                // - https://github.com/rust-lang/rust/issues/62875
+                // - https://github.com/rust-lang/rust/issues/61956
+                // unsafe { mem::transmute::<_, [T; LEN]>(&arr) }
+                unsafe { mem::transmute_copy::<_, [T; LEN]>(&unarr) }
+            };
+
+            #[cfg(feature = "no_unsafe")]
+            let arr = core::array::from_fn(|n| {
+                let index = (self.front + n) % CAP;
+                self.array[index].clone()
+            });
+
+            Some(arr)
+        }
     }
 
     /* dup */
@@ -1159,7 +1213,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 4>::from([1, 2, 3]);
     /// q.dup_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 3]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 3])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1188,7 +1242,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 4>::from([1, 2, 3]);
     /// q.dup_front()?;
-    /// assert_eq![q.to_vec(), vec![1, 1, 2, 3]];
+    /// assert_eq![q.to_array(), Some([1, 1, 2, 3])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1218,7 +1272,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3, 4])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1251,7 +1305,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_front()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 1, 2, 3, 4])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1285,7 +1339,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 3]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1314,7 +1368,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_front()?;
-    /// assert_eq![q.to_vec(), vec![2, 1, 2, 3, 4]];
+    /// assert_eq![q.to_array(), Some([2, 1, 2, 3, 4])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1344,7 +1398,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 5, 6, 3, 4]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6, 3, 4])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1377,7 +1431,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_front()?;
-    /// assert_eq![q.to_vec(), vec![3, 4, 1, 2, 3, 4, 5, 6]];
+    /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 3, 4, 5, 6])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1411,7 +1465,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 5, 4, 5]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 5, 4, 5])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1442,7 +1496,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_front()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 1, 3, 4, 5]];
+    /// assert_eq![q.to_array(), Some([1, 2, 1, 3, 4, 5])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1475,7 +1529,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_back()?;
-    /// assert_eq![q.to_vec(), vec![1, 4, 5, 2, 3, 4, 5]];
+    /// assert_eq![q.to_array(), Some([1, 4, 5, 2, 3, 4, 5])];
     /// # Ok(()) }
     /// ```
     #[inline]
@@ -1510,7 +1564,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_front()?;
-    /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 1, 2, 5]];
+    /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 1, 2, 5])];
     /// # Ok(()) }
     /// ```
     #[inline]
