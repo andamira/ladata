@@ -17,9 +17,7 @@
 use core::fmt;
 
 #[cfg(not(feature = "no_unsafe"))]
-use core::{
-    mem::{self, MaybeUninit},
-};
+use core::mem::{self, MaybeUninit};
 
 use crate::mem::{Raw, Storage};
 
