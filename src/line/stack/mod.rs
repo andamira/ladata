@@ -13,7 +13,7 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A constant-capacity Stack, backed by an array.
+/// A Stack, backed by an array.
 ///
 /// A stack is a linear list for which all accesses are made from one end.
 pub struct Stack<T, S: Storage, const CAP: usize> {

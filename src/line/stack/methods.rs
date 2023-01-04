@@ -121,7 +121,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         }
     }
 
-    /// Returns the number of elements in the stack.
+    /// Returns the number of stacked elements.
     #[inline]
     pub const fn len(&self) -> usize {
         self.len
@@ -155,7 +155,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         self.len() == CAP
     }
 
-    /// Returns the stack's capacity.
+    /// Returns the stack's total capacity.
     ///
     /// # Examples
     /// ```
@@ -169,7 +169,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         CAP
     }
 
-    /// Returns the stack's available capacity.
+    /// Returns the stack's remaining capacity.
     /// ```
     /// use ladata::line::RawStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
@@ -406,6 +406,22 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
             self.array.swap(self.len - 3, self.len - 1);
             Ok(())
         }
+    }
+
+    /// Clears the stack.
+    ///
+    /// `( a b c -- )`
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::RawStack;
+    ///
+    /// let mut s = RawStack::<_, 8>::from([1, 2, 3, 4]);
+    /// s.clear();
+    /// assert![s.is_empty()];
+    /// ```
+    pub fn clear(&mut self) {
+        self.len = 0;
     }
 
     /// Drops the top stack element.
