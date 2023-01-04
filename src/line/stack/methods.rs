@@ -4,7 +4,10 @@
 //
 
 #[cfg(not(feature = "no_unsafe"))]
-use core::mem::{self, MaybeUninit};
+use core::{
+    mem::{self, MaybeUninit},
+    ptr,
+};
 
 use super::Stack;
 use crate::{
@@ -46,7 +49,7 @@ impl<T: Clone, const CAP: usize> Stack<T, (), CAP> {
         let data = Raw::new(core::array::from_fn(|_| element.clone()));
 
         Self {
-            stack: data,
+            array: data,
             len: 0,
         }
     }
@@ -94,7 +97,7 @@ impl<T: Clone, const CAP: usize> Stack<T, Boxed, CAP> {
         };
 
         Self {
-            stack: data,
+            array: data,
             len: 0,
         }
     }
@@ -113,7 +116,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     pub fn from_array(arr: [T; CAP]) -> Stack<T, S, CAP> {
         Self {
             // CHECK
-            stack: arr.into(),
+            array: arr.into(),
             len: CAP,
         }
     }
@@ -196,7 +199,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// ```
     #[inline]
     pub fn as_slice(&self) -> &[T] {
-        &self.stack[..self.len]
+        &self.array[..self.len]
     }
 
     /// Returns the stack as an exclusive slice.
@@ -210,10 +213,10 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// ```
     #[inline]
     pub fn as_mut_slice(&mut self) -> &mut [T] {
-        &mut self.stack[..self.len]
+        &mut self.array[..self.len]
     }
 
-    /// Extends a stack from an iterator.
+    /// Extends the stack from an iterator.
     ///
     /// # Errors
     /// Errors if the stack becomes full before the iterator finishes.
@@ -267,7 +270,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
-            let e = &self.stack[self.len - 1];
+            let e = &self.array[self.len - 1];
             Ok(e)
         }
     }
@@ -293,7 +296,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
-            let e = &mut self.stack[self.len - 1];
+            let e = &mut self.array[self.len - 1];
             Ok(e)
         }
     }
@@ -321,7 +324,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() <= nth {
             Err(Error::NotEnoughElements(nth))
         } else {
-            let e = &self.stack[self.len - 1 - nth];
+            let e = &self.array[self.len - 1 - nth];
             Ok(e)
         }
     }
@@ -349,7 +352,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() <= nth {
             Err(Error::NotEnoughElements(nth))
         } else {
-            let e = &mut self.stack[self.len - 1 - nth];
+            let e = &mut self.array[self.len - 1 - nth];
             Ok(e)
         }
     }
@@ -374,7 +377,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 2 {
             Err(Error::NotEnoughElements(2))
         } else {
-            self.stack.swap(self.len - 2, self.len - 1);
+            self.array.swap(self.len - 2, self.len - 1);
             Ok(())
         }
     }
@@ -399,8 +402,8 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 4 {
             Err(Error::NotEnoughElements(4))
         } else {
-            self.stack.swap(self.len - 4, self.len - 2);
-            self.stack.swap(self.len - 3, self.len - 1);
+            self.array.swap(self.len - 4, self.len - 2);
+            self.array.swap(self.len - 3, self.len - 1);
             Ok(())
         }
     }
@@ -475,7 +478,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 2 {
             Err(Error::NotEnoughElements(2))
         } else {
-            self.stack.swap(self.len - 2, self.len - 1);
+            self.array.swap(self.len - 2, self.len - 1);
             self.len -= 1;
             Ok(())
         }
@@ -501,8 +504,8 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 4 {
             Err(Error::NotEnoughElements(4))
         } else {
-            self.stack.swap(self.len - 4, self.len - 2);
-            self.stack.swap(self.len - 3, self.len - 1);
+            self.array.swap(self.len - 4, self.len - 2);
+            self.array.swap(self.len - 3, self.len - 1);
             self.len -= 2;
             Ok(())
         }
@@ -530,7 +533,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 3 {
             Err(Error::NotEnoughElements(3))
         } else {
-            self.stack[self.len - 3..self.len].rotate_left(1);
+            self.array[self.len - 3..self.len].rotate_left(1);
             Ok(())
         }
     }
@@ -557,7 +560,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 3 {
             Err(Error::NotEnoughElements(3))
         } else {
-            self.stack[self.len - 3..self.len].rotate_right(1);
+            self.array[self.len - 3..self.len].rotate_right(1);
             Ok(())
         }
     }
@@ -584,7 +587,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 6 {
             Err(Error::NotEnoughElements(6))
         } else {
-            self.stack[self.len - 6..self.len].rotate_left(2);
+            self.array[self.len - 6..self.len].rotate_left(2);
             Ok(())
         }
     }
@@ -611,7 +614,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.len() < 6 {
             Err(Error::NotEnoughElements(6))
         } else {
-            self.stack[self.len - 6..self.len].rotate_right(2);
+            self.array[self.len - 6..self.len].rotate_right(2);
             Ok(())
         }
     }
@@ -638,9 +641,41 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.is_full() {
             Err(Error::NotEnoughSpace(Some(1)))
         } else {
-            self.stack[self.len] = e;
+            self.array[self.len] = e;
             self.len += 1;
             Ok(())
+        }
+    }
+
+    /// Pops the top stack element.
+    ///
+    /// `( a b -- a )`
+    ///
+    /// # Errors
+    /// Errors if the stack is empty.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::RawStack;
+    /// # fn main() -> ladata::error::LadataResult<()> {
+    ///
+    /// let mut s = RawStack::<_, 2>::from([1, 2]);
+    /// assert_eq![2, s.pop()?];
+    /// assert_eq![1, s.pop()?];
+    /// assert![s.is_empty()];
+    /// # Ok(()) }
+    /// ```
+    #[inline]
+    #[cfg(not(feature = "no_unsafe"))]
+    // unsafe version that doesn't depend on T: Clone
+    pub fn pop(&mut self) -> Result<T> {
+        if self.is_empty() {
+            Err(Error::NotEnoughElements(1))
+        } else {
+            self.len -= 1;
+            // SAFETY: we're not gonna access the value, but move it out
+            let e = unsafe { ptr::read((self.array.get_unchecked(self.len)) as *const T) };
+            Ok(e)
         }
     }
 }
@@ -666,12 +701,14 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
+    #[cfg(feature = "no_unsafe")]
+    // safe-only version that depends on T: Clone
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
             self.len -= 1;
-            let e = self.stack[self.len].clone();
+            let e = self.array[self.len].clone();
             Ok(e)
         }
     }
@@ -700,7 +737,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         } else if self.is_full() {
             Err(Error::NotEnoughSpace(Some(1)))
         } else {
-            self.stack[self.len] = self.stack[self.len - 1].clone();
+            self.array[self.len] = self.array[self.len - 1].clone();
             self.len += 1;
             Ok(())
         }
@@ -731,10 +768,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         } else if self.len() > CAP - 2 {
             Err(Error::NotEnoughSpace(Some(2)))
         } else {
-            let a = self.stack[self.len - 2].clone();
-            let b = self.stack[self.len - 1].clone();
-            self.stack[self.len] = a;
-            self.stack[self.len + 1] = b;
+            let a = self.array[self.len - 2].clone();
+            let b = self.array[self.len - 1].clone();
+            self.array[self.len] = a;
+            self.array[self.len + 1] = b;
             self.len += 2;
             Ok(())
         }
@@ -765,7 +802,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         } else if self.is_full() {
             Err(Error::NotEnoughSpace(Some(1)))
         } else {
-            self.stack[self.len] = self.stack[self.len - 2].clone();
+            self.array[self.len] = self.array[self.len - 2].clone();
             self.len += 1;
             Ok(())
         }
@@ -796,10 +833,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         } else if self.remaining_capacity() < 2 {
             Err(Error::NotEnoughSpace(Some(2)))
         } else {
-            let a = self.stack[self.len - 4].clone();
-            let b = self.stack[self.len - 3].clone();
-            self.stack[self.len] = a;
-            self.stack[self.len + 1] = b;
+            let a = self.array[self.len - 4].clone();
+            let b = self.array[self.len - 3].clone();
+            self.array[self.len] = a;
+            self.array[self.len + 1] = b;
             self.len += 2;
             Ok(())
         }
@@ -830,9 +867,9 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         } else if self.is_full() {
             Err(Error::NotEnoughSpace(Some(1)))
         } else {
-            let a = self.stack[self.len - 1].clone();
-            self.stack.swap(self.len - 2, self.len - 1);
-            self.stack[self.len] = a;
+            let a = self.array[self.len - 1].clone();
+            self.array.swap(self.len - 2, self.len - 1);
+            self.array[self.len] = a;
             self.len += 1;
             Ok(())
         }
@@ -864,14 +901,14 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
             Err(Error::NotEnoughSpace(Some(2)))
         } else {
             // swap2
-            self.stack.swap(self.len - 4, self.len - 2);
-            self.stack.swap(self.len - 3, self.len - 1);
+            self.array.swap(self.len - 4, self.len - 2);
+            self.array.swap(self.len - 3, self.len - 1);
 
             // over2
-            let a = self.stack[self.len - 4].clone();
-            let b = self.stack[self.len - 3].clone();
-            self.stack[self.len] = a;
-            self.stack[self.len + 1] = b;
+            let a = self.array[self.len - 4].clone();
+            let b = self.array[self.len - 3].clone();
+            self.array[self.len] = a;
+            self.array[self.len + 1] = b;
 
             self.len += 2;
             Ok(())
@@ -902,7 +939,7 @@ impl<T: Default, S: Storage, const CAP: usize> Stack<T, S, CAP> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
-            self.stack[self.len - 1] = T::default();
+            self.array[self.len - 1] = T::default();
             self.len -= 1;
             Ok(())
         }

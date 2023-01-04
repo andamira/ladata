@@ -1,22 +1,8 @@
 // ladata::line::stack
 //
-//! LIFO Stacks.
+//! Stacks.
 //!
-//! Logical structure:
-//! - Linear list with LIFO
-//! - Control parameter: Stack-top pointer
-//!
-//! Storage structure:
-//! - Sequential stack
-//! - Linked stack
-//!
-//! Basic operations:
-//! - Init
-//! - is_empty, len, remaining
-//! - clear
-//! - push, pop
-//!
-//! [w]: https://en.wikipedia.org/wiki/Stack_(abstract_data_type)
+//! <https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>
 //
 
 use crate::mem::Storage;
@@ -25,16 +11,13 @@ use crate::mem::Storage;
 use crate::mem::Boxed;
 
 mod methods;
-
 mod std_impls;
 
-/// A constant-capacity [`LIFO Stack`], implemented over an array.
+/// A constant-capacity Stack, backed by an array.
 ///
-/// A stack is a linear list for which practically all accesses are made at one end.
+/// A stack is a linear list for which all accesses are made from one end.
 pub struct Stack<T, S: Storage, const CAP: usize> {
-    /// The stack stored in the generic container.
-    stack: S::Container<[T; CAP]>,
-    /// The len index == the count of elements.
+    array: S::Container<[T; CAP]>,
     len: usize,
 }
 

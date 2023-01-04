@@ -20,7 +20,7 @@ where
 {
     fn clone(&self) -> Self {
         Self {
-            stack: self.stack.clone(),
+            array: self.array.clone(),
             len: self.len,
         }
     }
@@ -42,14 +42,26 @@ where
         debug.field("CAP", &CAP).field("len", &self.len);
 
         if CAP <= 6 {
-            debug.field("nodes", &self.stack);
+            debug.field("nodes", &self.array);
         } else {
             // IMPROVE: show first 3 and last 3
-            debug.field("stack { ... }", &());
+            debug.field("array { ... }", &());
         }
         debug.finish()
     }
 }
+
+// T:PartialEq
+impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for Stack<T, S, CAP>
+where
+    S::Container<[T; CAP]>: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.array == other.array && self.len == other.len
+    }
+}
+// T:Eq
+impl<T: Eq, S: Storage, const CAP: usize> Eq for Stack<T, S, CAP> where S::Container<[T; CAP]>: Eq {}
 
 // S:() + T:Default
 impl<T: Default, const CAP: usize> Default for Stack<T, (), CAP> {
@@ -69,7 +81,7 @@ impl<T: Default, const CAP: usize> Default for Stack<T, (), CAP> {
         let data = core::array::from_fn(|_| T::default());
 
         Self {
-            stack: data.into(),
+            array: data.into(),
             len: 0,
         }
     }
@@ -117,7 +129,7 @@ impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
         };
 
         Self {
-            stack: data,
+            array: data,
             len: 0,
         }
     }
