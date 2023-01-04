@@ -45,7 +45,8 @@
 
 pub mod error;
 pub mod line;
-// pub mod map;
+// pub mod hybrid;
+// pub mod key;
 pub mod mem;
 // pub mod tree;
 pub mod unit;
@@ -56,7 +57,7 @@ pub mod all {
     pub use super::error::*;
 
     #[doc(inline)]
-    pub use super::line::{link::*, stack::*};
+    pub use super::line::{link::*, queue::*, stack::*};
 
     #[doc(inline)]
     #[cfg(feature = "std")]
