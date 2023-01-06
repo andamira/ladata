@@ -1,7 +1,11 @@
 // ladata::list
 //
-//! Linear data structures.
+//! Lists.
 //
+
+pub mod array;
+#[doc(inline)]
+pub use array::*;
 
 #[cfg(feature = "bv")]
 pub mod bit;
@@ -9,14 +13,18 @@ pub mod bit;
 // #[doc(inline)]
 // pub use bit::*;
 
-pub mod link;
+pub mod stack;
 #[doc(inline)]
-pub use link::*;
+pub use stack::*;
 
 pub mod queue;
 #[doc(inline)]
 pub use queue::*;
 
-pub mod stack;
+pub mod deque;
 #[doc(inline)]
-pub use stack::*;
+pub use deque::*;
+
+pub mod link;
+#[doc(inline)]
+pub use link::*;

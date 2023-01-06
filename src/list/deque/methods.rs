@@ -1,6 +1,6 @@
-// ladata::line::queue::methods
+// ladata::list::deque::methods
 //
-//! Queues.
+//! Double ended queues.
 //
 
 #[cfg(not(feature = "no_unsafe"))]
@@ -9,47 +9,30 @@ use core::{
     ptr,
 };
 
-use super::Queue;
+use super::{Array, ArrayDeque};
+
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    mem::{Raw, Storage},
+    mem::Storage,
 };
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+// #[cfg(feature = "std")]
+// use crate::mem::Boxed;
 
 // `S:() + T:Clone`
-impl<T: Clone, const CAP: usize> Queue<T, (), CAP> {
-    /// Returns an empty queue, allocated in the stack,
+impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
+    /// Returns an empty deque, allocated in the stack,
     /// using `element` to fill the remaining free data.
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::Queue;
+    /// use ladata::list::ArrayDeque;
     ///
-    /// let q = Queue::<_, (), 16>::new('\0');
+    /// let q = ArrayDeque::<_, (), 16>::new('\0');
     /// ```
     pub fn new(element: T) -> Self {
-        #[cfg(not(feature = "no_unsafe"))]
-        let data = Raw::new({
-            let mut arr: [MaybeUninit<T>; CAP] = unsafe { MaybeUninit::uninit().assume_init() };
-
-            for i in &mut arr[..] {
-                let _ = i.write(element.clone());
-            }
-
-            // TEMP:FIX: can't use transmute for now:
-            // - https://github.com/rust-lang/rust/issues/62875
-            // - https://github.com/rust-lang/rust/issues/61956
-            // unsafe { mem::transmute::<_, [T; CAP]>(&arr) }
-            unsafe { mem::transmute_copy::<_, [T; CAP]>(&arr) }
-        });
-
-        #[cfg(feature = "no_unsafe")]
-        let data = Raw::new(core::array::from_fn(|_| element.clone()));
-
         Self {
-            array: data,
+            array: Array::<T, (), CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -58,7 +41,7 @@ impl<T: Clone, const CAP: usize> Queue<T, (), CAP> {
 }
 
 // ``
-impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
+impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     // Returns the `nth` element's index counting from the back.
     #[inline(always)]
     const fn idx_back(&self, nth: usize) -> usize {
@@ -70,17 +53,18 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         (self.front + nth) % CAP
     }
 
-    /// Moves an array into a [`full`][Self::is_full] queue.
+    /// Moves an array into a [`full`][Self::is_full] deque.
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::all::Deque;
     ///
-    /// let q = Queue::<_, (), 3>::from_array([1, 2, 3]);
+    /// let q = Deque::<_, 3>::from_array([1, 2, 3]);
     /// ```
-    pub fn from_array(arr: [T; CAP]) -> Queue<T, S, CAP> {
+    // TODO IMPROVE
+    pub fn from_array(arr: [T; CAP]) -> ArrayDeque<T, S, CAP> {
         Self {
-            array: arr.into(),
+            array: Array::new(arr),
             front: 0,
             back: 0,
             len: CAP,
@@ -97,9 +81,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let q = RawQueue::<i32, 8>::default();
+    /// let q = Deque::<i32, 8>::default();
     /// assert![q.is_empty()];
     /// ```
     #[inline]
@@ -111,9 +95,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let q = RawQueue::<_, 3>::from([1, 2, 3]);
+    /// let q = Deque::<_, 3>::from([1, 2, 3]);
     /// assert![q.is_full()];
     /// ```
     #[inline]
@@ -121,13 +105,13 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         self.len() == CAP
     }
 
-    /// Returns the queue's total capacity.
+    /// Returns the deque's total capacity.
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let q = RawQueue::<i32, 3>::default();
+    /// let q = Deque::<i32, 3>::default();
     /// assert_eq![3, q.capacity()];
     /// ```
     #[inline]
@@ -135,12 +119,12 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         CAP
     }
 
-    /// Returns the queue's remaining capacity.
+    /// Returns the deque's remaining capacity.
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<i32, 3>::default();
+    /// let mut q = Deque::<i32, 3>::default();
     /// assert_eq![3, q.remaining_capacity()];
     /// q.push_back(1)?;
     /// assert_eq![2, q.remaining_capacity()];
@@ -153,18 +137,18 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
 
     /* extend */
 
-    /// Extends the back of the queue from an iterator.
+    /// Extends the back of the deque from an iterator.
     ///
     /// `( a … b -- a … b c d e f )` for [c d e f]
     ///
     /// # Errors
-    /// Errors if the queue becomes full before the iterator finishes.
+    /// Errors if the deque becomes full before the iterator finishes.
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 6>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 6>::from([1, 2, 3]);
     /// q.extend_back([4, 5, 6, 7, 8]);
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6])];
     /// ```
@@ -192,9 +176,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 6>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 6>::from([1, 2, 3]);
     /// q.extend_front([4, 5, 6, 7, 8]);
     /// assert_eq![q.to_array(), Some([6, 5, 4, 1, 2, 3])];
     /// ```
@@ -224,10 +208,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 3>::default();
+    /// let mut q = Deque::<u8, 3>::default();
     /// q.push_front(1)?;
     /// q.push_front(2)?;
     /// q.push_front(3)?;
@@ -266,10 +250,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 3>::default();
+    /// let mut q = Deque::<u8, 3>::default();
     /// q.push_back(1)?;
     /// q.push_back(2)?;
     /// q.push_back(3)?;
@@ -315,10 +299,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&1, q.peek_front()?];
     /// # Ok(()) }
     /// ```
@@ -339,10 +323,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 1, q.peek_front_mut()?];
     /// # Ok(()) }
     /// ```
@@ -363,10 +347,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
+    /// let q = Deque::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&3, q.peek_nth_front(2)?];
     /// # Ok(()) }
     /// ```
@@ -387,10 +371,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&mut 3, q.peek_nth_front_mut(2)?];
     /// # Ok(()) }
     /// ```
@@ -411,10 +395,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&3, q.peek_back()?];
     /// # Ok(()) }
     /// ```
@@ -435,10 +419,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 3, q.peek_back_mut()?];
     /// # Ok(()) }
     /// ```
@@ -459,10 +443,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&1, q.peek_nth_back(2)?];
     /// # Ok(()) }
     /// ```
@@ -483,10 +467,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 1, q.peek_nth_back_mut(2)?];
     /// # Ok(()) }
     /// ```
@@ -511,10 +495,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop_front()?];
     /// assert_eq![2, q.pop_front()?];
     /// assert_eq![3, q.pop_front()?];
@@ -554,10 +538,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![3, q.pop_back()?];
     /// assert_eq![2, q.pop_back()?];
     /// assert_eq![1, q.pop_back()?];
@@ -587,9 +571,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
     /// q.clear();
     /// assert![q.is_empty()];
     /// ```
@@ -610,10 +594,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2]);
+    /// let mut q = Deque::<_, 8>::from([1, 2]);
     /// q.drop_back()?;
     /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
@@ -637,10 +621,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2]);
+    /// let mut q = Deque::<_, 8>::from([1, 2]);
     /// q.drop_front()?;
     /// assert_eq![q.to_array(), Some([2])];
     /// # Ok(()) }
@@ -664,10 +648,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_nth_back(3)?;
     /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
@@ -691,10 +675,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_nth_front(3)?;
     /// assert_eq![q.to_array(), Some([4])];
     /// # Ok(()) }
@@ -720,9 +704,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_front();
     /// assert_eq![q.to_array(), Some([2, 1, 3, 4])];
     /// ```
@@ -757,9 +741,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_back();
     /// assert_eq![q.to_array(), Some([1, 2, 4, 3])];
     /// ```
@@ -794,9 +778,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 6>::from([1, 2, 3, 4, 5]);
+    /// let mut q = Deque::<_, 6>::from([1, 2, 3, 4, 5]);
     /// q.swap_ends();
     /// assert_eq![q.to_array(), Some([5, 2, 3, 4, 1])];
     /// ```
@@ -821,9 +805,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
+    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_front();
     /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 5, 6, 7, 8])];
     /// ```
@@ -864,9 +848,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
+    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_back();
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 7, 8, 5, 6])];
     /// ```
@@ -906,9 +890,9 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     ///
-    /// let mut q = RawQueue::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
     /// q.swap2_ends();
     /// assert_eq![q.to_array(), Some([8, 9, 3, 4, 5, 6, 7, 1, 2])];
     /// ```
@@ -935,10 +919,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
+    /// let mut q = Deque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -961,10 +945,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
+    /// let mut q = Deque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -988,10 +972,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
+    /// let mut q = Deque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -1014,10 +998,10 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<i32, 8>::from([2, 3]);
+    /// let mut q = Deque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -1037,7 +1021,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
 }
 
 // `T:Clone`
-impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
+impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// Pops the front element.
     ///
     /// `( a … b -- … b )`
@@ -1047,10 +1031,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop_front()?];
     /// assert_eq![2, q.pop_front()?];
     /// assert_eq![3, q.pop_front()?];
@@ -1088,10 +1072,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![3, q.pop_back()?];
     /// assert_eq![2, q.pop_back()?];
     /// assert_eq![1, q.pop_back()?];
@@ -1118,10 +1102,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 5>::from([3, 4]);
+    /// let mut q = Deque::<_, 5>::from([3, 4]);
     /// q.push_front(2)?;
     /// q.push_back(5)?;
     /// q.push_front(1)?;
@@ -1152,14 +1136,14 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// This is a `no_std` alternative method to [`to_vec`][Self::to_vec].
     ///
     /// # Panics
-    /// Panics if the allocated array doesn't fit in the stack.
+    /// Panics if the new LEN sized array can't be allocated.
     ///
     /// # Examples
     /// ```
-    /// use ladata::line::RawQueue;
+    /// use ladata::list::Deque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<_, 5>::from([3, 4]);
+    /// let mut q = Deque::<_, 5>::from([3, 4]);
     /// q.push_front(2)?;
     /// q.push_back(5)?;
     /// q.push_front(1)?;
@@ -1167,6 +1151,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     pub fn to_array<const LEN: usize>(&self) -> Option<[T; LEN]> {
+        // MAYBE return not option
+        // TODO: improve from_iter
+        // Some(Array::<T, S, LEN>::new())
+
         if self.is_empty() || LEN > self.len() || LEN == 0 {
             None
         } else {
@@ -1208,10 +1196,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 4>::from([1, 2, 3]);
+    /// let mut q = Deque::<u8, 4>::from([1, 2, 3]);
     /// q.dup_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 3])];
     /// # Ok(()) }
@@ -1237,10 +1225,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 4>::from([1, 2, 3]);
+    /// let mut q = Deque::<u8, 4>::from([1, 2, 3]);
     /// q.dup_front()?;
     /// assert_eq![q.to_array(), Some([1, 1, 2, 3])];
     /// # Ok(()) }
@@ -1267,10 +1255,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3, 4])];
     /// # Ok(()) }
@@ -1300,10 +1288,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 1, 2, 3, 4])];
     /// # Ok(()) }
@@ -1334,10 +1322,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3])];
     /// # Ok(()) }
@@ -1363,10 +1351,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_front()?;
     /// assert_eq![q.to_array(), Some([2, 1, 2, 3, 4])];
     /// # Ok(()) }
@@ -1393,10 +1381,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
+    /// let mut q = Deque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6, 3, 4])];
     /// # Ok(()) }
@@ -1426,10 +1414,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
+    /// let mut q = Deque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_front()?;
     /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 3, 4, 5, 6])];
     /// # Ok(()) }
@@ -1460,10 +1448,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 5, 4, 5])];
     /// # Ok(()) }
@@ -1491,10 +1479,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 1, 3, 4, 5])];
     /// # Ok(()) }
@@ -1524,10 +1512,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_back()?;
     /// assert_eq![q.to_array(), Some([1, 4, 5, 2, 3, 4, 5])];
     /// # Ok(()) }
@@ -1559,10 +1547,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::RawQueue;
+    /// use ladata::all::Deque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = RawQueue::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 1, 2, 5])];
     /// # Ok(()) }
@@ -1591,7 +1579,7 @@ mod tests {
     // test the private idx_* functions
     #[test]
     fn idx() {
-        let q = Queue::<_, (), 5>::from([1, 2, 3]);
+        let q = ArrayDeque::<_, (), 5>::from([1, 2, 3]);
 
         // counting from the front:
         assert_eq![0, q.idx_front(0)];

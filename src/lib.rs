@@ -44,7 +44,7 @@
 #![cfg_attr(feature = "no_unsafe", forbid(unsafe_code))]
 
 pub mod error;
-pub mod line;
+pub mod list;
 // pub mod hybrid;
 // pub mod key;
 pub mod mem;
@@ -57,14 +57,17 @@ pub mod all {
     pub use super::error::*;
 
     #[doc(inline)]
-    pub use super::line::{link::*, queue::*, stack::*};
+    pub use super::list::{array::*, deque::*, link::*, queue::*, stack::*};
 
     #[doc(inline)]
     #[cfg(feature = "std")]
-    pub use super::line::bit::*;
+    pub use super::list::bit::*;
 
     #[doc(inline)]
     pub use super::mem::*;
+
+    // #[doc(inline)]
+    // pub use super::tree::*;
 
     #[doc(inline)]
     pub use crate::unit::{bares::*, cells::*, traits::*, types::*};

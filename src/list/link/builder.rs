@@ -1,4 +1,4 @@
-// ladata::line::link::builder
+// ladata::list::link::builder
 //
 //! A macro builder for linked lists backed by a const-sized array.
 //
@@ -17,7 +17,10 @@
 use core::fmt;
 
 #[cfg(not(feature = "no_unsafe"))]
-use core::mem::{self, MaybeUninit};
+use core::{
+    mem::{self, MaybeUninit},
+    ptr,
+};
 
 use crate::mem::{Raw, Storage};
 

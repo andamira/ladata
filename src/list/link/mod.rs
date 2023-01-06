@@ -1,4 +1,4 @@
-// ladata::line::link
+// ladata::list::link
 //
 //! Linked lists.
 //
