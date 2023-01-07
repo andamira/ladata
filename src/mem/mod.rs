@@ -33,7 +33,7 @@ pub use raw::Raw;
 ///
 /// /// Generically store a generic array of generic size.
 /// pub struct MyStructure<T, S: Storage, const L: usize> {
-///     data: S::Container<[T; L]>,
+///     data: S::Stored<[T; L]>,
 /// }
 ///
 /// impl<T, S: Storage, const L: usize> MyStructure<T, S, L> {
@@ -42,7 +42,7 @@ pub use raw::Raw;
 ///         T: Default,
 ///     {
 ///         Self {
-///             data: S::Container::from(array::from_fn(|_| T::default())),
+///             data: S::Stored::from(array::from_fn(|_| T::default())),
 ///         }
 ///     }
 /// }
@@ -56,7 +56,7 @@ pub use raw::Raw;
 ///
 /// ```
 pub trait Storage {
-    type Container<T>: ops::DerefMut<Target = T> + From<T>;
+    type Stored<T>: ops::DerefMut<Target = T> + From<T>;
 }
 
 /// A storage that wraps its data in a [`Box`].
@@ -65,10 +65,10 @@ pub struct Boxed;
 
 #[cfg(feature = "std")]
 impl Storage for Boxed {
-    type Container<T> = Box<T>;
+    type Stored<T> = Box<T>;
 }
 
 /// A storage that wraps its data in a [`Raw`].
 impl Storage for () {
-    type Container<T> = Raw<T>;
+    type Stored<T> = Raw<T>;
 }

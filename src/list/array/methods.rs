@@ -3,13 +3,15 @@
 //! Arrays.
 //
 
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 use core::mem::{self, MaybeUninit};
 
 use core::marker::PhantomData;
 
-use super::Array;
-use crate::mem::{Raw, Storage};
+use crate::{
+    list::Array,
+    mem::{Raw, Storage},
+};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -36,7 +38,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
     /// let s = Array::<_, (), 16>::with('\0');
     /// ```
     pub fn with(element: T) -> Self {
-        #[cfg(not(feature = "no_unsafe"))]
+        #[cfg(not(feature = "safe"))]
         let data = Raw::new({
             let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
 
@@ -47,11 +49,11 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
             // TEMP:FIX: can't use transmute for now:
             // - https://github.com/rust-lang/rust/issues/62875
             // - https://github.com/rust-lang/rust/issues/61956
-            // unsafe { mem::transmute::<_, [T; LEN]>(&arr) }
+            // mem::transmute::<_, [T; LEN]>(&arr)
             unsafe { mem::transmute_copy::<_, [T; LEN]>(&arr) }
         });
 
-        #[cfg(feature = "no_unsafe")]
+        #[cfg(feature = "safe")]
         let data = Raw::new(core::array::from_fn(|_| element.clone()));
 
         Self {
@@ -74,7 +76,7 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
     /// let mut s = BoxedArray::<_, 1_000>::with(0);
     /// ```
     pub fn with(element: T) -> Self {
-        #[cfg(feature = "no_unsafe")]
+        #[cfg(feature = "safe")]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -88,7 +90,7 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
             array
         };
 
-        #[cfg(not(feature = "no_unsafe"))]
+        #[cfg(not(feature = "safe"))]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 

@@ -30,6 +30,6 @@ pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
 /// An [`ArrayDeque`] stored in the stack.
 pub type Deque<T, const CAP: usize> = ArrayDeque<T, (), CAP>;
 
-/// An [`Array`] stored in the heap.
+/// An [`ArrayDeque`] stored in the heap.
 #[cfg(feature = "std")]
 pub type BoxedDeque<T, const CAP: usize> = ArrayDeque<T, Boxed, CAP>;

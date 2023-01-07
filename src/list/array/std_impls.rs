@@ -3,7 +3,7 @@
 //!
 //
 
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 use core::mem::{self, MaybeUninit};
 
 use core::{
@@ -36,7 +36,7 @@ impl<T, S: Storage, const LEN: usize> DerefMut for Array<T, S, LEN> {
 // T:Clone
 impl<T: Clone, S: Storage, const LEN: usize> Clone for Array<T, S, LEN>
 where
-    S::Container<[T; LEN]>: Clone,
+    S::Stored<[T; LEN]>: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -47,15 +47,13 @@ where
 }
 
 // T:Copy
-impl<T: Copy, S: Storage, const LEN: usize> Copy for Array<T, S, LEN> where
-    S::Container<[T; LEN]>: Copy
-{
-}
+impl<T: Copy, S: Storage, const LEN: usize> Copy for Array<T, S, LEN> where S::Stored<[T; LEN]>: Copy
+{}
 
 // T:Debug
 impl<T: fmt::Debug, S: Storage, const LEN: usize> fmt::Debug for Array<T, S, LEN>
 where
-    S::Container<[T; LEN]>: fmt::Debug,
+    S::Stored<[T; LEN]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug = f.debug_struct(stringify![Array]);
@@ -68,21 +66,21 @@ where
 // T:PartialEq
 impl<T: PartialEq, S: Storage, const LEN: usize> PartialEq for Array<T, S, LEN>
 where
-    S::Container<[T; LEN]>: PartialEq,
+    S::Stored<[T; LEN]>: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.array == other.array && self.len() == other.len()
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const LEN: usize> Eq for Array<T, S, LEN> where S::Container<[T; LEN]>: Eq {}
+impl<T: Eq, S: Storage, const LEN: usize> Eq for Array<T, S, LEN> where S::Stored<[T; LEN]>: Eq {}
 
 // S:() + T:Default
 impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
     /// Returns an empty array, allocated in the stack,
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
-        #[cfg(not(feature = "no_unsafe"))]
+        #[cfg(not(feature = "safe"))]
         let data = {
             let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
             for i in &mut arr[..] {
@@ -91,7 +89,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
             unsafe { mem::transmute_copy::<_, [T; LEN]>(&arr) }
         };
 
-        #[cfg(feature = "no_unsafe")]
+        #[cfg(feature = "safe")]
         let data = core::array::from_fn(|_| T::default());
 
         Array {
@@ -114,7 +112,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
     /// let mut s = BoxedArray::<i32, 100>::default();
     /// ```
     fn default() -> Self {
-        #[cfg(feature = "no_unsafe")]
+        #[cfg(feature = "safe")]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -128,7 +126,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
             array
         };
 
-        #[cfg(not(feature = "no_unsafe"))]
+        #[cfg(not(feature = "safe"))]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -152,5 +150,11 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
 impl<T, const LEN: usize> From<Array<T, (), LEN>> for [T; LEN] {
     fn from(array: Array<T, (), LEN>) -> [T; LEN] {
         array.array.0
+    }
+}
+#[cfg(feature = "std")]
+impl<T, const LEN: usize> From<Array<T, Boxed, LEN>> for Box<[T; LEN]> {
+    fn from(array: Array<T, Boxed, LEN>) -> Box<[T; LEN]> {
+        array.array
     }
 }

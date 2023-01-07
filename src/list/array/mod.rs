@@ -14,7 +14,7 @@ mod std_impls;
 
 /// An array, backed by a primitive [`array`][array].
 pub struct Array<T, S: Storage, const LEN: usize> {
-    array: S::Container<[T; LEN]>,
+    array: S::Stored<[T; LEN]>,
     _phantom: PhantomData<T>,
 }
 

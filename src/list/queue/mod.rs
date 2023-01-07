@@ -26,9 +26,9 @@ pub struct ArrayQueue<T, S: Storage, const CAP: usize> {
 //     back: usize,
 // }
 
-/// A [`Queue`] stored in the stack.
+/// An [`ArrayQueue`] stored in the stack.
 pub type Queue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
 
-/// A [`Queue`] stored in the heap.
+/// An [`ArrayQueue`] stored in the heap.
 #[cfg(feature = "std")]
 pub type BoxedQueue<T, const CAP: usize> = ArrayQueue<T, Boxed, CAP>;

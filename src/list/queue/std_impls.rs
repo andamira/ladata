@@ -14,7 +14,7 @@ use crate::mem::Boxed;
 // T:Clone
 impl<T: Clone, S: Storage, const CAP: usize> Clone for ArrayQueue<T, S, CAP>
 where
-    S::Container<[T; CAP]>: Clone,
+    S::Stored<[T; CAP]>: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -28,14 +28,14 @@ where
 
 // T:Copy
 impl<T: Copy, S: Storage, const CAP: usize> Copy for ArrayQueue<T, S, CAP> where
-    S::Container<[T; CAP]>: Copy
+    S::Stored<[T; CAP]>: Copy
 {
 }
 
 // T:Debug
 impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for ArrayQueue<T, S, CAP>
 where
-    S::Container<[T; CAP]>: fmt::Debug,
+    S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug = f.debug_struct(stringify![ArrayQueue]);
@@ -58,7 +58,7 @@ where
 // T:PartialEq
 impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for ArrayQueue<T, S, CAP>
 where
-    S::Container<[T; CAP]>: PartialEq,
+    S::Stored<[T; CAP]>: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.array == other.array
@@ -68,17 +68,14 @@ where
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayQueue<T, S, CAP> where
-    S::Container<[T; CAP]>: Eq
-{
-}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayQueue<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // TODO: WIP
 // T:PartialOrd
 // use core::cmp::Ordering;
 // impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for ArrayQueue<T, S, CAP>
 // where
-//     S::Container<[T; CAP]>: PartialOrd,
+//     S::Stored<[T; CAP]>: PartialOrd,
 // {
 //     fn partial_cmp(&self, other: &Self) -> Ordering {
 //         self.array == other.array
@@ -88,7 +85,7 @@ impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayQueue<T, S, CAP> where
 //     }
 // }
 // // T:Ord
-// impl<T: Ord, S: Storage, const CAP: usize> Ord for ArrayQueue<T, S, CAP> where S::Container<[T; CAP]>: Ord {}
+// impl<T: Ord, S: Storage, const CAP: usize> Ord for ArrayQueue<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
 
 // S:() + T:Default
 impl<T: Default, const CAP: usize> Default for ArrayQueue<T, (), CAP> {

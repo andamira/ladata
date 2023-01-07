@@ -3,7 +3,7 @@
 //! Double ended queues.
 //
 
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 use core::{
     mem::{self, MaybeUninit},
     ptr,
@@ -16,8 +16,8 @@ use crate::{
     mem::Storage,
 };
 
-// #[cfg(feature = "std")]
-// use crate::mem::Boxed;
+#[cfg(feature = "std")]
+use crate::mem::Boxed;
 
 // `S:() + T:Clone`
 impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
@@ -33,6 +33,28 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
     pub fn new(element: T) -> Self {
         Self {
             array: Array::<T, (), CAP>::with(element),
+            front: 0,
+            back: 0,
+            len: 0,
+        }
+    }
+}
+
+// `S:Boxed + T:Clone`
+#[cfg(feature = "std")]
+impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
+    /// Returns an empty deque, allocated in the stack,
+    /// using `element` to fill the remaining free data.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::list::BoxedDeque;
+    ///
+    /// let q = BoxedDeque::<_, 16>::new('\0');
+    /// ```
+    pub fn new(element: T) -> Self {
+        Self {
+            array: Array::<T, Boxed, CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -506,13 +528,13 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(not(feature = "no_unsafe"))]
-    // unsafe version that doesn't depend on T: Clone
+    #[cfg(not(feature = "safe"))]
     pub fn pop_front(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
             // SAFETY: we're not gonna access the value, but move it out
+            // MOTIVATION: to not depend on T: Clone
             let e = unsafe { ptr::read((self.array.get_unchecked(self.front)) as *const T) };
 
             self.front = (self.front + 1) % CAP;
@@ -524,7 +546,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// The habitual dequeue operation for a single-ended queue.
     #[inline(always)]
-    #[cfg(not(feature = "no_unsafe"))]
+    #[cfg(not(feature = "safe"))]
     pub fn dequeue(&mut self) -> Result<T> {
         self.pop_front()
     }
@@ -549,14 +571,14 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(not(feature = "no_unsafe"))]
-    // unsafe version that doesn't depend on T: Clone
+    #[cfg(not(feature = "safe"))]
     pub fn pop_back(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
             self.back = (self.back + CAP - 1) % CAP;
             // SAFETY: we're not gonna access the value, but move it out
+            // MOTIVATION: to not depend on T: Clone
             let e = unsafe { ptr::read((self.array.get_unchecked(self.back)) as *const T) };
             self.len -= 1;
             Ok(e)
@@ -1042,8 +1064,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(feature = "no_unsafe")]
-    // safe-only version that depends on T: Clone
+    #[cfg(feature = "safe")]
     pub fn pop_front(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
@@ -1058,7 +1079,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// The habitual dequeue operation for a single-ended queue.
     #[inline(always)]
-    #[cfg(feature = "no_unsafe")]
+    #[cfg(feature = "safe")]
     pub fn dequeue(&mut self) -> Result<T> {
         self.pop_front()
     }
@@ -1083,7 +1104,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(feature = "no_unsafe")]
+    #[cfg(feature = "safe")]
     // safe-only version that depends on T: Clone
     pub fn pop_back(&mut self) -> Result<T> {
         if self.is_empty() {
@@ -1158,7 +1179,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         if self.is_empty() || LEN > self.len() || LEN == 0 {
             None
         } else {
-            #[cfg(not(feature = "no_unsafe"))]
+            #[cfg(not(feature = "safe"))]
             let arr = {
                 let mut unarr: [MaybeUninit<T>; LEN] =
                     unsafe { MaybeUninit::uninit().assume_init() };
@@ -1171,11 +1192,11 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
                 // TEMP:FIX: can't use transmute for now:
                 // - https://github.com/rust-lang/rust/issues/62875
                 // - https://github.com/rust-lang/rust/issues/61956
-                // unsafe { mem::transmute::<_, [T; LEN]>(&arr) }
+                // mem::transmute::<_, [T; LEN]>(&arr)
                 unsafe { mem::transmute_copy::<_, [T; LEN]>(&unarr) }
             };
 
-            #[cfg(feature = "no_unsafe")]
+            #[cfg(feature = "safe")]
             let arr = core::array::from_fn(|n| {
                 let index = (self.front + n) % CAP;
                 self.array[index].clone()

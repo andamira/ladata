@@ -1677,7 +1677,7 @@ macro_rules! impl_data_bares {
         // }
         // impl DataCellsCopy for $bname {}
 
-        #[cfg(not(feature = "no_unsafe"))]
+        #[cfg(not(feature = "safe"))]
         unsafe impl DataBares for $bname {}
     };
 }

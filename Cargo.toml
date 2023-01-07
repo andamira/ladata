@@ -44,25 +44,23 @@ time = { version = "0.3.11", optional = true }
 bv = { version = "0.11.1", optional = true } # BitArray* (impl `Bits`)
 
 [features]
-default = [ "std", "deps_default" ]
-std = [ "half?/std" ]
-no_unsafe = []
+default = ["std", "deps_default"]
+std = ["half?/std"]
+safe = []
 
-deps_all = [
-	"deps_numerical",
-	"deps_categorical",
-]
-deps_default = [
-	#"deps_numerical",
-		"deps_discrete",
-		#"deps_continuous",
-			"half", "twofloat",
-	#"deps_categorical",
-		"deps_bit",
-		"deps_string",
-		#"deps_datetime",
-			"time", # !"fugit",
-]
+deps_all = ["deps_numerical", "deps_categorical"]
+# deps_default = [
+#     #"deps_numerical",
+#         "deps_discrete",
+#         #"deps_continuous",
+#             "half", "twofloat",
+#     #"deps_categorical",
+#         "deps_bit",
+#         "deps_string",
+#         #"deps_datetime",
+#             "time", # !"fugit",
+# ]
+deps_default = ["deps_discrete", "half", "twofloat", "deps_bit", "deps_string", "time"]
 
 deps_numerical= ["deps_continuous", "deps_discrete"]
 deps_continuous = ["half", "twofloat"]

@@ -6,7 +6,6 @@
 use core::fmt;
 
 use super::{Array, ArrayDeque, Storage};
-use crate::list::{ArrayQueue, ArrayStack};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -14,7 +13,7 @@ use crate::mem::Boxed;
 // T:Clone
 impl<T: Clone, S: Storage, const CAP: usize> Clone for ArrayDeque<T, S, CAP>
 where
-    S::Container<[T; CAP]>: Clone,
+    S::Stored<[T; CAP]>: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -28,14 +27,14 @@ where
 
 // T:Copy
 impl<T: Copy, S: Storage, const CAP: usize> Copy for ArrayDeque<T, S, CAP> where
-    S::Container<[T; CAP]>: Copy
+    S::Stored<[T; CAP]>: Copy
 {
 }
 
 // T:Debug
 impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for ArrayDeque<T, S, CAP>
 where
-    S::Container<[T; CAP]>: fmt::Debug,
+    S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug = f.debug_struct(stringify![Deque]);
@@ -58,7 +57,7 @@ where
 // T:PartialEq
 impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for ArrayDeque<T, S, CAP>
 where
-    S::Container<[T; CAP]>: PartialEq,
+    S::Stored<[T; CAP]>: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.array == other.array
@@ -68,14 +67,14 @@ where
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayDeque<T, S, CAP> where S::Container<[T; CAP]>: Eq {}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayDeque<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // TODO: WIP
 // T:PartialOrd
 // use core::cmp::Ordering;
 // impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for ArrayDeque<T, S, CAP>
 // where
-//     S::Container<[T; CAP]>: PartialOrd,
+//     S::Stored<[T; CAP]>: PartialOrd,
 // {
 //     fn partial_cmp(&self, other: &Self) -> Ordering {
 //         self.array == other.array
@@ -85,7 +84,7 @@ impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayDeque<T, S, CAP> where S::
 //     }
 // }
 // // T:Ord
-// impl<T: Ord, S: Storage, const CAP: usize> Ord for ArrayDeque<T, S, CAP> where S::Container<[T; CAP]>: Ord {}
+// impl<T: Ord, S: Storage, const CAP: usize> Ord for ArrayDeque<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
 
 // S:() + T:Default
 impl<T: Default, const CAP: usize> Default for ArrayDeque<T, (), CAP> {
@@ -159,29 +158,5 @@ where
         let mut s = ArrayDeque::<T, Boxed, CAP>::default();
         let _ = s.extend_back(iterator);
         s
-    }
-}
-
-// TODO: CHECK
-impl<T, S: Storage, const CAP: usize> From<ArrayQueue<T, S, CAP>> for ArrayDeque<T, S, CAP> {
-    fn from(deque: ArrayQueue<T, S, CAP>) -> Self {
-        ArrayDeque {
-            array: deque.array,
-            front: deque.front,
-            back: deque.back,
-            len: deque.len,
-        }
-    }
-}
-
-// TODO: CHECK
-impl<T, S: Storage, const CAP: usize> From<ArrayStack<T, S, CAP>> for ArrayDeque<T, S, CAP> {
-    fn from(stack: ArrayStack<T, S, CAP>) -> Self {
-        ArrayDeque {
-            array: stack.array,
-            len: stack.len,
-            front: 0,
-            back: stack.len,
-        }
     }
 }

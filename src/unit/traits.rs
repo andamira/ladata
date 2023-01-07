@@ -77,7 +77,7 @@ pub trait DataCellsCopy: DataCells + Copy {}
 /// # Safety
 /// TODO
 ///
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 pub unsafe trait DataBares {}
 
 /// Comon (marker) trait for *unsafe* `Copy` *data cells*.
@@ -85,5 +85,5 @@ pub unsafe trait DataBares {}
 /// # Safety
 /// TODO
 ///
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 pub unsafe trait DataBaresCopy: DataBares + Copy {}

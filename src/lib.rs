@@ -24,9 +24,9 @@
 //!   $ cargo build --no-default-features --features=std
 //!   ```
 //!
-//! * `no_unsafe` forbids unsafe code.
+//! * `safe` forbids unsafe code.
 //!   ```shell
-//!   $ cargo build --features=no_unsafe
+//!   $ cargo build --features=safe
 //!   ```
 //!
 //! * all the dependencies (See the full list in
@@ -41,7 +41,7 @@
 #![allow(non_snake_case, non_camel_case_types)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(feature = "no_unsafe", forbid(unsafe_code))]
+#![cfg_attr(feature = "safe", forbid(unsafe_code))]
 
 pub mod error;
 pub mod list;

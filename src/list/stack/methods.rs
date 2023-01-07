@@ -3,7 +3,7 @@
 //! Stacks.
 //
 
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 use core::ptr;
 
 use super::ArrayStack;
@@ -57,23 +57,6 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
 
 // ``
 impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
-    /// Moves an array into a [`full`][Self::is_full] stack.
-    ///
-    /// # Examples
-    /// ```
-    /// use ladata::all::Stack;
-    ///
-    /// let s = Stack::<_, 3>::from_array([1, 2, 3]);
-    /// ```
-    // IMPROVE?
-    // - MAYBE arr: impl Into<[T; CAP]?> Even None…
-    pub fn from_array(arr: [T; CAP]) -> ArrayStack<T, S, CAP> {
-        Self {
-            array: Array::new(arr),
-            len: CAP,
-        }
-    }
-
     /// Returns the number of stacked elements.
     #[inline]
     pub const fn len(&self) -> usize {
@@ -635,14 +618,14 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(not(feature = "no_unsafe"))]
-    // unsafe version that doesn't depend on T: Clone
+    #[cfg(not(feature = "safe"))]
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
         } else {
             self.len -= 1;
             // SAFETY: we're not gonna access the value, but move it out
+            // MOTIVATION: to not depend on T: Clone
             let e = unsafe { ptr::read((self.array.get_unchecked(self.len)) as *const T) };
             Ok(e)
         }
@@ -670,7 +653,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(feature = "no_unsafe")]
+    #[cfg(feature = "safe")]
     // safe-only version that depends on T: Clone
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
@@ -881,6 +864,26 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
             self.len += 2;
             Ok(())
+        }
+    }
+}
+
+// ``
+impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+    /// Moves an array into a [`full`][Self::is_full] stack.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::Stack;
+    ///
+    /// let s = Stack::<_, 3>::from_array([1, 2, 3]);
+    /// ```
+    // IMPROVE?
+    // - MAYBE arr: impl Into<[T; CAP]?> Even None…
+    pub fn from_array(arr: [T; CAP]) -> ArrayStack<T, S, CAP> {
+        Self {
+            array: Array::new(arr),
+            len: CAP,
         }
     }
 }

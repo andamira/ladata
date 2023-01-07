@@ -13,7 +13,7 @@ use crate::mem::Boxed;
 // T:Clone
 impl<T: Clone, S: Storage, const CAP: usize> Clone for ArrayStack<T, S, CAP>
 where
-    S::Container<[T; CAP]>: Clone,
+    S::Stored<[T; CAP]>: Clone,
 {
     fn clone(&self) -> Self {
         Self {
@@ -25,14 +25,14 @@ where
 
 // T:Copy
 impl<T: Copy, S: Storage, const CAP: usize> Copy for ArrayStack<T, S, CAP> where
-    S::Container<[T; CAP]>: Copy
+    S::Stored<[T; CAP]>: Copy
 {
 }
 
 // T:Debug
 impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for ArrayStack<T, S, CAP>
 where
-    S::Container<[T; CAP]>: fmt::Debug,
+    S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut debug = f.debug_struct(stringify![ArrayStack]);
@@ -51,17 +51,14 @@ where
 // T:PartialEq
 impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for ArrayStack<T, S, CAP>
 where
-    S::Container<[T; CAP]>: PartialEq,
+    S::Stored<[T; CAP]>: PartialEq,
 {
     fn eq(&self, other: &Self) -> bool {
         self.array == other.array && self.len == other.len
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayStack<T, S, CAP> where
-    S::Container<[T; CAP]>: Eq
-{
-}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayStack<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // S:() + T:Default
 impl<T: Default, const CAP: usize> Default for ArrayStack<T, (), CAP> {
@@ -133,25 +130,3 @@ where
         s
     }
 }
-
-// TODO
-// impl<T, S: Storage, const CAP: usize> From<ArrayDeque<T, S, CAP>> for ArrayStack<T, S, CAP> {
-//     fn from(deque: ArrayDeque<T, S, CAP>) -> Self {
-//         ArrayQueue {
-//             array: deque.array,
-//             front: deque.front,
-//             back: deque.back,
-//             len: deque.len,
-//         }
-//     }
-// }
-// impl<T, S: Storage, const CAP: usize> From<ArrayStack<T, S, CAP>> for ArrayQueue<T, S, CAP> {
-//     fn from(stack: ArrayStack<T, S, CAP>) -> Self {
-//         ArrayQueue {
-//             array: deque.array,
-//             front: deque.front,
-//             back: deque.back,
-//             len: deque.len,
-//         }
-//     }
-// }

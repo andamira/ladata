@@ -13,7 +13,7 @@
 use super::macros::*;
 use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
-#[cfg(not(feature = "no_unsafe"))]
+#[cfg(not(feature = "safe"))]
 use super::DataBares;
 
 // 1. Mockups for substituting unused dependencies

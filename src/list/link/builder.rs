@@ -14,15 +14,9 @@
 // and a predecessor (prev), pointing towards the front.
 // ```
 
-use core::fmt;
+use core::fmt::{self, Debug};
 
-#[cfg(not(feature = "no_unsafe"))]
-use core::{
-    mem::{self, MaybeUninit},
-    ptr,
-};
-
-use crate::mem::{Raw, Storage};
+use crate::{list::Array, mem::Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -44,7 +38,7 @@ macro_rules! linked_list_array {
         #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
         pub(super) struct [<$name$b Index>](Option<$nmt>);
 
-        impl fmt::Debug for [<$name$b Index>] {
+        impl Debug for [<$name$b Index>] {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 write!(f,  "{:?}", self.0)
             }
@@ -161,8 +155,6 @@ macro_rules! linked_list_array {
         // Node ----------------------------------------------------------------
 
         /// The list node.
-        //
-        // Doesn't derive `Default` on purpose.
         pub(super) struct [<$name$b Node>] <T> {
             /// The index of the previous element, towards the front of the list.
             prev: [<$name$b Index>],
@@ -171,6 +163,17 @@ macro_rules! linked_list_array {
             /// The node's data.
             data: T,
         }
+
+        impl<T: Default> Default for [<$name$b Node>]<T> {
+            fn default() -> Self {
+                Self {
+                    data: T::default(),
+                    prev: None.into(),
+                    next: None.into(),
+                }
+            }
+        }
+
 
         impl<T: Clone> Clone for [<$name$b Node>]<T> {
             #[inline]
@@ -184,7 +187,7 @@ macro_rules! linked_list_array {
         }
         impl<T: Copy> Copy for [<$name$b Node>]<T> {}
 
-        impl<T: fmt::Debug> fmt::Debug for [<$name$b Node>]<T> {
+        impl<T: Debug> Debug for [<$name$b Node>]<T> {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 f.debug_struct(stringify![[<$name$b Node>]])
                 .field("prev", &self.prev)
@@ -296,7 +299,7 @@ macro_rules! linked_list_array {
             /// The index of the current element at the back.
             back: [<$name$b Index>],
             /// The array of nodes, stored in the generic container.
-            nodes: S::Container<[ [<$name$b Node>]<T>; CAP]>,
+            nodes: Array<[<$name$b Node>]<T>, S, CAP>,
         }
 
         /// impl Clone, Copy, Debug, Default…
@@ -305,7 +308,7 @@ macro_rules! linked_list_array {
 
             // T:Clone
             impl<T: Clone, S: Storage, const CAP: usize> Clone for [<$name$b>]<T, S, CAP>
-                where S::Container<[[<$name$b Node>]<T>; CAP]>: Clone {
+                where S::Stored<[[<$name$b Node>]<T>; CAP]>: Clone {
                 fn clone(&self) -> Self {
                     Self {
                         count: self.count.clone(),
@@ -318,11 +321,11 @@ macro_rules! linked_list_array {
 
             /// `T:Copy`
             impl<T: Copy, S: Storage, const CAP: usize> Copy for [<$name$b>]<T, S, CAP>
-                where S::Container<[[<$name$b Node>]<T>; CAP]>: Copy {}
+                where S::Stored<[[<$name$b Node>]<T>; CAP]>: Copy {}
 
             /// `T:Debug`
-            impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for [<$name$b>]<T, S, CAP>
-                where S::Container<[[<$name$b Node>]<T>; CAP]>: fmt::Debug {
+            impl<T: Debug, S: Storage, const CAP: usize> Debug for [<$name$b>]<T, S, CAP>
+                where S::Stored<[[<$name$b Node>]<T>; CAP]>: Debug {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                     let mut debug = f.debug_struct(stringify![[<$name$b>]]);
                     debug
@@ -343,7 +346,9 @@ macro_rules! linked_list_array {
             }
 
             /// `S=(); T:Default`
-            impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, (), CAP> {
+            impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, (), CAP>
+                where [<$name$b Node>]<T>: Default
+            {
                 /// Returns an empty, non-circular, doubly linked list.
                 ///
                 /// # Examples
@@ -356,32 +361,20 @@ macro_rules! linked_list_array {
                 #[doc = "Panics if `CAP` is > [`" $t "::MAX`]."]
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
-                    #[cfg(not(feature = "no_unsafe"))]
-                    let data = Raw::new({
-                        let mut arr: [MaybeUninit<[<$name$b Node>]<T>>; CAP] = unsafe {
-                            MaybeUninit::uninit().assume_init()
-                        };
-                        for i in &mut arr[..] {
-                            let _ = i.write([<$name$b Node>]::new_unlinked(T::default()));
-                        }
-                        unsafe { mem::transmute_copy::<_, [ [<$name$b Node>]<T>; CAP]>(&arr) }
-                    });
-                    #[cfg(feature = "no_unsafe")]
-                    let data = Raw::new(
-                        core::array::from_fn(|_| [<$name$b Node>]::new_unlinked(T::default())));
-
                     Self {
+                        nodes: Array::default(),
                         count: 0.into(),
                         front: None.into(),
                         back: None.into(),
-                        nodes: data,
                     }
                 }
             }
 
             /// `S=Boxed; T:Default`
             #[cfg(feature = "std")]
-            impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, Boxed, CAP> {
+            impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, Boxed, CAP>
+                where [<$name$b Node>]<T>: Default
+            {
                 /// Returns an empty, non-circular, doubly linked list.
                 ///
                 /// # Examples
@@ -394,25 +387,11 @@ macro_rules! linked_list_array {
                 #[doc = "Panics if `CAP` is > [`" $t "::MAX`]."]
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
-                    let data = {
-                        let mut v = Vec::<[<$name$b Node>]<T>>::with_capacity(CAP);
-
-                        for _ in 0..CAP {
-                            v.push([<$name$b Node>]::new_unlinked(T::default()));
-                        }
-
-                        let Ok(array) = v.into_boxed_slice().try_into() else {
-                            panic!("Can't turn the boxed slice into a boxed array");
-                        };
-                        array
-                    };
-
-
                     Self {
+                        nodes: Array::default(),
                         count: 0.into(),
                         front: None.into(),
                         back: None.into(),
-                        nodes: data,
                     }
                 }
             }
@@ -432,33 +411,12 @@ macro_rules! linked_list_array {
             #[doc = "Panics if `CAP` is >= [`" $t "::MAX`]."]
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
-
-                #[cfg(not(feature = "no_unsafe"))]
-                let data = {
-                    let mut arr: [MaybeUninit<[<$name$b Node>]<T>>; CAP] = unsafe {
-                        MaybeUninit::uninit().assume_init()
-                    };
-
-                    for i in &mut arr[..] {
-                        let _ = i.write([<$name$b Node>]::new_unlinked(value.clone()));
-                    }
-
-                    // TEMP:FIX: can't use transmute for now:
-                    // - https://github.com/rust-lang/rust/issues/62875
-                    // - https://github.com/rust-lang/rust/issues/61956
-                    // unsafe { mem::transmute::<_, [ [<$name$b Node>]<T>; CAP]>(&arr) }
-                    unsafe { mem::transmute_copy::<_, [ [<$name$b Node>]<T>; CAP]>(&arr) }
-                }.into();
-
-                #[cfg(feature = "no_unsafe")]
-                let data = Raw::new(
-                    core::array::from_fn(|_| [<$name$b Node>]::new_unlinked(value.clone())));
-
                 Self {
+                    nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
+                        with([<$name$b Node>]::new_unlinked(value)),
                     count: 0.into(),
                     front: None.into(),
                     back: None.into(),
-                    nodes: data,
                 }
             }
         }
@@ -478,25 +436,12 @@ macro_rules! linked_list_array {
             #[doc = "Panics if `CAP` is >= [`" $t "::MAX`]."]
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
-
-                let data = {
-                    let mut v = Vec::<[<$name$b Node>]<T>>::with_capacity(CAP);
-
-                    for _ in 0..CAP {
-                        v.push([<$name$b Node>]::new_unlinked(value.clone()));
-                    }
-
-                    let Ok(array) = v.into_boxed_slice().try_into() else {
-                        panic!("Can't turn the boxed slice into a boxed array");
-                    };
-                    array
-                };
-
                 Self {
+                    nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
+                        with([<$name$b Node>]::new_unlinked(value)),
                     count: 0.into(),
                     front: None.into(),
                     back: None.into(),
-                    nodes: data,
                 }
             }
         }
@@ -672,16 +617,17 @@ macro_rules! linked_list_array {
             /// Removes the element at the front of the array and returns it.
             ///
             /// Returns `None` if the list is empty.
-            // TODO WIP
-            #[allow(warnings)] // TEMP
-            #[cfg(not(feature = "no_unsafe"))]
+            // WIP
+            #[allow(warnings)]
+            #[cfg(not(feature = "safe"))]
             pub fn pop_front(&mut self) -> Option<T> {
                 if self.front.is_none() {
                     return None;
                 }
 
-                    todo![]
-                }
+                todo![]
+
+            }
 
             // /// Adds an element at the back of the array and returns its index.
             // ///
