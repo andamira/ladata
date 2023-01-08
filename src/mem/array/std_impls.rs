@@ -1,4 +1,4 @@
-// ladata::list::array::std_impls
+// ladata::mem::array::std_impls
 //
 //!
 //
@@ -12,8 +12,7 @@ use core::{
     ops::{Deref, DerefMut},
 };
 
-use super::Array;
-use crate::mem::{Raw, Storage};
+use crate::mem::{Array, Raw, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -107,7 +106,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::BoxedArray;
+    /// use ladata::mem::BoxedArray;
     ///
     /// let mut s = BoxedArray::<i32, 100>::default();
     /// ```

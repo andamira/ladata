@@ -3,10 +3,6 @@
 //! Lists.
 //
 
-pub mod array;
-#[doc(inline)]
-pub use array::*;
-
 #[cfg(feature = "bv")]
 pub mod bit;
 //#[cfg(feature = "bv")]

@@ -1,6 +1,7 @@
-// ladata::list::array
+// ladata::mem::array
 //
-//! Arrays are linear lists, sequentially allocated, statically sized.
+//! Arrays are random-access, sequentially allocated, statically sized,
+//! homogeneous data structures.
 //
 
 use core::marker::PhantomData;
@@ -12,7 +13,7 @@ use crate::mem::Storage;
 mod methods;
 mod std_impls;
 
-/// An array, backed by a primitive [`array`][array].
+/// An array, backed by a [`primitive array`][array].
 pub struct Array<T, S: Storage, const LEN: usize> {
     array: S::Stored<[T; LEN]>,
     _phantom: PhantomData<T>,

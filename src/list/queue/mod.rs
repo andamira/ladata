@@ -1,9 +1,10 @@
 // ladata::list::queue
 //
-//! Queues.
+//! Queues are linear lists for which addittions are made at one end,
+//! and removals are made at the opposite end.
 //
 
-use crate::{list::Array, mem::Storage};
+use crate::mem::{Array, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;

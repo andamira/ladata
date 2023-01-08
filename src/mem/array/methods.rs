@@ -1,4 +1,4 @@
-// ladata::list::stack::methods
+// ladata::mem::stack::methods
 //
 //! Arrays.
 //
@@ -8,10 +8,7 @@ use core::mem::{self, MaybeUninit};
 
 use core::marker::PhantomData;
 
-use crate::{
-    list::Array,
-    mem::{Raw, Storage},
-};
+use crate::mem::{Array, Raw, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -33,7 +30,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Array;
+    /// use ladata::mem::Array;
     ///
     /// let s = Array::<_, (), 16>::with('\0');
     /// ```
@@ -71,7 +68,7 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::BoxedArray;
+    /// use ladata::mem::BoxedArray;
     ///
     /// let mut s = BoxedArray::<_, 1_000>::with(0);
     /// ```

@@ -9,8 +9,7 @@ use core::ptr;
 use super::ArrayStack;
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    list::Array,
-    mem::Storage,
+    mem::{Array, Storage},
 };
 
 #[cfg(feature = "std")]

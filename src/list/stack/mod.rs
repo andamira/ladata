@@ -5,7 +5,7 @@
 //! <https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>
 //
 
-use crate::{list::Array, mem::Storage};
+use crate::mem::{Array, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;

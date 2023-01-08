@@ -1,9 +1,10 @@
 // ladata::list::deque
 //
-//! Queues.
+//! Double-ended queues are linear lists for which any accesses are made from
+//! either end.
 //
 
-use crate::{list::Array, mem::Storage};
+use crate::mem::{Array, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -13,13 +14,11 @@ mod std_impls;
 
 /// A double-ended queue, backed by an [`Array`].
 ///
-/// A double-ended queue, specifically, since the only difference between them
-/// are the restriction of methods.
+/// It has the [`Queue`] and [`Stack`] methods implemented for both the front
+/// and the back sides.
 ///
-/// is a linear list for which accesses are made from both ends.
-///
-/// You can get the classic Queue methods by using enqueue() and dequeue() which
-/// are aliases for push_back, and pop_front() respectively.
+/// [`Queue`]: crate::all::Queue
+/// [`Stack`]: crate::all::Stack
 pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
     pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,

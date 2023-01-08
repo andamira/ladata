@@ -57,14 +57,13 @@ pub mod all {
     pub use super::error::*;
 
     #[doc(inline)]
-    pub use super::list::{array::*, deque::*, link::*, queue::*, stack::*};
+    pub use super::list::{deque::*, link::*, queue::*, stack::*};
 
     #[doc(inline)]
+    pub use super::mem::{array::*, Raw, Storage};
+
     #[cfg(feature = "std")]
-    pub use super::list::bit::*;
-
-    #[doc(inline)]
-    pub use super::mem::*;
+    pub use super::{list::bit::*, mem::{Boxed}};
 
     // #[doc(inline)]
     // pub use super::tree::*;

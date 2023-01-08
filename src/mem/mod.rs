@@ -14,11 +14,20 @@
 
 use core::ops;
 
-mod raw;
-pub use raw::Raw;
+pub mod array;
+#[doc(inline)]
+pub use array::*;
 
 // mod arena;
+// #[doc(inline)]
 // pub use arena::*;
+
+// mod cache;
+// #[doc(inline)]
+// pub use cache::*;
+
+mod raw;
+pub use raw::Raw;
 
 /// Allows to be generic in respect of the data storage.
 ///
