@@ -92,6 +92,8 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, Boxed, CAP> {
     }
 }
 
+/* From<IntoIterator<Item = T>> */
+
 impl<T: Default, I, const CAP: usize> From<I> for ArrayStack<T, (), CAP>
 where
     I: IntoIterator<Item = T>,

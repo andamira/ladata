@@ -9,7 +9,7 @@ use core::{
     ptr,
 };
 
-use super::{Array, ArrayQueue};
+use super::{Array, ArrayQueue, QueueIter};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
@@ -66,7 +66,7 @@ impl<T: Clone, const CAP: usize> ArrayQueue<T, Boxed, CAP> {
 impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     // Returns the `nth` element's index counting from the front.
     #[inline(always)]
-    const fn idx_front(&self, nth: usize) -> usize {
+    pub(super) const fn idx_front(&self, nth: usize) -> usize {
         (self.front + nth) % CAP
     }
 
@@ -150,6 +150,15 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     #[inline]
     pub const fn remaining_capacity(&self) -> usize {
         CAP - self.len()
+    }
+
+    /* iter */
+
+    pub fn iter(&self) -> QueueIter<'_, T, S, CAP> {
+        QueueIter {
+            queue: self,
+            idx: 0,
+        }
     }
 
     /* extend */

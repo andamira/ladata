@@ -9,7 +9,7 @@ use core::{
     ptr,
 };
 
-use super::{Array, ArrayDeque};
+use super::{Array, ArrayDeque, DequeIter};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
@@ -66,12 +66,12 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
 impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     // Returns the `nth` element's index counting from the back.
     #[inline(always)]
-    const fn idx_back(&self, nth: usize) -> usize {
+    pub(super) const fn idx_back(&self, nth: usize) -> usize {
         (self.back + CAP - nth - 1) % CAP
     }
     // Returns the `nth` element's index counting from the front.
     #[inline(always)]
-    const fn idx_front(&self, nth: usize) -> usize {
+    pub(super) const fn idx_front(&self, nth: usize) -> usize {
         (self.front + nth) % CAP
     }
 
@@ -155,6 +155,15 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     #[inline]
     pub const fn remaining_capacity(&self) -> usize {
         CAP - self.len()
+    }
+
+    /* iter */
+
+    pub fn iter(&self) -> DequeIter<'_, T, S, CAP> {
+        DequeIter {
+            deque: self,
+            idx: 0,
+        }
     }
 
     /* extend */

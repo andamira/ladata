@@ -6,7 +6,7 @@
 #[cfg(not(feature = "safe"))]
 use core::ptr;
 
-use super::ArrayStack;
+use super::{ArrayStack, StackIter};
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
     mem::{Array, Storage},
@@ -883,6 +883,13 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
         Self {
             array: Array::new(arr),
             len: CAP,
+        }
+    }
+
+    pub fn iter(&self) -> StackIter<'_, T, S, CAP> {
+        StackIter {
+            stack: self,
+            idx: 0,
         }
     }
 }

@@ -33,3 +33,47 @@ pub type Queue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
 /// An [`ArrayQueue`] stored in the heap.
 #[cfg(feature = "std")]
 pub type BoxedQueue<T, const CAP: usize> = ArrayQueue<T, Boxed, CAP>;
+
+/* iterators */
+
+pub struct QueueIter<'s, T, S: Storage, const CAP: usize> {
+    queue: &'s ArrayQueue<T, S, CAP>,
+    idx: usize,
+}
+
+impl<'s, T, S: Storage, const CAP: usize> Iterator for QueueIter<'s, T, S, CAP> {
+    type Item = &'s T;
+    /// Iterates over shared references.
+    ///
+    /// # Example
+    /// ```
+    /// use ladata::all::Queue;
+    ///
+    /// let mut q = Queue::<i32, 4>::from([1, 2]);
+    /// q.pop();
+    /// q.push(3);
+    /// q.pop();
+    /// q.push(4);
+    ///
+    /// let mut qi = q.iter();
+    /// assert_eq![Some(&3), qi.next()];
+    /// assert_eq![Some(&4), qi.next()];
+    /// assert_eq![None, qi.next()];
+    ///
+    /// ```
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = if self.idx == self.queue.len() {
+            None
+        } else {
+            Some(&self.queue.array[self.queue.idx_front(self.idx)])
+        };
+        self.idx += 1;
+        item
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.queue.len(), Some(self.queue.len()))
+    }
+}
+
+impl<'s, T, S: Storage, const CAP: usize> ExactSizeIterator for QueueIter<'s, T, S, CAP> {}
