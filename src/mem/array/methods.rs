@@ -139,4 +139,14 @@ impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
     pub const fn is_empty(&self) -> bool {
         LEN == 0
     }
+
+    /// Returns a slice containing the entire array.
+    pub fn as_slice(&self) -> &[T] {
+        self.array.as_slice()
+    }
+
+    /// Returns an exclusive slice containing the entire array.
+    pub fn as_mut_slice(&mut self) -> &mut [T] {
+        self.array.as_mut_slice()
+    }
 }

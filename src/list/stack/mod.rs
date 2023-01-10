@@ -19,12 +19,6 @@ pub struct ArrayStack<T, S: Storage, const CAP: usize> {
     pub(crate) len: usize,
 }
 
-// TODO
-// /// A Stack, backed by a [`Vec`].
-// pub struct VecStack<T> {
-//     vec: Vec<T>,
-// }
-
 /// An [`ArrayStack`] stored in the stack.
 pub type Stack<T, const CAP: usize> = ArrayStack<T, (), CAP>;
 

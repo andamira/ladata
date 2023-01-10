@@ -157,3 +157,111 @@ impl<T, const LEN: usize> From<Array<T, Boxed, LEN>> for Box<[T; LEN]> {
         array.array
     }
 }
+
+impl<T: Default, I, const LEN: usize> From<I> for Array<T, (), LEN>
+where
+    I: IntoIterator<Item = T>,
+{
+    /// Returns a array filled with an iterator, in the stack.
+    ///
+    /// If the `iterator` length is less than the array length `LEN`,
+    /// the missing elements will be the default value of `T`.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::mem::RawArray;
+    ///
+    /// let s: RawArray<_, 4> = [1, 2, 3].into();
+    ///
+    /// assert_eq![s.as_slice(), &[1, 2, 3, 0]];
+    /// ```
+    fn from(iterator: I) -> Array<T, (), LEN> {
+        let mut iterator = iterator.into_iter();
+
+        #[cfg(not(feature = "safe"))]
+        let data = {
+            let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
+            for i in &mut arr[..] {
+                if let Some(e) = iterator.next() {
+                    let _ = i.write(e);
+                } else {
+                    let _ = i.write(T::default());
+                }
+            }
+            unsafe { mem::transmute_copy::<_, [T; LEN]>(&arr) }
+        };
+
+        #[cfg(feature = "safe")]
+        let data = core::array::from_fn(|_| {
+            if let Some(e) = iterator.next() {
+                e
+            } else {
+                T::default()
+            }
+        });
+
+        Array {
+            array: Raw::new(data),
+            _phantom: PhantomData,
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl<T: Default, I, const LEN: usize> From<I> for Array<T, Boxed, LEN>
+where
+    I: IntoIterator<Item = T>,
+{
+    /// Returns a array filled with an iterator, in the heap.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::mem::BoxedArray;
+    ///
+    /// let s: BoxedArray<_, 4> = [1, 2, 3].into();
+    ///
+    /// assert_eq![s.as_slice(), &[1, 2, 3, 0]];
+    /// ```
+    fn from(iterator: I) -> Array<T, Boxed, LEN> {
+        let mut iterator = iterator.into_iter();
+
+        #[cfg(feature = "safe")]
+        let data = {
+            let mut v = Vec::<T>::with_capacity(LEN);
+
+            for _ in 0..LEN {
+                if let Some(e) = iterator.next() {
+                    v.push(e);
+                } else {
+                    v.push(T::default());
+                }
+            }
+            let Ok(array) = v.into_boxed_slice().try_into() else {
+                panic!("Can't turn the boxed slice into a boxed array");
+            };
+            array
+        };
+
+        #[cfg(not(feature = "safe"))]
+        let data = {
+            let mut v = Vec::<T>::with_capacity(LEN);
+
+            for _ in 0..LEN {
+                if let Some(e) = iterator.next() {
+                    v.push(e);
+                } else {
+                    v.push(T::default());
+                }
+            }
+            let slice = v.into_boxed_slice();
+            let raw_slice = Box::into_raw(slice);
+            // SAFETY: pointer comes from using `into_raw`, and capacity is right.
+            unsafe { Box::from_raw(raw_slice as *mut [T; LEN]) }
+        };
+
+        Array {
+            array: data,
+            _phantom: PhantomData,
+        }
+    }
+}

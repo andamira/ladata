@@ -58,12 +58,15 @@ pub mod all {
 
     #[doc(inline)]
     pub use super::list::{deque::*, link::*, queue::*, stack::*};
+    #[doc(inline)]
+    #[cfg(feature = "bv")]
+    pub use super::list::bit::*;
 
     #[doc(inline)]
     pub use super::mem::{array::*, Raw, Storage};
-
+    #[doc(inline)]
     #[cfg(feature = "std")]
-    pub use super::{list::bit::*, mem::Boxed};
+    pub use super::mem::Boxed;
 
     // #[doc(inline)]
     // pub use super::tree::*;
