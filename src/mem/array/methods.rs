@@ -108,6 +108,24 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
     }
 }
 
+// `T: PartialEq`
+impl<T: PartialEq, S: Storage, const CAP: usize> Array<T, S, CAP> {
+    /// Returns true if the array contains `element`.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::Array;
+    ///
+    /// let a = Array::<_, (), 5>::new([5, 78, 42, 33, 9]);
+    ///
+    /// assert![a.contains(&9)];
+    /// assert![!a.contains(&8)];
+    /// ```
+    pub fn contains(&self, element: &T) -> bool {
+        self.iter().any(|n| n == element)
+    }
+}
+
 // ``
 impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
     /// Returns the number of elements in the array.

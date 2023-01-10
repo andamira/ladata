@@ -894,6 +894,24 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     }
 }
 
+// `T: PartialEq`
+impl<T: PartialEq, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+    /// Returns true if the stack contains `element`.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::Stack;
+    ///
+    /// let s = Stack::<_, 6>::from([5, 78, 42, 33, 9]);
+    ///
+    /// assert![s.contains(&9)];
+    /// assert![!s.contains(&8)];
+    /// ```
+    pub fn contains(&self, element: &T) -> bool {
+        self.iter().any(|n| n == element)
+    }
+}
+
 // `T: Default`
 impl<T: Default, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// Drops the top of stack element,

@@ -532,6 +532,24 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     }
 }
 
+// `T: PartialEq`
+impl<T: PartialEq, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
+    /// Returns true if the queue contains `element`.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::all::Queue;
+    ///
+    /// let q = Queue::<_, 6>::from([5, 78, 42, 33, 9]);
+    ///
+    /// assert![q.contains(&9)];
+    /// assert![!q.contains(&8)];
+    /// ```
+    pub fn contains(&self, element: &T) -> bool {
+        self.iter().any(|n| n == element)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
