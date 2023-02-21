@@ -45,6 +45,7 @@
 #![cfg_attr(feature = "nightly", feature(doc_cfg))]
 
 pub mod error;
+pub mod grid;
 pub mod list;
 // pub mod hybrid;
 // pub mod key;
@@ -56,6 +57,9 @@ pub mod unit;
 pub mod all {
     #[doc(inline)]
     pub use super::error::*;
+
+    #[doc(inline)]
+    pub use super::grid::*;
 
     #[doc(inline)]
     #[cfg(feature = "bv")]

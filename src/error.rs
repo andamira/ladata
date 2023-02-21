@@ -12,9 +12,6 @@ pub type LadataResult<N> = result::Result<N, LadataError>;
 #[non_exhaustive]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LadataError {
-    /// The index is out of bounds.
-    IndexOutOfBounds,
-
     /// There are not enough elements for the operation.
     ///
     /// Contains the minimum number of elements needed.
@@ -27,6 +24,20 @@ pub enum LadataError {
 
     /// The key already exists.
     KeyAlreadyExists,
+
+    /// The given index is out of bounds.
+    // /// The given index in row or column major order was out of bounds.
+    IndexOutOfBounds(usize),
+
+    /// The given indices 2d are out of bounds.
+    // TODO: more dimensions
+    Indices2dOutOfBounds(usize, usize),
+
+    /// The given indices 2d were out of bounds for a chunk of the given length.
+    ChunkIndices2dOutOfBounds(usize, usize, usize),
+
+    /// The dimensions given did not match the elements provided
+    DimensionMismatch,
 }
 
 /// impl Display & Error
@@ -41,7 +52,6 @@ mod std_impls {
     impl fmt::Display for LadataError {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             match self {
-                LadataError::IndexOutOfBounds => write!(f, "Index is out of bounds."),
                 LadataError::NotEnoughElements(n) => {
                     write!(f, "Not enough elements. Needs at least `{n}` elements.")
                 }
@@ -56,6 +66,15 @@ mod std_impls {
                     }
                 }
                 LadataError::KeyAlreadyExists => write!(f, "The key already exists."),
+                LadataError::IndexOutOfBounds(i) => write!(f, "Index {i} is out of bounds."),
+                LadataError::Indices2dOutOfBounds(i, j) => {
+                    write!(f, "Indices 2d: {i}, {j} are out of bounds.")
+                }
+                LadataError::ChunkIndices2dOutOfBounds(i, j, k) => write!(
+                    f,
+                    "Indices 2d {i}, {j} are out of bounds for a chunk of length {k}."
+                ),
+                LadataError::DimensionMismatch => write!(f, "Dimension Mismatch."),
             }
         }
     }
