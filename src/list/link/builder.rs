@@ -22,6 +22,7 @@ use crate::mem::{Array, Storage};
 use crate::mem::Boxed;
 
 /// Generates a doubly linked list backed by an array, with custom index size.
+#[rustfmt::skip]
 macro_rules! linked_list_array {
     // $name : name prefix. E.g.: LinkedList
     // $B : byte size

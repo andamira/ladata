@@ -74,6 +74,7 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, (), CAP> {
 
 // S:Boxed + T:Default
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Default, const CAP: usize> Default for ArrayStack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using the default value to fill the remaining free data.
@@ -114,6 +115,7 @@ where
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Default, I, const CAP: usize> From<I> for ArrayStack<T, Boxed, CAP>
 where
     I: IntoIterator<Item = T>,

@@ -991,12 +991,16 @@ macro_rules! define_type {
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep,
                 )*
 
                 $( // pointer-size & feature-gated dependencies
                     #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep,
                 )*
@@ -1061,11 +1065,15 @@ macro_rules! define_type {
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep,
                 )*
                 $(
                     #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))))]
                     #[doc = $vdoc_dep]
                     $vname_dep,
                 )*
@@ -1073,6 +1081,8 @@ macro_rules! define_type {
                     #[cfg(all($cvpsize_psize_dep,
                             feature = $cvdep1_psize_dep,
                             feature = $cvdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep,
                 )*
@@ -1080,6 +1090,8 @@ macro_rules! define_type {
                     #[cfg(all($vpsize_psize_dep,
                             feature = $vdep1_psize_dep,
                             feature = $vdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))))]
                     #[doc = $vdoc_psize_dep]
                     $vname_psize_dep,
                 )*
@@ -1187,6 +1199,7 @@ macro_rules! define_cell {
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                    #[cfg_attr(feature = "nightly", doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep($cvtype_dep),
                 )*
@@ -1195,6 +1208,8 @@ macro_rules! define_cell {
                     #[cfg(all($cvpsize_psize_dep,
                             feature = $cvdep1_psize_dep,
                             feature = $cvdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
@@ -1264,11 +1279,14 @@ macro_rules! define_cell {
 
                 $( // feature-gated dependencies
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                    #[cfg_attr(feature = "nightly", doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                     #[doc = $cvdoc_dep]
                     $cvname_dep($cvtype_dep),
                 )*
                 $(
                     #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))))]
                     #[doc = $vdoc_dep]
                     $vname_dep($vtype_dep),
                 )*
@@ -1277,6 +1295,8 @@ macro_rules! define_cell {
                     #[cfg(all($cvpsize_psize_dep,
                             feature = $cvdep1_psize_dep,
                             feature = $cvdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
@@ -1284,6 +1304,8 @@ macro_rules! define_cell {
                     #[cfg(all($vpsize_psize_dep,
                             feature = $vdep1_psize_dep,
                             feature = $vdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))))]
                     #[doc = $vdoc_psize_dep]
                     $vname_psize_dep($vtype_psize_dep),
                 )*
@@ -1429,6 +1451,8 @@ macro_rules! define_cell {
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                             [<$cname $b bit Copy With>]::$cvname_dep(v) => Self { $cvname_dep: v },
                         )*
                     }
@@ -1502,12 +1526,17 @@ macro_rules! define_bare {
                 // feature-gated dependencies
                 $(
                     #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                     #[doc = $cvdoc_dep]
                     pub $cvname_dep: $cvtype_dep,
                 )*
 
                 $( // pointer-size & feature-gated dependencies
-                    #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg(all($cvpsize_psize_dep,
+                            feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                    #[cfg_attr(feature = "nightly",
+                        doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                     #[doc = $cvdoc_psize_dep]
                     $cvname_psize_dep($cvtype_psize_dep),
                 )*
@@ -1576,19 +1605,29 @@ macro_rules! impl_data_types {
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                             $cvname_dep => core::mem::align_of::<$cvtype_dep>(),
                         )*
                         $(
                             #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))))]
                             $vname_dep => core::mem::align_of::<$vtype_dep>(),
                         )*
 
                         $( // pointer-size & feature-gated dependencies
-                            #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            #[cfg(all($cvpsize_psize_dep,
+                                    feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                             $cvname_psize_dep => core::mem::align_of::<$cvtype_psize_dep>(),
                         )*
                         $(
-                            #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            #[cfg(all($vpsize_psize_dep,
+                                    feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))))]
                             $vname_psize_dep => core::mem::align_of::<$vtype_psize_dep>(),
                         )*
                     }
@@ -1609,19 +1648,29 @@ macro_rules! impl_data_types {
 
                         $( // feature-gated dependencies
                             #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep))))]
                             $cvname_dep => core::mem::size_of::<$cvtype_dep>(),
                         )*
                         $(
                             #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $vdep1_dep, feature = $vdep2_dep))))]
                             $vname_dep => core::mem::size_of::<$vtype_dep>(),
                         )*
 
                         $( // pointer-size & feature-gated dependencies
-                            #[cfg(all($cvpsize_psize_dep, feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            #[cfg(all($cvpsize_psize_dep,
+                                    feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $cvdep1_psize_dep, feature = $cvdep2_psize_dep))))]
                             $cvname_psize_dep => core::mem::size_of::<$cvtype_psize_dep>(),
                         )*
                         $(
-                            #[cfg(all($vpsize_psize_dep, feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            #[cfg(all($vpsize_psize_dep,
+                                    feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))]
+                            #[cfg_attr(feature = "nightly",
+                                doc(cfg(all(feature = $vdep1_psize_dep, feature = $vdep2_psize_dep))))]
                             $vname_psize_dep => core::mem::size_of::<$vtype_psize_dep>(),
                         )*
                     }

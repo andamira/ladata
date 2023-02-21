@@ -70,9 +70,11 @@ pub trait Storage {
 
 /// A storage that wraps its data in a [`Box`].
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 pub struct Boxed;
 
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl Storage for Boxed {
     type Stored<T> = Box<T>;
 }

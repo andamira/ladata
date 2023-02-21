@@ -31,6 +31,7 @@ pub enum LadataError {
 
 /// impl Display & Error
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 mod std_impls {
     use super::LadataError;
     use std::{error::Error as StdError, fmt};

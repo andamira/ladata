@@ -42,6 +42,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
 
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
     /// Returns an empty deque, allocated in the stack,
     /// using `element` to fill the remaining free data.
@@ -1143,6 +1144,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[cfg(feature = "std")]
+    #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
     pub fn to_vec(&self) -> Vec<T> {
         let mut vec = Vec::new();
         if !self.is_empty() {

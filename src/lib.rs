@@ -42,6 +42,7 @@
 //
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(feature = "safe", forbid(unsafe_code))]
+#![cfg_attr(feature = "nightly", feature(doc_cfg))]
 
 pub mod error;
 pub mod list;
@@ -57,16 +58,16 @@ pub mod all {
     pub use super::error::*;
 
     #[doc(inline)]
-    pub use super::list::{deque::*, link::*, queue::*, stack::*};
-    #[doc(inline)]
     #[cfg(feature = "bv")]
     pub use super::list::bit::*;
-
     #[doc(inline)]
-    pub use super::mem::{array::*, Raw, Storage};
+    pub use super::list::{deque::*, link::*, queue::*, stack::*};
+
     #[doc(inline)]
     #[cfg(feature = "std")]
     pub use super::mem::Boxed;
+    #[doc(inline)]
+    pub use super::mem::{array::*, Raw, Storage};
 
     // #[doc(inline)]
     // pub use super::tree::*;

@@ -62,6 +62,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
 
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.

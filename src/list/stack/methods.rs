@@ -36,6 +36,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
 
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.

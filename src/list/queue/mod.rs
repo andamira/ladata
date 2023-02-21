@@ -32,6 +32,7 @@ pub type Queue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
 
 /// An [`ArrayQueue`] stored in the heap.
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 pub type BoxedQueue<T, const CAP: usize> = ArrayQueue<T, Boxed, CAP>;
 
 /* iterators */

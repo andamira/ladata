@@ -24,6 +24,7 @@ pub type Stack<T, const CAP: usize> = ArrayStack<T, (), CAP>;
 
 /// An [`ArrayStack`] stored in the heap.
 #[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 pub type BoxedStack<T, const CAP: usize> = ArrayStack<T, Boxed, CAP>;
 
 /* iterators */

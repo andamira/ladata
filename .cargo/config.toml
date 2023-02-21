@@ -3,6 +3,9 @@
 # CHECK
 cl = "clippy"
 clq = "clippy --quiet"
+#
+cl_nostd = "clippy --no-default-features"
+cl_all = "clippy --features=deps_all"
 
 # CLEAN PACKAGE
 cp = "clean --package"
@@ -13,6 +16,12 @@ d = "doc --no-deps"
 do = "doc --no-deps --open"
 dd = "doc"
 ddo = "doc --open"
+# +nightly
+nd_all = "doc --no-deps --features=nightly,deps_all"
+ndo_all = "doc --no-deps --open --features=nightly,deps_all"
+ndd_all = "doc --features=nightly,deps_all"
+nddo_all = "doc --open --features=nightly,deps_all"
+# 
 
 # BUILD
 b = "build"
@@ -26,6 +35,18 @@ brb = "build --release --bin"
 bre = "build --release --example"
 brqb = "build --release --quiet --bin"
 brqe = "build --release --quiet --example"
+#
+b_nostd = "build --no-default-features"
+bb_nostd = "build --bin --no-default-features"
+be_nostd = "build --example --no-default-features"
+bq_nostd = "build --quiet --no-default-features"
+br_nostd = "build --release --no-default-features"
+#
+b_all = "build --features=deps_all"
+bb_all = "build --bin --features=deps_all"
+be_all = "build --example --features=deps_all"
+bq_all = "build --quiet --features=deps_all"
+br_all = "build --release --features=deps_all"
 
 # RUN
 r = "run"
@@ -39,18 +60,37 @@ rrb = "run --release --bin"
 rre = "run --release --example"
 rrqb = "run --release --quiet --bin"
 rrqe = "run --release --quiet --example"
+#
+r_nostd = "run --no-default-features"
+rb_nostd = "run --bin --no-default-features"
+re_nostd = "run --example --no-default-features"
+rq_nostd = "run --quiet --no-default-features"
+rr_nostd = "run --release --no-default-features"
+#
+r_all = "run --features=deps_all"
+rb_all = "run --bin --features=deps_all"
+re_all = "run --example --features=deps_all"
+rq_all = "run --quiet --features=deps_all"
+rr_all = "run --release --features=deps_all"
 
 # TEST
 t = "test"
-te = "test --example"
 td = "test --doc"
 t_ = "test -- --nocapture"
 t_1 = "test -- --test-threads 1 --nocapture"
+#
+t_nostd = "test --no-default-features"
+td_nostd = "test --doc --no-default-features"
+#
+t_all = "test --features=deps_all"
+td_all = "test --doc --features=deps_all"
 
 # TREE
 tr = "tree"
 trf = "tree --format {p}:{f}" # with feature list
 trr = "tree --format {p}:{r}" # with repository url
+#
+tr_all = "tree --features=deps_all"
 
 # PUBLISH
 p = "publish --dry-run"
@@ -66,4 +106,3 @@ Ee = "expand --example"
 El = "expand --lib"
 
 [build]
-# rustdocflags = [ "--html-in-header", "./res/rustdoc-header.html"]
