@@ -8,6 +8,6 @@ A simple & modular mixed data model.
 
 See [the documentation](https://docs.rs/ladata/) for more information.
 
-# Status
+## Status
 
 - This is an experimental work in progress. The API can and will keep changing.
