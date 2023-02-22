@@ -44,7 +44,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
-    /// Returns an empty deque, allocated in the stack,
+    /// Returns an empty deque, allocated in the heap,
     /// using `element` to fill the remaining free data.
     ///
     /// # Examples

@@ -4,6 +4,7 @@
 //
 
 #[cfg(feature = "bv")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
 pub mod bit;
 //#[cfg(feature = "bv")]
 // #[doc(inline)]

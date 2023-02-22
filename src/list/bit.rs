@@ -7,6 +7,7 @@
 
 use bv::{Bits, BitsMut};
 
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
 pub use bv::BitVec;
 
 macro_rules! build_bit_array {
@@ -17,6 +18,7 @@ macro_rules! build_bit_array {
         paste::paste! {
             #[doc = $b "-bit [`bv`](https://crates.io/crates/bv)'s array of `Bits`."]
             #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
             pub struct [< BitArray $b >](pub $ty);
 
             impl Bits for [< BitArray $b >] {

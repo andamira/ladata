@@ -290,7 +290,7 @@ macro_rules! linked_list_array {
         ///
         #[doc = "- It has a maximum length of [`" $t "::MAX`]` -1` elements."]
         #[doc = "- An empty list has a minimum size of `3 * " $B "` bytes."]
-        #[doc = "- Each element occupies `2 * " $B " + core::mem::size_of::<T>()` bytes,"]
+        #[doc = "- Each element occupies `2 * " $B " + size_of::<T>()` bytes,"]
         #[doc = "plus any padding."]
         pub struct [<$name$b>]<T, S: Storage, const CAP: usize> {
             /// The current number of nodes.
