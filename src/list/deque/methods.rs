@@ -9,7 +9,7 @@ use core::{
     ptr,
 };
 
-use super::{Array, ArrayDeque, DequeIter};
+use super::{ArrayDeque, CoreArray, DequeIter};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
@@ -32,7 +32,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: Array::<T, (), CAP>::with(element),
+            array: CoreArray::<T, (), CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -55,7 +55,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: Array::<T, Boxed, CAP>::with(element),
+            array: CoreArray::<T, Boxed, CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -87,7 +87,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     // TODO IMPROVE
     pub fn from_array(arr: [T; CAP]) -> ArrayDeque<T, S, CAP> {
         Self {
-            array: Array::new(arr),
+            array: CoreArray::new(arr),
             front: 0,
             back: 0,
             len: CAP,
@@ -1185,7 +1185,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     pub fn to_array<const LEN: usize>(&self) -> Option<[T; LEN]> {
         // MAYBE return not option
         // TODO: improve from_iter
-        // Some(Array::<T, S, LEN>::new())
+        // Some(CoreArray::<T, S, LEN>::new())
 
         if self.is_empty() || LEN > self.len() || LEN == 0 {
             None

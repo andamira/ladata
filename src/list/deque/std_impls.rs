@@ -5,7 +5,7 @@
 
 use core::fmt;
 
-use super::{Array, ArrayDeque, Storage};
+use super::{ArrayDeque, CoreArray, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -92,7 +92,7 @@ impl<T: Default, const CAP: usize> Default for ArrayDeque<T, (), CAP> {
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             front: 0,
             back: 0,
             len: 0,
@@ -114,7 +114,7 @@ impl<T: Default, const CAP: usize> Default for ArrayDeque<T, Boxed, CAP> {
     /// ```
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             front: 0,
             back: 0,
             len: 0,

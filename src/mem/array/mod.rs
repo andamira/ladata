@@ -13,16 +13,16 @@ use crate::mem::Storage;
 mod methods;
 mod std_impls;
 
-/// An array, backed by a [`primitive array`][array].
-pub struct Array<T, S: Storage, const LEN: usize> {
+/// A generic array, backed by the core primitive [`array`].
+pub struct CoreArray<T, S: Storage, const LEN: usize> {
     array: S::Stored<[T; LEN]>,
     _phantom: PhantomData<T>,
 }
 
-/// An [`Array`] stored in the heap.
+/// A [`CoreArray`] stored in the heap.
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-pub type BoxedArray<T, const LEN: usize> = Array<T, Boxed, LEN>;
+pub type BoxedArray<T, const LEN: usize> = CoreArray<T, Boxed, LEN>;
 
-/// An [`Array`] stored in the stack.
-pub type RawArray<T, const LEN: usize> = Array<T, (), LEN>;
+/// A [`CoreArray`] stored in the stack.
+pub type DirectArray<T, const LEN: usize> = CoreArray<T, (), LEN>;

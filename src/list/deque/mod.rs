@@ -4,7 +4,7 @@
 //! either end.
 //
 
-use crate::mem::{Array, Storage};
+use crate::mem::{CoreArray, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -12,7 +12,7 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A double-ended queue, backed by an [`Array`].
+/// A double-ended queue, backed by a [`CoreArray`].
 ///
 /// It has the [`Queue`] and [`Stack`] methods implemented for both the front
 /// and the back sides.
@@ -20,7 +20,7 @@ mod std_impls;
 /// [`Queue`]: crate::all::Queue
 /// [`Stack`]: crate::all::Stack
 pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
-    pub(crate) array: Array<T, S, CAP>,
+    pub(crate) array: CoreArray<T, S, CAP>,
     pub(crate) len: usize,
     pub(crate) front: usize,
     pub(crate) back: usize,

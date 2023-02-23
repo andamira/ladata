@@ -9,7 +9,7 @@ use core::ptr;
 use super::{ArrayStack, StackIter};
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    mem::{Array, Storage},
+    mem::{CoreArray, Storage},
 };
 
 #[cfg(feature = "std")]
@@ -28,7 +28,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: Array::<T, (), CAP>::with(element),
+            array: CoreArray::<T, (), CAP>::with(element),
             len: 0,
         }
     }
@@ -49,7 +49,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: Array::<T, Boxed, CAP>::with(element),
+            array: CoreArray::<T, Boxed, CAP>::with(element),
             len: 0,
         }
     }
@@ -884,7 +884,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     // - MAYBE arr: impl Into<[T; CAP]?> Even None…
     pub fn from_array(arr: [T; CAP]) -> ArrayStack<T, S, CAP> {
         Self {
-            array: Array::new(arr),
+            array: CoreArray::new(arr),
             len: CAP,
         }
     }

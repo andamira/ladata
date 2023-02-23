@@ -71,7 +71,7 @@ pub mod all {
     #[cfg(feature = "std")]
     pub use super::mem::Boxed;
     #[doc(inline)]
-    pub use super::mem::{array::*, Raw, Storage};
+    pub use super::mem::{array::*, Direct, Storage};
 
     // #[doc(inline)]
     // pub use super::tree::*;

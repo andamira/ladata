@@ -18,7 +18,7 @@ use core::fmt::{self, Debug};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    mem::{Array, Storage},
+    mem::{CoreArray, Storage},
 };
 
 #[cfg(feature = "std")]
@@ -311,7 +311,7 @@ macro_rules! linked_list_array {
             /// The index of the current element at the back.
             back: [<$name$b Index>],
             /// The array of nodes, stored in the generic container.
-            nodes: Array<[<$name$b Node>]<T>, S, CAP>,
+            nodes: CoreArray<[<$name$b Node>]<T>, S, CAP>,
         }
 
         /// impl Clone, Copy, Debug, Default…
@@ -375,7 +375,7 @@ macro_rules! linked_list_array {
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
                     Self {
-                        nodes: Array::default(),
+                        nodes: CoreArray::default(),
                         count: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
@@ -403,7 +403,7 @@ macro_rules! linked_list_array {
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
                     Self {
-                        nodes: Array::default(),
+                        nodes: CoreArray::default(),
                         count: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
@@ -428,7 +428,7 @@ macro_rules! linked_list_array {
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
                 Self {
-                    nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
+                    nodes: CoreArray::<[<$name$b Node>]<T>, (), CAP>::
                         with([<$name$b Node>]::new_unlinked(value)),
                     count: $nmt::new(0).unwrap(),
                     front: None.into(),
@@ -455,7 +455,7 @@ macro_rules! linked_list_array {
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
                 Self {
-                    nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
+                    nodes: CoreArray::<[<$name$b Node>]<T>, Boxed, CAP>::
                         with([<$name$b Node>]::new_unlinked(value)),
                     count: $nmt::new(0).unwrap(),
                     front: None.into(),

@@ -5,11 +5,8 @@
 //! The trait [`Storage`] allows data structure implementations to have
 //! methods (specially constructors) be specialized by storage type.
 //!
-//! It is already implemented for the [`Boxed`] type, that wraps the data
-//! in a [`Box`], and for the [`()`] type which wraps the data in a [`Raw`].
-//!
-//! A new [`Raw`] type is defined, analogous to [`Box`], but without moving
-//! the data to the heap. In order to be able to be generic over the storage.
+//! It is implemented for the [`Boxed`] type and the [`()`][unit] unit type,
+//! which wraps their data in a [`Box`] and a [`Direct`], respectively.
 //
 
 use core::ops;
@@ -26,14 +23,14 @@ pub use array::*;
 // #[doc(inline)]
 // pub use cache::*;
 
-mod raw;
-pub use raw::Raw;
+mod direct;
+pub use direct::Direct;
 
 /// Allows to be generic in respect of the data storage.
 ///
 /// There are two reference implementations:
 /// - [`Boxed`], which wraps the data in a [`Box`].
-/// - [`()`][unit], which wraps the data in a [`Raw`].
+/// - [`()`][unit], which wraps the data in a [`Direct`].
 ///
 /// # Examples
 /// ```
@@ -68,7 +65,7 @@ pub trait Storage {
     type Stored<T>: ops::DerefMut<Target = T> + From<T>;
 }
 
-/// A storage that wraps its data in a [`Box`].
+/// A storage type that wraps its data in a [`Box`].
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 pub struct Boxed;
@@ -79,7 +76,7 @@ impl Storage for Boxed {
     type Stored<T> = Box<T>;
 }
 
-/// A storage that wraps its data in a [`Raw`].
+/// A storage type that wraps its data in a [`Direct`].
 impl Storage for () {
-    type Stored<T> = Raw<T>;
+    type Stored<T> = Direct<T>;
 }

@@ -4,7 +4,7 @@
 //! and removals are made at the opposite end.
 //
 
-use crate::mem::{Array, Storage};
+use crate::mem::{CoreArray, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -12,9 +12,9 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A queue, backed by an [`Array`].
+/// A queue, backed by a [`CoreArray`].
 pub struct ArrayQueue<T, S: Storage, const CAP: usize> {
-    pub(crate) array: Array<T, S, CAP>,
+    pub(crate) array: CoreArray<T, S, CAP>,
     pub(crate) len: usize,
     pub(crate) front: usize,
     pub(crate) back: usize,

@@ -8,13 +8,13 @@ use core::mem::{self, MaybeUninit};
 
 use core::marker::PhantomData;
 
-use crate::mem::{Array, Raw, Storage};
+use crate::mem::{CoreArray, Direct, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
 
 // ``
-impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
+impl<T, S: Storage, const LEN: usize> CoreArray<T, S, LEN> {
     pub fn new(array: [T; LEN]) -> Self {
         Self {
             array: array.into(),
@@ -24,19 +24,19 @@ impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
 }
 
 // `S:() + T:Clone`
-impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
+impl<T: Clone, const LEN: usize> CoreArray<T, (), LEN> {
     /// Returns an array, allocated in the stack,
     /// filled with `element`, cloned.
     ///
     /// # Examples
     /// ```
-    /// use ladata::mem::Array;
+    /// use ladata::mem::CoreArray;
     ///
-    /// let s = Array::<_, (), 16>::with('\0');
+    /// let s = CoreArray::<_, (), 16>::with('\0');
     /// ```
     pub fn with(element: T) -> Self {
         #[cfg(not(feature = "safe"))]
-        let data = Raw::new({
+        let data = Direct::new({
             let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
 
             for i in &mut arr[..] {
@@ -51,7 +51,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
         });
 
         #[cfg(feature = "safe")]
-        let data = Raw::new(core::array::from_fn(|_| element.clone()));
+        let data = Direct::new(core::array::from_fn(|_| element.clone()));
 
         Self {
             array: data,
@@ -63,7 +63,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
+impl<T: Clone, const LEN: usize> CoreArray<T, Boxed, LEN> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.
     ///
@@ -110,14 +110,14 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
 }
 
 // `T: PartialEq`
-impl<T: PartialEq, S: Storage, const CAP: usize> Array<T, S, CAP> {
+impl<T: PartialEq, S: Storage, const CAP: usize> CoreArray<T, S, CAP> {
     /// Returns true if the array contains `element`.
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Array;
+    /// use ladata::all::CoreArray;
     ///
-    /// let a = Array::<_, (), 5>::new([5, 78, 42, 33, 9]);
+    /// let a = CoreArray::<_, (), 5>::new([5, 78, 42, 33, 9]);
     ///
     /// assert![a.contains(&9)];
     /// assert![!a.contains(&8)];
@@ -128,7 +128,7 @@ impl<T: PartialEq, S: Storage, const CAP: usize> Array<T, S, CAP> {
 }
 
 // ``
-impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
+impl<T, S: Storage, const LEN: usize> CoreArray<T, S, LEN> {
     /// Returns the number of elements in the array.
     #[inline]
     pub const fn len(&self) -> usize {

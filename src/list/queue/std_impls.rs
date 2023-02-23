@@ -5,7 +5,7 @@
 
 use core::fmt;
 
-use super::{Array, ArrayQueue, Storage};
+use super::{ArrayQueue, CoreArray, Storage};
 use crate::list::{ArrayDeque, ArrayStack};
 
 #[cfg(feature = "std")]
@@ -93,7 +93,7 @@ impl<T: Default, const CAP: usize> Default for ArrayQueue<T, (), CAP> {
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             front: 0,
             back: 0,
             len: 0,
@@ -116,7 +116,7 @@ impl<T: Default, const CAP: usize> Default for ArrayQueue<T, Boxed, CAP> {
     /// ```
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             front: 0,
             back: 0,
             len: 0,

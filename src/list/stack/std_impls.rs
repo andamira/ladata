@@ -5,7 +5,7 @@
 
 use core::fmt;
 
-use super::{Array, ArrayStack, Storage};
+use super::{ArrayStack, CoreArray, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -66,7 +66,7 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, (), CAP> {
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             len: 0,
         }
     }
@@ -87,7 +87,7 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, Boxed, CAP> {
     /// ```
     fn default() -> Self {
         Self {
-            array: Array::default(),
+            array: CoreArray::default(),
             len: 0,
         }
     }
