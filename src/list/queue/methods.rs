@@ -166,7 +166,7 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Extends the queue from an iterator.
     ///
-    /// `( a … b -- a … b c d e f )` for [c d e f]
+    /// `( 1 2 -- 1 2 3 4 5 6 )` for `[3 4 5 6]`
     ///
     /// # Errors
     /// Errors if the queue becomes full before the iterator finishes.
@@ -175,8 +175,8 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     /// ```
     /// use ladata::list::Queue;
     ///
-    /// let mut q = Queue::<_, 6>::from([1, 2, 3]);
-    /// q.extend([4, 5, 6, 7, 8]);
+    /// let mut q = Queue::<_, 6>::from([1, 2]);
+    /// q.extend([3, 4, 5, 6]);
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6])];
     /// ```
     pub fn extend<I>(&mut self, iterator: I) -> Result<()>
@@ -198,7 +198,7 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Pushes a new element to the back of the queue.
     ///
-    /// `( a … b -- a … b c )`
+    /// `( 1 2 -- 1 2 3 )`
     ///
     /// # Errors
     /// Errors if the queue is full.
@@ -248,6 +248,8 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Returns a shared reference to the front element.
     ///
+    /// `( 1 -- 1 )`
+    ///
     /// # Errors
     /// Errors if the queue is empty.
     ///
@@ -271,6 +273,8 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     }
 
     /// Returns an exclusive reference to the front element.
+    ///
+    /// `( 1 -- 1 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -296,6 +300,8 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Returns a shared reference to the `nth` front element.
     ///
+    /// `( 1 -- 1 )`
+    ///
     /// # Errors
     /// Errors if the queue doesn't have at least `nth` elements.
     ///
@@ -319,6 +325,8 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     }
 
     /// Returns an exclusive reference to the `nth` front element.
+    ///
+    /// `( 1 -- 1 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least `nth` elements.
@@ -346,7 +354,7 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Clears the queue.
     ///
-    /// `( a … b -- )`
+    /// `( 1 2 3 4 -- )`
     ///
     /// # Examples
     /// ```
@@ -366,7 +374,7 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Pops the front element.
     ///
-    /// `( a … b -- … b )`
+    /// `( 1 2 3 -- 2 3 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -410,7 +418,7 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 impl<T: Clone, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     /// Pops the front element.
     ///
-    /// `( a … b -- … b )`
+    /// `( 1 2 3 -- 2 3 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.

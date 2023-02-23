@@ -187,7 +187,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Peeks the top stack element.
     ///
-    /// `( a -- a )`
+    /// `( 1 -- 1 )`
     ///
     /// Returns a shared reference to the top stack element.
     ///
@@ -213,7 +213,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Mutably peeks the top stack element.
     ///
-    /// `( a -- a )`
+    /// `( 1 -- 1 )`
     ///
     /// Returns an exclusive reference to the top stack element.
     ///
@@ -239,7 +239,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Peeks the `nth` element from the top of the stack.
     ///
-    /// `( a -- a )`
+    /// `( 1 -- 1 )`
     ///
     /// Returns a shared reference to the `nth` element,
     /// starting from 0 for the top, 1 for the next-of-stack, etc.
@@ -267,7 +267,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Mutably peeks the `nth` element from the top of the stack.
     ///
-    /// `( a -- a )`
+    /// `( 1 -- 1 )`
     ///
     /// Returns an exclusive reference to the `nth` element,
     /// starting from 0 for the top, 1 for the next-of-stack, etc.
@@ -295,7 +295,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Swaps the top two stack elements.
     ///
-    /// `( a b -- b a )`
+    /// `( 1 2 -- 2 1 )`
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 2 elements.
@@ -320,7 +320,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Swaps the top two pair stack elements.
     ///
-    /// `( a b c d -- c d a b )`
+    /// `( 1 2 3 4 -- 3 4 1 2 )`
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 4 elements.
@@ -346,7 +346,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Clears the stack.
     ///
-    /// `( a b c -- )`
+    /// `( 1 2 3 -- )`
     ///
     /// # Examples
     /// ```
@@ -362,7 +362,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Drops the top stack element.
     ///
-    /// `( a b -- a )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the stack is empty.
@@ -385,9 +385,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
         }
     }
 
-    /// Drops the top `nth` stack element.
+    /// Drops the top `n` stack elements.
     ///
-    /// `( a b c d -- a )` for nth == 3
+    /// `( 1 2 3 4 -- 1 )` for `n == 3`
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least `nth` elements.
@@ -397,11 +397,11 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// use ladata::list::Stack;
     ///
     /// let mut s = Stack::<_, 4>::from([1, 2, 3, 4]);
-    /// s.drop_nth(3);
+    /// s.drop_n(3);
     /// assert_eq![s.as_slice(), &[1]];
     /// ```
     #[inline]
-    pub fn drop_nth(&mut self, nth: usize) -> Result<()> {
+    pub fn drop_n(&mut self, nth: usize) -> Result<()> {
         if self.len() < nth {
             Err(Error::NotEnoughElements(nth))
         } else {
@@ -412,7 +412,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Drops the next of stack element.
     ///
-    /// `( a b -- b )`
+    /// `( 1 2 -- 2 )`
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 2 elements.
@@ -438,7 +438,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Drops the pair of next stack elements.
     ///
-    /// `( a b c d -- c d )`
+    /// `( 1 2 3 4 -- 3 4 )`
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 4 elements.
@@ -465,7 +465,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Rotates the top three stack elements, clockwise.
     ///
-    /// `( a b c -- b c a ) `
+    /// `( 1 2 3 -- 2 3 1 ) `
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 3 elements.
@@ -492,7 +492,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Rotates the top three stack elements, counter-clockwise.
     ///
-    /// `( a b c -- c a b ) `
+    /// `( 1 2 3 -- 3 1 2 ) `
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 3 elements.
@@ -519,7 +519,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Rotates the top six stack elements, clockwise, two times.
     ///
-    /// `( a b c d e f -- c d e f a b ) `
+    /// `( 1 2 3 4 5 6 -- 3 4 5 6 1 2 ) `
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 6 elements.
@@ -546,7 +546,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Rotates the top six stack elements, counter-clockwise, two times.
     ///
-    /// `( a b c d e f -- e f a b c d ) `
+    /// `( 1 2 3 4 5 6 -- 5 6 1 2 3 4 ) `
     ///
     /// # Errors
     /// Errors if the stack doesn't contain at least 6 elements.
@@ -572,6 +572,8 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     }
 
     /// Pushes a new element to the top of the stack.
+    ///
+    /// `( 1 -- 1 2 )`
     ///
     /// # Errors
     /// Errors if the stack is full.
@@ -601,7 +603,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Pops the top stack element.
     ///
-    /// `( a b -- a )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the stack is empty.
@@ -636,7 +638,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// Pops the top stack element.
     ///
-    /// `( a b -- a )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the stack is empty.
@@ -667,7 +669,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the top stack element.
     ///
-    /// `( a -- a a )`
+    /// `( 1 -- 1 1 )`
     ///
     /// # Errors
     /// Errors if the stack is either empty or full.
@@ -697,7 +699,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the top stack pair of elements.
     ///
-    /// `( a b -- a b a b )`
+    /// `( 1 2 -- 1 2 1 2 )`
     ///
     /// # Errors
     /// Errors if the stack doesn't have at least 2 elements,
@@ -731,7 +733,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the next of stack element to the top.
     ///
-    /// `( a b -- a b a )`
+    /// `( 1 2 -- 1 2 1 )`
     ///
     /// # Errors
     /// Errors stack doesn't have at least 2 elements,
@@ -762,7 +764,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the next of stack pair of elements to the top.
     ///
-    /// `( a b c d -- a b c d a b )`
+    /// `( 1 2 3 4 -- 1 2 3 4 1 2 )`
     ///
     /// # Errors
     /// Errors stack doesn't have at least 4 elements,
@@ -796,7 +798,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the top element before the next of stack element.
     ///
-    /// `( a b -- b a b )`
+    /// `( 1 2 -- 2 1 2 )`
     ///
     /// # Errors
     /// Errors stack doesn't have at least 2 elements,
@@ -829,7 +831,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Duplicates the top pair of elements before the next of stack pair of elements.
     ///
-    /// `( a b c d -- c d a b c d )`
+    /// `( 1 2 3 4 -- 3 4 1 2 3 4 )`
     ///
     /// # Errors
     /// Errors stack doesn't have at least 4 elements,
@@ -918,7 +920,7 @@ impl<T: Default, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// Drops the top of stack element,
     /// replacing the underlying data with the default value.
     ///
-    /// `( a b -- a )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the stack is empty.

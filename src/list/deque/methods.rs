@@ -171,7 +171,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Extends the back of the deque from an iterator.
     ///
-    /// `( a … b -- a … b c d e f )` for [c d e f]
+    /// `( 1 2 -- 1 2 3 4 5 6)` for `[3 4 5 6]`
     ///
     /// # Errors
     /// Errors if the deque becomes full before the iterator finishes.
@@ -201,7 +201,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Extends the front of the queue from an iterator.
     ///
-    /// `( a … b -- f e d c a … b )` for [c d e f]
+    /// `( 1 2 -- 6 5 4 3 1 2 )` for `[3 4 5 6]`
     ///
     /// # Errors
     /// Errors if the queue becomes full before the iterator finishes.
@@ -233,7 +233,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Pushes a new element to the front of the queue.
     ///
-    /// `( a … b -- c a … b )`
+    /// `( 1 2 -- 3 1 2 )`
     ///
     /// # Errors
     /// Errors if the queue is full.
@@ -275,7 +275,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Pushes a new element to the back of the queue.
     ///
-    /// `( a … b -- a … b c )`
+    /// `( 1 2 -- 1 2 3 )`
     ///
     /// # Errors
     /// Errors if the queue is full.
@@ -520,7 +520,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Pops the front element.
     ///
-    /// `( a … b -- … b )`
+    /// `( 1 2 -- 2 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -563,7 +563,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Pops the back element.
     ///
-    /// `( a … b -- a … )`
+    /// `( 1 2-- 1 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -599,7 +599,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Clears the queue.
     ///
-    /// `( a … b -- )`
+    /// `( 1 2 -- )`
     ///
     /// # Examples
     /// ```
@@ -619,7 +619,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Drops the back element.
     ///
-    /// `( a … b -- a … )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -646,7 +646,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Drops the front element.
     ///
-    /// `( a … b -- … b )`
+    /// `( 1 2 -- 2 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -671,9 +671,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Drops `nth` elements from the back.
+    /// Drops `n` elements from the back.
     ///
-    /// `( a … b c d -- a … )` for nth=3
+    /// `( 1 2 3 4 -- 1 )` for `n = 3`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least `nth` elements.
@@ -684,11 +684,11 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
-    /// q.drop_nth_back(3)?;
+    /// q.drop_n_back(3)?;
     /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
     /// ```
-    pub fn drop_nth_back(&mut self, nth: usize) -> Result<()> {
+    pub fn drop_n_back(&mut self, nth: usize) -> Result<()> {
         if self.len() <= nth {
             Err(Error::NotEnoughElements(nth))
         } else {
@@ -698,9 +698,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Drops `nth` elements from the back.
+    /// Drops `n` elements from the front.
     ///
-    /// `( a … b c d -- a … )` for nth=3
+    /// `( 1 2 3 4 -- 4 )` for `n = 3`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least `nth` elements.
@@ -711,11 +711,11 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
-    /// q.drop_nth_front(3)?;
+    /// q.drop_n_front(3)?;
     /// assert_eq![q.to_array(), Some([4])];
     /// # Ok(()) }
     /// ```
-    pub fn drop_nth_front(&mut self, nth: usize) -> Result<()> {
+    pub fn drop_n_front(&mut self, nth: usize) -> Result<()> {
         if self.len() <= nth {
             Err(Error::NotEnoughElements(nth))
         } else {
@@ -729,7 +729,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the first two elements at the front of the queue.
     ///
-    /// `( a b … c d -- b a … c d )`
+    /// `( 1 2 3 4 -- 2 1 3 4 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 2 elements.
@@ -766,7 +766,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the last two elements at the back of the queue.
     ///
-    /// `( a b … c d -- a b … d c )`
+    /// `( 1 2 3 4 -- 1 2 4 3 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 2 elements.
@@ -803,7 +803,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the front and back elements.
     ///
-    /// `( a b … c d -- d b … c a )`
+    /// `( 1 2 3 4 -- 4 2 3 1 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 2 elements.
@@ -830,7 +830,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the first two pairs of elements at the front of the queue.
     ///
-    /// `( a b c d … e f g h -- c d a b … e f g h )`
+    /// `( 1 2 3 4 5 6 7 8 -- 3 4 1 2 5 6 7 8 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 4 elements.
@@ -873,7 +873,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the last two pairs of elements at the back of the queue.
     ///
-    /// `( a b c d … e f g h -- a b c d … g h e f )`
+    /// `( 1 2 3 4 5 6 7 8 -- 1 2 3 4 7 8 5 6 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 2 elements.
@@ -915,7 +915,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Swaps the front and back pairs of elements.
     ///
-    /// `( a b c d … e f g h -- g h c d … e f a b )`
+    /// `( 1 2 3 4 5 6 7 8 -- 7 8 3 4 5 6 1 2 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't contain at least 4 elements.
@@ -924,9 +924,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// ```
     /// use ladata::list::Deque;
     ///
-    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_ends();
-    /// assert_eq![q.to_array(), Some([8, 9, 3, 4, 5, 6, 7, 1, 2])];
+    /// assert_eq![q.to_array(), Some([7, 8, 3, 4, 5, 6, 1, 2])];
     /// ```
     #[inline]
     pub fn swap2_ends(&mut self) -> Result<()> {
@@ -947,7 +947,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Rotates all the queued elements one place to the right.
     ///
-    /// `( a b … c d --  d a b … c )`
+    /// `( 1 2 3 4 --  4 1 2 3 )`
     ///
     /// # Examples
     /// ```
@@ -971,9 +971,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Rotates all the queued elements `nth` places to the right.
+    /// Rotates all the queued elements `n` places to the right.
     ///
-    /// `( a b … c d --  b … c d a )` for nth=3
+    /// `( 1 2 3 4 --  2 3 4 1 )` for `n = 3`
     ///
     /// # Examples
     /// ```
@@ -984,11 +984,11 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
-    /// q.rot_right_nth(3);
+    /// q.rot_right_n(3);
     /// assert_eq![q.to_array(), Some([2, 3, 4, 1])];
     /// # Ok(()) }
     /// ```
-    pub fn rot_right_nth(&mut self, nth: usize) {
+    pub fn rot_right_n(&mut self, nth: usize) {
         // don't rotate more than necessary
         let nth = nth % self.len();
         for _ in 0..nth {
@@ -998,9 +998,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Rotates the queued elements one place to the left.
+    /// Rotates all the queued elements one place to the left.
     ///
-    /// `( a b … c d --  b … c d a )`
+    /// `( 1 2 3 4 --  2 3 4 1 )`
     ///
     /// # Examples
     /// ```
@@ -1024,9 +1024,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Rotates the queued elements `nth` places to the left.
+    /// Rotates all the queued elements `n` places to the left.
     ///
-    /// `( a b … c d --  d a b … c )` for nth=3
+    /// `( 1 2 3 4 --  4 1 2 3 )` for `nth = 3`
     ///
     /// # Examples
     /// ```
@@ -1037,11 +1037,11 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
-    /// q.rot_left_nth(3);
+    /// q.rot_left_n(3);
     /// assert_eq![q.to_array(), Some([4, 1, 2, 3])];
     /// # Ok(()) }
     /// ```
-    pub fn rot_left_nth(&mut self, nth: usize) {
+    pub fn rot_left_n(&mut self, nth: usize) {
         // don't rotate more than necessary
         let nth = nth % self.len();
         for _ in 0..nth {
@@ -1056,7 +1056,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// Pops the front element.
     ///
-    /// `( a … b -- … b )`
+    /// `( 1 2 -- 2 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -1096,7 +1096,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Pops the back element.
     ///
-    /// `( a … b -- a … )`
+    /// `( 1 2 -- 1 )`
     ///
     /// # Errors
     /// Errors if the queue is empty.
@@ -1219,9 +1219,9 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /* dup */
 
-    /// Duplicates the back element.
+    /// Duplicates the back element at the back
     ///
-    /// `( a … b -- a … b b )`
+    /// `( 1 2 -- 1 2 2 )`
     ///
     /// # Errors
     /// Errors if the queue is either empty or full.
@@ -1248,9 +1248,9 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
         }
     }
 
-    /// Duplicates the front element.
+    /// Duplicates the front element at the front.
     ///
-    /// `( a … b -- a a … b )`
+    /// `( 1 2 -- 1 1 2 )`
     ///
     /// # Errors
     /// Errors if the queue is either empty or full.
@@ -1279,7 +1279,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the back pair of elements, at the back.
     ///
-    /// `( a b … c d -- a b … c d c d)`
+    /// `( 1 2 3 4 -- 1 2 3 4 3 4)`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 2 elements,
@@ -1312,7 +1312,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the front pair of elements, at the front.
     ///
-    /// `( a b … c d -- a b a b … c d)`
+    /// `( 1 2 3 4 -- 1 2 1 2 3 4)`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 2 elements,
@@ -1347,7 +1347,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the second back element, at the back.
     ///
-    /// `( a b … c d -- a b … c d c )`
+    /// `( 1 2 3 4 -- 1 2 3 4 3 )`
     ///
     /// # Errors
     /// Errors if the queue is full, or doesn't have at least 2 elements.
@@ -1376,7 +1376,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the second front element, at the front.
     ///
-    /// `( a b … c d -- b a b … c d )`
+    /// `( 1 2 3 4 -- 2 1 2 3 4 )`
     ///
     /// # Errors
     /// Errors if the queue is full, or doesn't have at least 2 elements.
@@ -1405,7 +1405,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the second back pair of elements, at the back.
     ///
-    /// `( a b c d … e f g h -- a b c d … e f g h e f )`
+    /// `( 1 2 3 4 5 6 7 8 -- 1 2 3 4 5 6 7 8 5 6 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 4 elements,
@@ -1438,7 +1438,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the second front pair of elements, at the front.
     ///
-    /// `( a b c d … e f g h -- c d a b c d … e f g h )`
+    /// `( 1 2 3 4 5 6 7 8 -- 3 4 1 2 3 4 5 6 7 8 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 4 elements,
@@ -1473,7 +1473,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the back element, before the second back element.
     ///
-    /// `( a b … c d -- a b … d c d )`
+    /// `( 1 2 3 4 -- 1 2 4 3 4 )`
     ///
     /// # Errors
     /// Errors if the queue is full, or doesn't have at least 2 elements.
@@ -1504,7 +1504,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Duplicates the front element, after the second front element.
     ///
-    /// `( a b … c d -- a b a … c d )`
+    /// `( 1 2 3 4 -- 1 2 1 3 4 )`
     ///
     /// # Errors
     /// Errors if the queue is full, or doesn't have at least 2 elements.
@@ -1536,7 +1536,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// Duplicates the back pair of elements,
     /// before the second back pair of elements.
     ///
-    /// `( a b c d … e f g h -- a b c d … g h e f g h )`
+    /// `( 1 2 3 4 5 6 7 8 -- 1 2 3 4 7 8 5 6 7 8 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 4 elements,
@@ -1571,7 +1571,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// Duplicates the front pair of elements,
     /// after the second front pair of elements.
     ///
-    /// `( a b c d … e f g h -- a b c d a b … e f g h )`
+    /// `( 1 2 3 4 5 6 7 8 -- 1 2 3 4 1 2 5 6 7 8 )`
     ///
     /// # Errors
     /// Errors if the queue doesn't have at least 4 elements,
