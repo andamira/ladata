@@ -6,10 +6,11 @@
 #[cfg(test)]
 mod tests;
 
-mod builder;
-pub use builder::{LinkedList16, LinkedList32, LinkedList8};
+mod doubly;
+pub use doubly::{DoublyLinked16, DoublyLinked32, DoublyLinked8};
 
-/// A doubly linked list, re-exported from [`std`].
+/// A growable doubly linked list, re-exported from [`std`].
+///
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-pub use std::collections::LinkedList as DoublyLinkedList;
+pub use std::collections::LinkedList as GrowDoublyLinked;

@@ -38,6 +38,9 @@ pub enum LadataError {
 
     /// The dimensions given did not match the elements provided
     DimensionMismatch,
+
+    /// The node is empty.
+    EmptyNode,
 }
 
 /// impl Display & Error
@@ -75,6 +78,7 @@ mod std_impls {
                     "Indices 2d {i}, {j} are out of bounds for a chunk of length {k}."
                 ),
                 LadataError::DimensionMismatch => write!(f, "Dimension Mismatch."),
+                LadataError::EmptyNode => write!(f, "The node is empty."),
             }
         }
     }
