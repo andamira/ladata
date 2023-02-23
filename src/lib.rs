@@ -44,6 +44,7 @@
 #![cfg_attr(feature = "safe", forbid(unsafe_code))]
 #![cfg_attr(feature = "nightly", feature(doc_cfg))]
 
+pub mod adt;
 pub mod error;
 pub mod grid;
 pub mod list;
@@ -53,8 +54,11 @@ pub mod mem;
 // pub mod tree;
 pub mod unit;
 
-/// Everything re-exported.
+/// Everything is directly available in here.
 pub mod all {
+    #[doc(inline)]
+    pub use super::adt::*;
+
     #[doc(inline)]
     pub use super::error::*;
 

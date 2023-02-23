@@ -1,6 +1,6 @@
 // ladata::mem
 //
-//! Memory-management structures.
+//! Memory-management.
 //!
 //! The trait [`Storage`] allows data structure implementations to have
 //! methods (specially constructors) be specialized by storage type.

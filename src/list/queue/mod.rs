@@ -28,7 +28,7 @@ pub struct ArrayQueue<T, S: Storage, const CAP: usize> {
 // }
 
 /// An [`ArrayQueue`] stored in the stack.
-pub type Queue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
+pub type DirectQueue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
 
 /// An [`ArrayQueue`] stored in the heap.
 #[cfg(feature = "std")]
@@ -48,9 +48,9 @@ impl<'s, T, S: Storage, const CAP: usize> Iterator for QueueIter<'s, T, S, CAP> 
     ///
     /// # Example
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::all::DirectQueue;
     ///
-    /// let mut q = Queue::<i32, 4>::from([1, 2]);
+    /// let mut q = DirectQueue::<i32, 4>::from([1, 2]);
     /// q.pop();
     /// q.push(3);
     /// q.pop();

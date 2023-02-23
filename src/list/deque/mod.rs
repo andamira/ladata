@@ -14,11 +14,11 @@ mod std_impls;
 
 /// A double-ended queue, backed by a [`CoreArray`].
 ///
-/// It has the [`Queue`] and [`Stack`] methods implemented for both the front
-/// and the back sides.
+/// It has the [`DirectQueue`] and [`DirectStack`] methods implemented for both
+/// the front and the back sides.
 ///
-/// [`Queue`]: crate::all::Queue
-/// [`Stack`]: crate::all::Stack
+/// [`DirectQueue`]: crate::all::DirectQueue
+/// [`DirectStack`]: crate::all::DirectStack
 pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
     pub(crate) array: CoreArray<T, S, CAP>,
     pub(crate) len: usize,
@@ -27,7 +27,7 @@ pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
 }
 
 /// An [`ArrayDeque`] stored in the stack.
-pub type Deque<T, const CAP: usize> = ArrayDeque<T, (), CAP>;
+pub type DirectDeque<T, const CAP: usize> = ArrayDeque<T, (), CAP>;
 
 /// An [`ArrayDeque`] stored in the heap.
 #[cfg(feature = "std")]
@@ -46,9 +46,9 @@ impl<'s, T, S: Storage, const CAP: usize> Iterator for DequeIter<'s, T, S, CAP> 
     ///
     /// # Example
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::all::DirectDeque;
     ///
-    /// let mut dq = Deque::<i32, 4>::from([1, 2]);
+    /// let mut dq = DirectDeque::<i32, 4>::from([1, 2]);
     /// dq.pop_front();
     /// dq.push_back(3);
     /// dq.pop_front();
@@ -82,9 +82,9 @@ impl<'s, T, S: Storage, const CAP: usize> DoubleEndedIterator for DequeIter<'s, 
     ///
     /// # Example
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::all::DirectDeque;
     ///
-    /// let mut dq = Deque::<i32, 4>::from([1, 2]);
+    /// let mut dq = DirectDeque::<i32, 4>::from([1, 2]);
     /// dq.pop_front();
     /// dq.push_back(3);
     /// dq.pop_front();

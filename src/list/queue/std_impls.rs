@@ -134,9 +134,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let s: Queue<_, 3> = [1, 2, 3].into();
+    /// let s: DirectQueue<_, 3> = [1, 2, 3].into();
     /// ```
     fn from(iterator: I) -> ArrayQueue<T, (), CAP> {
         let mut s = ArrayQueue::<T, (), CAP>::default();

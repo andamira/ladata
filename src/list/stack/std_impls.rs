@@ -103,9 +103,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::all::DirectStack;
     ///
-    /// let s: Stack<_, 3> = [1, 2, 3].into();
+    /// let s: DirectStack<_, 3> = [1, 2, 3].into();
     /// ```
     fn from(iterator: I) -> ArrayStack<T, (), CAP> {
         let mut s = ArrayStack::<T, (), CAP>::default();

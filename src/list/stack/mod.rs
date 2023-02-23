@@ -20,7 +20,7 @@ pub struct ArrayStack<T, S: Storage, const CAP: usize> {
 }
 
 /// An [`ArrayStack`] stored in the stack.
-pub type Stack<T, const CAP: usize> = ArrayStack<T, (), CAP>;
+pub type DirectStack<T, const CAP: usize> = ArrayStack<T, (), CAP>;
 
 /// An [`ArrayStack`] stored in the heap.
 #[cfg(feature = "std")]
@@ -40,9 +40,9 @@ impl<'s, T, S: Storage, const CAP: usize> Iterator for StackIter<'s, T, S, CAP> 
     ///
     /// # Example
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::all::DirectStack;
     ///
-    /// let s = Stack::<i32, 4>::from([1, 2]);
+    /// let s = DirectStack::<i32, 4>::from([1, 2]);
     ///
     /// let mut si = s.iter();
     /// assert_eq![Some(&1), si.next()];

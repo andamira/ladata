@@ -22,9 +22,9 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::stack::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 16>::new('\0');
+    /// let s = DirectStack::<_, 16>::new('\0');
     /// ```
     pub fn new(element: T) -> Self {
         Self {
@@ -43,7 +43,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::BoxedStack;
+    /// use ladata::list::BoxedStack;
     ///
     /// let mut s = BoxedStack::<_, 100>::new(0);
     /// ```
@@ -67,9 +67,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<i32, 8>::default();
+    /// let s = DirectStack::<i32, 8>::default();
     /// assert![s.is_empty()];
     /// ```
     #[inline]
@@ -81,9 +81,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 3>::from([1, 2, 3]);
+    /// let s = DirectStack::<_, 3>::from([1, 2, 3]);
     /// assert![s.is_full()];
     /// ```
     #[inline]
@@ -95,9 +95,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<i32, 3>::default();
+    /// let s = DirectStack::<i32, 3>::default();
     /// assert_eq![3, s.capacity()];
     /// ```
     #[inline]
@@ -107,10 +107,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 
     /// Returns the stack's remaining capacity.
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<i32, 3>::default();
+    /// let mut s = DirectStack::<i32, 3>::default();
     /// assert_eq![3, s.remaining_capacity()];
     /// s.push(1)?;
     /// assert_eq![2, s.remaining_capacity()];
@@ -128,9 +128,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 3>::from([1, 2, 3]);
+    /// let s = DirectStack::<_, 3>::from([1, 2, 3]);
     /// assert_eq![s.as_slice(), &[1, 2, 3]];
     /// ```
     #[inline]
@@ -142,9 +142,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 3>::from([1, 2, 3]);
+    /// let mut s = DirectStack::<_, 3>::from([1, 2, 3]);
     /// assert_eq![s.as_mut_slice(), &mut [1, 2, 3]];
     /// ```
     #[inline]
@@ -159,9 +159,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 5>::default();
+    /// let mut s = DirectStack::<_, 5>::default();
     /// s.extend([1, 2, 3]);
     /// assert_eq![s.as_slice(), &[1, 2, 3]];
     ///
@@ -196,9 +196,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 2>::from([1, 2]);
+    /// let s = DirectStack::<_, 2>::from([1, 2]);
     /// assert_eq![s.peek(), Ok(&2)];
     /// ```
     #[inline]
@@ -222,9 +222,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// assert_eq![s.peek_mut(), Ok(&mut 2)];
     /// ```
     #[inline]
@@ -249,9 +249,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 5>::from([1, 2, 3, 4, 5]);
+    /// let s = DirectStack::<_, 5>::from([1, 2, 3, 4, 5]);
     /// assert_eq![s.peek_nth(0), Ok(&5)];
     /// assert_eq![s.peek_nth(4), Ok(&1)];
     /// ```
@@ -277,9 +277,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 5>::from([1, 2, 3, 4, 5]);
+    /// let mut s = DirectStack::<_, 5>::from([1, 2, 3, 4, 5]);
     /// assert_eq![s.peek_nth_mut(0), Ok(&mut 5)];
     /// assert_eq![s.peek_nth_mut(4), Ok(&mut 1)];
     /// ```
@@ -302,9 +302,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// s.swap();
     /// assert_eq![s.as_slice(), &[2, 1]];
     /// ```
@@ -327,9 +327,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<_, 4>::from([1, 2, 3, 4]);
     /// s.swap2();
     /// assert_eq![s.as_slice(), &[3, 4, 1, 2]];
     /// ```
@@ -350,9 +350,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<_, 8>::from([1, 2, 3, 4]);
     /// s.clear();
     /// assert![s.is_empty()];
     /// ```
@@ -369,9 +369,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// s.drop();
     /// assert_eq![s.as_slice(), &[1]];
     /// ```
@@ -394,9 +394,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<_, 4>::from([1, 2, 3, 4]);
     /// s.drop_n(3);
     /// assert_eq![s.as_slice(), &[1]];
     /// ```
@@ -419,9 +419,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// s.nip();
     /// assert_eq![s.as_slice(), &[2]];
     /// ```
@@ -445,9 +445,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<_, 8>::from([1, 2, 3, 4]);
     /// s.nip2();
     /// assert_eq![s.as_slice(), &[3, 4]];
     /// ```
@@ -472,10 +472,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 3>::from(['a', 'b', 'c']);
+    /// let mut s = DirectStack::<_, 3>::from(['a', 'b', 'c']);
     /// s.rot()?;
     /// assert_eq![s.as_slice(), &['b', 'c', 'a']];
     /// # Ok(()) }
@@ -499,10 +499,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 3>::from(['a', 'b', 'c']);
+    /// let mut s = DirectStack::<_, 3>::from(['a', 'b', 'c']);
     /// s.rot_cc()?;
     /// assert_eq![s.as_slice(), &['c', 'a', 'b']];
     /// # Ok(()) }
@@ -526,10 +526,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
+    /// let mut s = DirectStack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
     /// s.rot2()?;
     /// assert_eq![s.as_slice(), &['c', 'd', 'e', 'f', 'a', 'b']];
     /// # Ok(()) }
@@ -553,10 +553,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
+    /// let mut s = DirectStack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
     /// s.rot2()?;
     /// assert_eq![s.as_slice(), &['c', 'd', 'e', 'f', 'a', 'b']];
     /// # Ok(()) }
@@ -580,10 +580,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<u8, 2>::default();
+    /// let mut s = DirectStack::<u8, 2>::default();
     /// s.push(1)?;
     /// s.push(2)?;
     /// assert![s.push(3).is_err()];
@@ -610,10 +610,10 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// assert_eq![2, s.pop()?];
     /// assert_eq![1, s.pop()?];
     /// assert![s.is_empty()];
@@ -645,10 +645,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// assert_eq![2, s.pop()?];
     /// assert_eq![1, s.pop()?];
     /// assert![s.is_empty()];
@@ -676,10 +676,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<u8, 2>::from([1]);
+    /// let mut s = DirectStack::<u8, 2>::from([1]);
     /// s.dup()?;
     /// assert_eq![&[1, 1], s.as_slice()];
     /// # Ok(()) }
@@ -707,10 +707,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<u8, 5>::from([1, 2]);
+    /// let mut s = DirectStack::<u8, 5>::from([1, 2]);
     /// s.dup2()?;
     /// assert_eq![&[1, 2, 1, 2], s.as_slice()];
     /// # Ok(()) }
@@ -741,10 +741,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut s = Stack::<u8, 3>::from([1, 2]);
+    /// let mut s = DirectStack::<u8, 3>::from([1, 2]);
     /// s.over()?;
     /// assert_eq![&[1, 2, 1], s.as_slice()];
     /// # Ok(()) }
@@ -772,10 +772,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut s = Stack::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<u8, 6>::from([1, 2, 3, 4]);
     /// s.over2()?;
     /// assert_eq![&[1, 2, 3, 4, 1, 2], s.as_slice()];
     /// # Ok(()) }
@@ -806,10 +806,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()>  {
     ///
-    /// let mut s = Stack::<u8, 3>::from([1, 2]);
+    /// let mut s = DirectStack::<u8, 3>::from([1, 2]);
     /// s.tuck()?;
     /// assert_eq![&[2, 1, 2], s.as_slice()];
     /// # Ok(()) }
@@ -839,10 +839,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     /// # fn main() -> ladata::all::LadataResult<()>  {
     ///
-    /// let mut s = Stack::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut s = DirectStack::<u8, 6>::from([1, 2, 3, 4]);
     /// s.tuck2()?;
     /// assert_eq![&[3, 4, 1, 2, 3, 4], s.as_slice()];
     /// # Ok(()) }
@@ -876,9 +876,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 3>::from_array([1, 2, 3]);
+    /// let s = DirectStack::<_, 3>::from_array([1, 2, 3]);
     /// ```
     // IMPROVE?
     // - MAYBE arr: impl Into<[T; CAP]?> Even None…
@@ -903,9 +903,9 @@ impl<T: PartialEq, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let s = Stack::<_, 6>::from([5, 78, 42, 33, 9]);
+    /// let s = DirectStack::<_, 6>::from([5, 78, 42, 33, 9]);
     ///
     /// assert![s.contains(&9)];
     /// assert![!s.contains(&8)];
@@ -927,9 +927,9 @@ impl<T: Default, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Stack;
+    /// use ladata::list::DirectStack;
     ///
-    /// let mut s = Stack::<_, 2>::from([1, 2]);
+    /// let mut s = DirectStack::<_, 2>::from([1, 2]);
     /// s.drop_replace_default();
     /// assert_eq![s.as_slice(), &[1]];
     /// ```

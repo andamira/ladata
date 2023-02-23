@@ -37,7 +37,7 @@ where
     S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut debug = f.debug_struct(stringify![Deque]);
+        let mut debug = f.debug_struct(stringify![DirectDeque]);
         debug
             .field("CAP", &CAP)
             .field("len", &self.len)
@@ -130,9 +130,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::all::DirectDeque;
     ///
-    /// let s: Deque<_, 3> = [1, 2, 3].into();
+    /// let s: DirectDeque<_, 3> = [1, 2, 3].into();
     /// ```
     fn from(iterator: I) -> ArrayDeque<T, (), CAP> {
         let mut s = ArrayDeque::<T, (), CAP>::default();

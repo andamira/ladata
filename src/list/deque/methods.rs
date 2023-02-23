@@ -80,9 +80,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let q = Deque::<_, 3>::from_array([1, 2, 3]);
+    /// let q = DirectDeque::<_, 3>::from_array([1, 2, 3]);
     /// ```
     // TODO IMPROVE
     pub fn from_array(arr: [T; CAP]) -> ArrayDeque<T, S, CAP> {
@@ -104,9 +104,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let q = Deque::<i32, 8>::default();
+    /// let q = DirectDeque::<i32, 8>::default();
     /// assert![q.is_empty()];
     /// ```
     #[inline]
@@ -118,9 +118,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let q = Deque::<_, 3>::from([1, 2, 3]);
+    /// let q = DirectDeque::<_, 3>::from([1, 2, 3]);
     /// assert![q.is_full()];
     /// ```
     #[inline]
@@ -132,9 +132,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let q = Deque::<i32, 3>::default();
+    /// let q = DirectDeque::<i32, 3>::default();
     /// assert_eq![3, q.capacity()];
     /// ```
     #[inline]
@@ -144,10 +144,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 
     /// Returns the deque's remaining capacity.
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<i32, 3>::default();
+    /// let mut q = DirectDeque::<i32, 3>::default();
     /// assert_eq![3, q.remaining_capacity()];
     /// q.push_back(1)?;
     /// assert_eq![2, q.remaining_capacity()];
@@ -178,9 +178,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 6>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 6>::from([1, 2, 3]);
     /// q.extend_back([4, 5, 6, 7, 8]);
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6])];
     /// ```
@@ -208,9 +208,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 6>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 6>::from([1, 2, 3]);
     /// q.extend_front([4, 5, 6, 7, 8]);
     /// assert_eq![q.to_array(), Some([6, 5, 4, 1, 2, 3])];
     /// ```
@@ -240,10 +240,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 3>::default();
+    /// let mut q = DirectDeque::<u8, 3>::default();
     /// q.push_front(1)?;
     /// q.push_front(2)?;
     /// q.push_front(3)?;
@@ -282,10 +282,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 3>::default();
+    /// let mut q = DirectDeque::<u8, 3>::default();
     /// q.push_back(1)?;
     /// q.push_back(2)?;
     /// q.push_back(3)?;
@@ -331,10 +331,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&1, q.peek_front()?];
     /// # Ok(()) }
     /// ```
@@ -355,10 +355,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 1, q.peek_front_mut()?];
     /// # Ok(()) }
     /// ```
@@ -379,10 +379,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Deque::<_, 8>::from([1, 2, 3, 4]);
+    /// let q = DirectDeque::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&3, q.peek_nth_front(2)?];
     /// # Ok(()) }
     /// ```
@@ -403,10 +403,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&mut 3, q.peek_nth_front_mut(2)?];
     /// # Ok(()) }
     /// ```
@@ -427,10 +427,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&3, q.peek_back()?];
     /// # Ok(()) }
     /// ```
@@ -451,10 +451,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 3, q.peek_back_mut()?];
     /// # Ok(()) }
     /// ```
@@ -475,10 +475,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&1, q.peek_nth_back(2)?];
     /// # Ok(()) }
     /// ```
@@ -499,10 +499,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 1, q.peek_nth_back_mut(2)?];
     /// # Ok(()) }
     /// ```
@@ -527,10 +527,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop_front()?];
     /// assert_eq![2, q.pop_front()?];
     /// assert_eq![3, q.pop_front()?];
@@ -570,10 +570,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![3, q.pop_back()?];
     /// assert_eq![2, q.pop_back()?];
     /// assert_eq![1, q.pop_back()?];
@@ -603,9 +603,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3, 4]);
     /// q.clear();
     /// assert![q.is_empty()];
     /// ```
@@ -626,10 +626,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2]);
     /// q.drop_back()?;
     /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
@@ -653,10 +653,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2]);
     /// q.drop_front()?;
     /// assert_eq![q.to_array(), Some([2])];
     /// # Ok(()) }
@@ -680,10 +680,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_n_back(3)?;
     /// assert_eq![q.to_array(), Some([1])];
     /// # Ok(()) }
@@ -707,10 +707,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3, 4]);
     /// q.drop_n_front(3)?;
     /// assert_eq![q.to_array(), Some([4])];
     /// # Ok(()) }
@@ -736,9 +736,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_front();
     /// assert_eq![q.to_array(), Some([2, 1, 3, 4])];
     /// ```
@@ -773,9 +773,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 4>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<_, 4>::from([1, 2, 3, 4]);
     /// q.swap_back();
     /// assert_eq![q.to_array(), Some([1, 2, 4, 3])];
     /// ```
@@ -810,9 +810,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 6>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectDeque::<_, 6>::from([1, 2, 3, 4, 5]);
     /// q.swap_ends();
     /// assert_eq![q.to_array(), Some([5, 2, 3, 4, 1])];
     /// ```
@@ -837,9 +837,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
+    /// let mut q = DirectDeque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_front();
     /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 5, 6, 7, 8])];
     /// ```
@@ -880,9 +880,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
+    /// let mut q = DirectDeque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_back();
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 7, 8, 5, 6])];
     /// ```
@@ -922,9 +922,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let mut q = Deque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
+    /// let mut q = DirectDeque::<_, 16>::from([1, 2, 3, 4, 5, 6, 7, 8]);
     /// q.swap2_ends();
     /// assert_eq![q.to_array(), Some([7, 8, 3, 4, 5, 6, 1, 2])];
     /// ```
@@ -951,10 +951,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<i32, 8>::from([2, 3]);
+    /// let mut q = DirectDeque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -977,10 +977,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<i32, 8>::from([2, 3]);
+    /// let mut q = DirectDeque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -1004,10 +1004,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<i32, 8>::from([2, 3]);
+    /// let mut q = DirectDeque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -1030,10 +1030,10 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<i32, 8>::from([2, 3]);
+    /// let mut q = DirectDeque::<i32, 8>::from([2, 3]);
     /// q.push_front(1)?;
     /// q.push_back(4)?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4])];
@@ -1063,10 +1063,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop_front()?];
     /// assert_eq![2, q.pop_front()?];
     /// assert_eq![3, q.pop_front()?];
@@ -1103,10 +1103,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<_, 8>::from([1, 2, 3]);
     /// assert_eq![3, q.pop_back()?];
     /// assert_eq![2, q.pop_back()?];
     /// assert_eq![1, q.pop_back()?];
@@ -1133,10 +1133,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 5>::from([3, 4]);
+    /// let mut q = DirectDeque::<_, 5>::from([3, 4]);
     /// q.push_front(2)?;
     /// q.push_back(5)?;
     /// q.push_front(1)?;
@@ -1172,10 +1172,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Deque::<_, 5>::from([3, 4]);
+    /// let mut q = DirectDeque::<_, 5>::from([3, 4]);
     /// q.push_front(2)?;
     /// q.push_back(5)?;
     /// q.push_front(1)?;
@@ -1228,10 +1228,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 4>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<u8, 4>::from([1, 2, 3]);
     /// q.dup_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 3])];
     /// # Ok(()) }
@@ -1257,10 +1257,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 4>::from([1, 2, 3]);
+    /// let mut q = DirectDeque::<u8, 4>::from([1, 2, 3]);
     /// q.dup_front()?;
     /// assert_eq![q.to_array(), Some([1, 1, 2, 3])];
     /// # Ok(()) }
@@ -1287,10 +1287,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3, 4])];
     /// # Ok(()) }
@@ -1320,10 +1320,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 6>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<u8, 6>::from([1, 2, 3, 4]);
     /// q.dup2_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 1, 2, 3, 4])];
     /// # Ok(()) }
@@ -1354,10 +1354,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 3])];
     /// # Ok(()) }
@@ -1383,10 +1383,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4]);
     /// q.over_front()?;
     /// assert_eq![q.to_array(), Some([2, 1, 2, 3, 4])];
     /// # Ok(()) }
@@ -1413,10 +1413,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
+    /// let mut q = DirectDeque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6, 3, 4])];
     /// # Ok(()) }
@@ -1446,10 +1446,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
+    /// let mut q = DirectDeque::<u8, 8>::from([1, 2, 3, 4, 5, 6]);
     /// q.over2_front()?;
     /// assert_eq![q.to_array(), Some([3, 4, 1, 2, 3, 4, 5, 6])];
     /// # Ok(()) }
@@ -1480,10 +1480,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_back()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 5, 4, 5])];
     /// # Ok(()) }
@@ -1511,10 +1511,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 1, 3, 4, 5])];
     /// # Ok(()) }
@@ -1544,10 +1544,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_back()?;
     /// assert_eq![q.to_array(), Some([1, 4, 5, 2, 3, 4, 5])];
     /// # Ok(()) }
@@ -1579,10 +1579,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Deque::<u8, 7>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectDeque::<u8, 7>::from([1, 2, 3, 4, 5]);
     /// q.tuck2_front()?;
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 1, 2, 5])];
     /// # Ok(()) }
@@ -1610,9 +1610,9 @@ impl<T: PartialEq, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Deque;
+    /// use ladata::list::DirectDeque;
     ///
-    /// let dq = Deque::<_, 6>::from([5, 78, 42, 33, 9]);
+    /// let dq = DirectDeque::<_, 6>::from([5, 78, 42, 33, 9]);
     ///
     /// assert![dq.contains(&9)];
     /// assert![!dq.contains(&8)];

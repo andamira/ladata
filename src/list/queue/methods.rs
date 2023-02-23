@@ -99,9 +99,9 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let q = Queue::<i32, 8>::default();
+    /// let q = DirectQueue::<i32, 8>::default();
     /// assert![q.is_empty()];
     /// ```
     #[inline]
@@ -113,9 +113,9 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let q = Queue::<_, 3>::from([1, 2, 3]);
+    /// let q = DirectQueue::<_, 3>::from([1, 2, 3]);
     /// assert![q.is_full()];
     /// ```
     #[inline]
@@ -127,9 +127,9 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let q = Queue::<i32, 3>::default();
+    /// let q = DirectQueue::<i32, 3>::default();
     /// assert_eq![3, q.capacity()];
     /// ```
     #[inline]
@@ -139,10 +139,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
 
     /// Returns the queue's remaining capacity.
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Queue::<i32, 3>::default();
+    /// let mut q = DirectQueue::<i32, 3>::default();
     /// assert_eq![3, q.remaining_capacity()];
     /// q.push(1)?;
     /// assert_eq![2, q.remaining_capacity()];
@@ -173,9 +173,9 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let mut q = Queue::<_, 6>::from([1, 2]);
+    /// let mut q = DirectQueue::<_, 6>::from([1, 2]);
     /// q.extend([3, 4, 5, 6]);
     /// assert_eq![q.to_array(), Some([1, 2, 3, 4, 5, 6])];
     /// ```
@@ -205,10 +205,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Queue::<u8, 3>::default();
+    /// let mut q = DirectQueue::<u8, 3>::default();
     /// q.push(1)?;
     /// q.push(2)?;
     /// q.push(3)?;
@@ -255,10 +255,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Queue::<_, 8>::from([1, 2, 3]);
+    /// let q = DirectQueue::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&1, q.peek()?];
     /// # Ok(()) }
     /// ```
@@ -281,10 +281,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectQueue::<_, 8>::from([1, 2, 3]);
     /// assert_eq![&mut 1, q.peek_mut()?];
     /// # Ok(()) }
     /// ```
@@ -307,10 +307,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let q = Queue::<_, 8>::from([1, 2, 3, 4]);
+    /// let q = DirectQueue::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&3, q.peek_nth(2)?];
     /// # Ok(()) }
     /// ```
@@ -333,10 +333,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectQueue::<_, 8>::from([1, 2, 3, 4]);
     /// assert_eq![&mut 3, q.peek_nth_mut(2)?];
     /// # Ok(()) }
     /// ```
@@ -358,9 +358,9 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let mut q = Queue::<_, 8>::from([1, 2, 3, 4]);
+    /// let mut q = DirectQueue::<_, 8>::from([1, 2, 3, 4]);
     /// q.clear();
     /// assert![q.is_empty()];
     /// ```
@@ -381,10 +381,10 @@ impl<T, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectQueue::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop()?];
     /// assert_eq![2, q.pop()?];
     /// assert_eq![3, q.pop()?];
@@ -425,10 +425,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::error::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 8>::from([1, 2, 3]);
+    /// let mut q = DirectQueue::<_, 8>::from([1, 2, 3]);
     /// assert_eq![1, q.pop()?];
     /// assert_eq![2, q.pop()?];
     /// assert_eq![3, q.pop()?];
@@ -461,10 +461,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 5>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectQueue::<_, 5>::from([1, 2, 3, 4, 5]);
     /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 5]];
     /// # Ok(()) }
     /// ```
@@ -497,10 +497,10 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::Queue;
+    /// use ladata::list::DirectQueue;
     /// # fn main() -> ladata::all::LadataResult<()> {
     ///
-    /// let mut q = Queue::<_, 5>::from([1, 2, 3, 4, 5]);
+    /// let mut q = DirectQueue::<_, 5>::from([1, 2, 3, 4, 5]);
     /// assert_eq![q.to_array::<5>(), Some([1, 2, 3, 4, 5])];
     /// # Ok(()) }
     /// ```
@@ -548,9 +548,9 @@ impl<T: PartialEq, S: Storage, const CAP: usize> ArrayQueue<T, S, CAP> {
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::Queue;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let q = Queue::<_, 6>::from([5, 78, 42, 33, 9]);
+    /// let q = DirectQueue::<_, 6>::from([5, 78, 42, 33, 9]);
     ///
     /// assert![q.contains(&9)];
     /// assert![!q.contains(&8)];
