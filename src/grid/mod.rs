@@ -10,5 +10,6 @@ mod grid2d;
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 pub use grid2d::Grid2d;
 
+#[cfg(feature = "std")]
 #[cfg(test)]
 mod tests;

@@ -17,6 +17,11 @@ do = "doc --no-deps --open"
 dd = "doc"
 ddo = "doc --open"
 # +nightly
+nd = "doc --no-deps --features=nightly"
+ndo = "doc --no-deps --open --features=nightly"
+ndd = "doc --features=nightly"
+nddo = "doc --open --features=nightly"
+#
 nd_all = "doc --no-deps --features=nightly,deps_all"
 ndo_all = "doc --no-deps --open --features=nightly,deps_all"
 ndd_all = "doc --features=nightly,deps_all"
