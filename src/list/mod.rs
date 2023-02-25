@@ -1,27 +1,22 @@
 // ladata::list
 //
-//! Lists.
+//! List types.
 //
 
-#[cfg(feature = "bv")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
-pub mod bit;
-//#[cfg(feature = "bv")]
-// #[doc(inline)]
-// pub use bit::*;
-
-pub mod stack;
-#[doc(inline)]
-pub use stack::*;
-
-pub mod queue;
-#[doc(inline)]
-pub use queue::*;
-
+pub mod array;
 pub mod deque;
-#[doc(inline)]
-pub use deque::*;
-
 pub mod link;
-#[doc(inline)]
-pub use link::*;
+pub mod queue;
+pub mod stack;
+
+pub use all::*;
+pub(crate) mod all {
+    #[doc(inline)]
+    pub use super::{
+        array::{Array, ArrayAdt, BoxedArray, DirectArray},
+        deque::*,
+        link::*,
+        queue::*,
+        stack::*,
+    };
+}

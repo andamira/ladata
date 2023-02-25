@@ -1,6 +1,6 @@
 // ladata::mem
 //
-//! Memory-management.
+//! Memory-management types.
 //!
 //! The trait [`Storage`] allows data structure implementations to have
 //! methods (specially constructors) be specialized by storage type.
@@ -11,10 +11,6 @@
 
 use core::ops;
 
-pub mod array;
-#[doc(inline)]
-pub use array::*;
-
 // mod arena;
 // #[doc(inline)]
 // pub use arena::*;
@@ -22,6 +18,10 @@ pub use array::*;
 // mod cache;
 // #[doc(inline)]
 // pub use cache::*;
+
+// mod pool;
+// #[doc(inline)]
+// pub use pool::*;
 
 mod direct;
 pub use direct::Direct;

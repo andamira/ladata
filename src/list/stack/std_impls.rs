@@ -5,13 +5,13 @@
 
 use core::fmt;
 
-use super::{ArrayStack, CoreArray, Storage};
+use super::{Array, Stack, Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
 
 // T:Clone
-impl<T: Clone, S: Storage, const CAP: usize> Clone for ArrayStack<T, S, CAP>
+impl<T: Clone, S: Storage, const CAP: usize> Clone for Stack<T, S, CAP>
 where
     S::Stored<[T; CAP]>: Clone,
 {
@@ -24,18 +24,16 @@ where
 }
 
 // T:Copy
-impl<T: Copy, S: Storage, const CAP: usize> Copy for ArrayStack<T, S, CAP> where
-    S::Stored<[T; CAP]>: Copy
-{
-}
+impl<T: Copy, S: Storage, const CAP: usize> Copy for Stack<T, S, CAP> where S::Stored<[T; CAP]>: Copy
+{}
 
 // T:Debug
-impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for ArrayStack<T, S, CAP>
+impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for Stack<T, S, CAP>
 where
     S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut debug = f.debug_struct(stringify![ArrayStack]);
+        let mut debug = f.debug_struct(stringify![Stack]);
         debug.field("CAP", &CAP).field("len", &self.len);
 
         if CAP <= 6 {
@@ -49,7 +47,7 @@ where
 }
 
 // T:PartialEq
-impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for ArrayStack<T, S, CAP>
+impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for Stack<T, S, CAP>
 where
     S::Stored<[T; CAP]>: PartialEq,
 {
@@ -58,15 +56,15 @@ where
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayStack<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for Stack<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // S:() + T:Default
-impl<T: Default, const CAP: usize> Default for ArrayStack<T, (), CAP> {
+impl<T: Default, const CAP: usize> Default for Stack<T, (), CAP> {
     /// Returns an empty stack, allocated in the stack,
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
         Self {
-            array: CoreArray::default(),
+            array: Array::default(),
             len: 0,
         }
     }
@@ -75,19 +73,19 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, (), CAP> {
 // S:Boxed + T:Default
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Default, const CAP: usize> Default for ArrayStack<T, Boxed, CAP> {
+impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using the default value to fill the remaining free data.
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::BoxedStack;
+    /// use ladata::list::BoxedStack;
     ///
     /// let mut s = BoxedStack::<i32, 100>::default();
     /// ```
     fn default() -> Self {
         Self {
-            array: CoreArray::default(),
+            array: Array::default(),
             len: 0,
         }
     }
@@ -95,7 +93,7 @@ impl<T: Default, const CAP: usize> Default for ArrayStack<T, Boxed, CAP> {
 
 /* From<IntoIterator<Item = T>> */
 
-impl<T: Default, I, const CAP: usize> From<I> for ArrayStack<T, (), CAP>
+impl<T: Default, I, const CAP: usize> From<I> for Stack<T, (), CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -103,12 +101,12 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::DirectStack;
+    /// use ladata::list::DirectStack;
     ///
     /// let s: DirectStack<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> ArrayStack<T, (), CAP> {
-        let mut s = ArrayStack::<T, (), CAP>::default();
+    fn from(iterator: I) -> Stack<T, (), CAP> {
+        let mut s = Stack::<T, (), CAP>::default();
         let _ = s.extend(iterator);
         s
     }
@@ -116,7 +114,7 @@ where
 
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Default, I, const CAP: usize> From<I> for ArrayStack<T, Boxed, CAP>
+impl<T: Default, I, const CAP: usize> From<I> for Stack<T, Boxed, CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -124,12 +122,12 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::BoxedStack;
+    /// use ladata::list::BoxedStack;
     ///
     /// let s: BoxedStack<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> ArrayStack<T, Boxed, CAP> {
-        let mut s = ArrayStack::<T, Boxed, CAP>::default();
+    fn from(iterator: I) -> Stack<T, Boxed, CAP> {
+        let mut s = Stack::<T, Boxed, CAP>::default();
         let _ = s.extend(iterator);
         s
     }

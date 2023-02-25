@@ -4,7 +4,12 @@
 //! either end.
 //
 
-use crate::mem::{CoreArray, Storage};
+use crate::{
+    base::CollectionAdt,
+    error::LadataResult as Result,
+    list::{Array, QueueAdt},
+    mem::Storage,
+};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -12,31 +17,50 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A double-ended queue, backed by a [`CoreArray`].
+/// An abstract Deque.
+pub trait DequeAdt: CollectionAdt + QueueAdt {
+    ///
+    fn deque_dequeue_back(&mut self) -> Result<<Self as CollectionAdt>::Element>;
+    ///
+    fn deque_enqueue_front(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
+    //
+    ///
+    fn deque_dequeue_front(&mut self) -> Result<<Self as CollectionAdt>::Element> {
+        self.queue_dequeue()
+    }
+    ///
+    fn deque_enqueue_back(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()> {
+        self.queue_enqueue(element)
+    }
+}
+
+/// A double-ended queue, backed by a [`Array`].
 ///
 /// It has the [`DirectQueue`] and [`DirectStack`] methods implemented for both
 /// the front and the back sides.
 ///
 /// [`DirectQueue`]: crate::all::DirectQueue
 /// [`DirectStack`]: crate::all::DirectStack
-pub struct ArrayDeque<T, S: Storage, const CAP: usize> {
-    pub(crate) array: CoreArray<T, S, CAP>,
+pub struct Deque<T, S: Storage, const CAP: usize> {
+    pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,
     pub(crate) front: usize,
     pub(crate) back: usize,
 }
 
-/// An [`ArrayDeque`] stored in the stack.
-pub type DirectDeque<T, const CAP: usize> = ArrayDeque<T, (), CAP>;
+/// A [`Deque`] stored in the stack.
+pub type DirectDeque<T, const CAP: usize> = Deque<T, (), CAP>;
 
-/// An [`ArrayDeque`] stored in the heap.
+/// A [`Deque`] stored in the heap.
 #[cfg(feature = "std")]
-pub type BoxedDeque<T, const CAP: usize> = ArrayDeque<T, Boxed, CAP>;
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+pub type BoxedDeque<T, const CAP: usize> = Deque<T, Boxed, CAP>;
 
 /* iterators */
 
+/// A deque iterator.
 pub struct DequeIter<'s, T, S: Storage, const CAP: usize> {
-    deque: &'s ArrayDeque<T, S, CAP>,
+    deque: &'s Deque<T, S, CAP>,
     idx: usize,
 }
 

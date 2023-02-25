@@ -6,17 +6,18 @@
 #[cfg(not(feature = "safe"))]
 use core::ptr;
 
-use super::{ArrayStack, StackIter};
+use super::{Stack, StackIter};
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    mem::{CoreArray, Storage},
+    list::Array,
+    mem::Storage,
 };
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
 
 // `S:() + T:Clone`
-impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
+impl<T: Clone, const CAP: usize> Stack<T, (), CAP> {
     /// Returns an empty stack, allocated in the stack,
     /// using `element` to fill the remaining free data.
     ///
@@ -28,7 +29,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: CoreArray::<T, (), CAP>::with(element),
+            array: Array::<T, (), CAP>::with(element),
             len: 0,
         }
     }
@@ -37,7 +38,7 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, (), CAP> {
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
+impl<T: Clone, const CAP: usize> Stack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.
     ///
@@ -49,14 +50,14 @@ impl<T: Clone, const CAP: usize> ArrayStack<T, Boxed, CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: CoreArray::<T, Boxed, CAP>::with(element),
+            array: Array::<T, Boxed, CAP>::with(element),
             len: 0,
         }
     }
 }
 
 // ``
-impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// Returns the number of stacked elements.
     #[inline]
     pub const fn len(&self) -> usize {
@@ -473,7 +474,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<_, 3>::from(['a', 'b', 'c']);
     /// s.rot()?;
@@ -500,7 +501,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<_, 3>::from(['a', 'b', 'c']);
     /// s.rot_cc()?;
@@ -527,7 +528,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
     /// s.rot2()?;
@@ -554,7 +555,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<_, 6>::from(['a', 'b', 'c', 'd', 'e', 'f']);
     /// s.rot2()?;
@@ -581,7 +582,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<u8, 2>::default();
     /// s.push(1)?;
@@ -635,7 +636,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 }
 
 // `T:Clone`
-impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// Pops the top stack element.
     ///
     /// `( 1 2 -- 1 )`
@@ -773,7 +774,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()> {
+    /// # fn main() -> ladata::error::LadataResult<()> {
     ///
     /// let mut s = DirectStack::<u8, 6>::from([1, 2, 3, 4]);
     /// s.over2()?;
@@ -807,7 +808,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()>  {
+    /// # fn main() -> ladata::error::LadataResult<()>  {
     ///
     /// let mut s = DirectStack::<u8, 3>::from([1, 2]);
     /// s.tuck()?;
@@ -840,7 +841,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// # Examples
     /// ```
     /// use ladata::list::DirectStack;
-    /// # fn main() -> ladata::all::LadataResult<()>  {
+    /// # fn main() -> ladata::error::LadataResult<()>  {
     ///
     /// let mut s = DirectStack::<u8, 6>::from([1, 2, 3, 4]);
     /// s.tuck2()?;
@@ -871,7 +872,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 }
 
 // ``
-impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// Moves an array into a [`full`][Self::is_full] stack.
     ///
     /// # Examples
@@ -882,9 +883,9 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
     /// ```
     // IMPROVE?
     // - MAYBE arr: impl Into<[T; CAP]?> Even None…
-    pub fn from_array(arr: [T; CAP]) -> ArrayStack<T, S, CAP> {
+    pub fn from_array(arr: [T; CAP]) -> Stack<T, S, CAP> {
         Self {
-            array: CoreArray::new(arr),
+            array: Array::new(arr),
             len: CAP,
         }
     }
@@ -898,7 +899,7 @@ impl<T, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 }
 
 // `T: PartialEq`
-impl<T: PartialEq, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+impl<T: PartialEq, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// Returns true if the stack contains `element`.
     ///
     /// # Examples
@@ -916,7 +917,7 @@ impl<T: PartialEq, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
 }
 
 // `T: Default`
-impl<T: Default, S: Storage, const CAP: usize> ArrayStack<T, S, CAP> {
+impl<T: Default, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// Drops the top of stack element,
     /// replacing the underlying data with the default value.
     ///

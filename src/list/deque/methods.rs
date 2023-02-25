@@ -9,7 +9,7 @@ use core::{
     ptr,
 };
 
-use super::{ArrayDeque, CoreArray, DequeIter};
+use super::{Array, Deque, DequeIter};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
@@ -20,19 +20,19 @@ use crate::{
 use crate::mem::Boxed;
 
 // `S:() + T:Clone`
-impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
+impl<T: Clone, const CAP: usize> Deque<T, (), CAP> {
     /// Returns an empty deque, allocated in the stack,
     /// using `element` to fill the remaining free data.
     ///
     /// # Examples
     /// ```
-    /// use ladata::list::ArrayDeque;
+    /// use ladata::list::Deque;
     ///
-    /// let q = ArrayDeque::<_, (), 16>::new('\0');
+    /// let q = Deque::<_, (), 16>::new('\0');
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: CoreArray::<T, (), CAP>::with(element),
+            array: Array::<T, (), CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -43,7 +43,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, (), CAP> {
 // `S:Boxed + T:Clone`
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
+impl<T: Clone, const CAP: usize> Deque<T, Boxed, CAP> {
     /// Returns an empty deque, allocated in the heap,
     /// using `element` to fill the remaining free data.
     ///
@@ -55,7 +55,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
     /// ```
     pub fn new(element: T) -> Self {
         Self {
-            array: CoreArray::<T, Boxed, CAP>::with(element),
+            array: Array::<T, Boxed, CAP>::with(element),
             front: 0,
             back: 0,
             len: 0,
@@ -64,7 +64,7 @@ impl<T: Clone, const CAP: usize> ArrayDeque<T, Boxed, CAP> {
 }
 
 // ``
-impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
+impl<T, S: Storage, const CAP: usize> Deque<T, S, CAP> {
     // Returns the `nth` element's index counting from the back.
     #[inline(always)]
     pub(super) const fn idx_back(&self, nth: usize) -> usize {
@@ -85,9 +85,9 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     /// let q = DirectDeque::<_, 3>::from_array([1, 2, 3]);
     /// ```
     // TODO IMPROVE
-    pub fn from_array(arr: [T; CAP]) -> ArrayDeque<T, S, CAP> {
+    pub fn from_array(arr: [T; CAP]) -> Deque<T, S, CAP> {
         Self {
-            array: CoreArray::new(arr),
+            array: Array::new(arr),
             front: 0,
             back: 0,
             len: CAP,
@@ -1053,7 +1053,7 @@ impl<T, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 }
 
 // `T:Clone`
-impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
+impl<T: Clone, S: Storage, const CAP: usize> Deque<T, S, CAP> {
     /// Pops the front element.
     ///
     /// `( 1 2 -- 2 )`
@@ -1185,7 +1185,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
     pub fn to_array<const LEN: usize>(&self) -> Option<[T; LEN]> {
         // MAYBE return not option
         // TODO: improve from_iter
-        // Some(CoreArray::<T, S, LEN>::new())
+        // Some(Array::<T, S, LEN>::new())
 
         if self.is_empty() || LEN > self.len() || LEN == 0 {
             None
@@ -1605,7 +1605,7 @@ impl<T: Clone, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
 }
 
 // `T: PartialEq`
-impl<T: PartialEq, S: Storage, const CAP: usize> ArrayDeque<T, S, CAP> {
+impl<T: PartialEq, S: Storage, const CAP: usize> Deque<T, S, CAP> {
     /// Returns true if the deque contains `element`.
     ///
     /// # Examples
@@ -1629,7 +1629,7 @@ mod tests {
     // test the private idx_* functions
     #[test]
     fn idx() {
-        let q = ArrayDeque::<_, (), 5>::from([1, 2, 3]);
+        let q = Deque::<_, (), 5>::from([1, 2, 3]);
 
         // counting from the front:
         assert_eq![0, q.idx_front(0)];

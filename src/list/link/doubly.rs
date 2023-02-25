@@ -18,7 +18,8 @@ use core::fmt::{self, Debug};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
-    mem::{CoreArray, Storage},
+    list::Array,
+    mem::Storage,
 };
 
 #[cfg(feature = "std")]
@@ -296,7 +297,7 @@ macro_rules! linked_list_array {
 
         // List ----------------------------------------------------------------
 
-        #[doc = "A doubly linked list, backed by an array, with " $b "-bit indices."]
+        #[doc = "A doubly linked list, backed by an [`Array`], using " $b "-bit indices."]
         ///
         #[doc = "- It has a maximum length of [`" $t "::MAX`]` -1` elements."]
         #[doc = "- An empty list has a minimum size of `3 * " $B "` bytes."]
@@ -311,7 +312,7 @@ macro_rules! linked_list_array {
             /// The index of the current element at the back.
             back: [<$name$b Index>],
             /// The array of nodes, stored in the generic container.
-            nodes: CoreArray<[<$name$b Node>]<T>, S, CAP>,
+            nodes: Array<[<$name$b Node>]<T>, S, CAP>,
         }
 
         /// impl Clone, Copy, Debug, Default…
@@ -366,8 +367,8 @@ macro_rules! linked_list_array {
                 ///
                 /// # Examples
                 /// ```
-                /// use ladata::all::DoublyLinked8;
-                /// let l = DoublyLinked8::<u8, (), 100>::default();
+                /// use ladata::all::DoublyLinkedList8;
+                /// let l = DoublyLinkedList8::<u8, (), 100>::default();
                 /// ```
                 ///
                 /// # Panics
@@ -375,7 +376,7 @@ macro_rules! linked_list_array {
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
                     Self {
-                        nodes: CoreArray::default(),
+                        nodes: Array::default(),
                         count: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
@@ -394,8 +395,8 @@ macro_rules! linked_list_array {
                 ///
                 /// # Examples
                 /// ```
-                /// use ladata::all::{Boxed, DoublyLinked8};
-                /// let l = DoublyLinked8::<u8, Boxed, 10>::default();
+                /// use ladata::all::{Boxed, DoublyLinkedList8};
+                /// let l = DoublyLinkedList8::<u8, Boxed, 10>::default();
                 /// ```
                 ///
                 /// # Panics
@@ -403,7 +404,7 @@ macro_rules! linked_list_array {
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
                     Self {
-                        nodes: CoreArray::default(),
+                        nodes: Array::default(),
                         count: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
@@ -419,8 +420,8 @@ macro_rules! linked_list_array {
             ///
             /// # Examples
             /// ```
-            /// use ladata::all::DoublyLinked8;
-            /// let l = DoublyLinked8::<u8, (), 100>::new(0);
+            /// use ladata::all::DoublyLinkedList8;
+            /// let l = DoublyLinkedList8::<u8, (), 100>::new(0);
             /// ```
             ///
             /// # Panics
@@ -428,7 +429,7 @@ macro_rules! linked_list_array {
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
                 Self {
-                    nodes: CoreArray::<[<$name$b Node>]<T>, (), CAP>::
+                    nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
                         with([<$name$b Node>]::new_unlinked(value)),
                     count: $nmt::new(0).unwrap(),
                     front: None.into(),
@@ -446,8 +447,8 @@ macro_rules! linked_list_array {
             ///
             /// # Examples
             /// ```
-            /// use ladata::all::{Boxed, DoublyLinked8};
-            /// let l = DoublyLinked8::<u8, Boxed, 100>::new(0);
+            /// use ladata::all::{Boxed, DoublyLinkedList8};
+            /// let l = DoublyLinkedList8::<u8, Boxed, 100>::new(0);
             /// ```
             ///
             /// # Panics
@@ -455,7 +456,7 @@ macro_rules! linked_list_array {
             pub fn new(value: T) -> Self {
                 assert![CAP < $t::MAX as usize];
                 Self {
-                    nodes: CoreArray::<[<$name$b Node>]<T>, Boxed, CAP>::
+                    nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
                         with([<$name$b Node>]::new_unlinked(value)),
                     count: $nmt::new(0).unwrap(),
                     front: None.into(),
@@ -798,7 +799,7 @@ macro_rules! linked_list_array {
     target_pointer_width = "64",
     target_pointer_width = "128"
 ))]
-linked_list_array![DoublyLinked, 1, 8, u8, nonmax::NonMaxU8];
+linked_list_array![DoublyLinkedList, 1, 8, u8, nonmax::NonMaxU8];
 
 #[cfg(any(
     target_pointer_width = "16",
@@ -806,7 +807,7 @@ linked_list_array![DoublyLinked, 1, 8, u8, nonmax::NonMaxU8];
     target_pointer_width = "64",
     target_pointer_width = "128"
 ))]
-linked_list_array![DoublyLinked, 2, 16, u16, nonmax::NonMaxU16];
+linked_list_array![DoublyLinkedList, 2, 16, u16, nonmax::NonMaxU16];
 
 #[cfg(any(
     target_pointer_width = "16",
@@ -814,4 +815,4 @@ linked_list_array![DoublyLinked, 2, 16, u16, nonmax::NonMaxU16];
     target_pointer_width = "64",
     target_pointer_width = "128"
 ))]
-linked_list_array![DoublyLinked, 4, 32, u32, nonmax::NonMaxU32];
+linked_list_array![DoublyLinkedList, 4, 32, u32, nonmax::NonMaxU32];

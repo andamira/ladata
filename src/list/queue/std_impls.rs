@@ -5,14 +5,14 @@
 
 use core::fmt;
 
-use super::{ArrayQueue, CoreArray, Storage};
-use crate::list::{ArrayDeque, ArrayStack};
+use super::{Queue, Storage};
+use crate::list::{Array, Deque, Stack};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
 
 // T:Clone
-impl<T: Clone, S: Storage, const CAP: usize> Clone for ArrayQueue<T, S, CAP>
+impl<T: Clone, S: Storage, const CAP: usize> Clone for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: Clone,
 {
@@ -27,18 +27,16 @@ where
 }
 
 // T:Copy
-impl<T: Copy, S: Storage, const CAP: usize> Copy for ArrayQueue<T, S, CAP> where
-    S::Stored<[T; CAP]>: Copy
-{
-}
+impl<T: Copy, S: Storage, const CAP: usize> Copy for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Copy
+{}
 
 // T:Debug
-impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for ArrayQueue<T, S, CAP>
+impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut debug = f.debug_struct(stringify![ArrayQueue]);
+        let mut debug = f.debug_struct(stringify![Queue]);
         debug
             .field("CAP", &CAP)
             .field("len", &self.len)
@@ -56,7 +54,7 @@ where
 }
 
 // T:PartialEq
-impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for ArrayQueue<T, S, CAP>
+impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: PartialEq,
 {
@@ -68,12 +66,12 @@ where
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayQueue<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // TODO: WIP
 // T:PartialOrd
 // use core::cmp::Ordering;
-// impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for ArrayQueue<T, S, CAP>
+// impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for Queue<T, S, CAP>
 // where
 //     S::Stored<[T; CAP]>: PartialOrd,
 // {
@@ -85,15 +83,15 @@ impl<T: Eq, S: Storage, const CAP: usize> Eq for ArrayQueue<T, S, CAP> where S::
 //     }
 // }
 // // T:Ord
-// impl<T: Ord, S: Storage, const CAP: usize> Ord for ArrayQueue<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
+// impl<T: Ord, S: Storage, const CAP: usize> Ord for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
 
 // S:() + T:Default
-impl<T: Default, const CAP: usize> Default for ArrayQueue<T, (), CAP> {
+impl<T: Default, const CAP: usize> Default for Queue<T, (), CAP> {
     /// Returns an empty queue, allocated in the stack,
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
         Self {
-            array: CoreArray::default(),
+            array: Array::default(),
             front: 0,
             back: 0,
             len: 0,
@@ -104,7 +102,7 @@ impl<T: Default, const CAP: usize> Default for ArrayQueue<T, (), CAP> {
 // S:Boxed + T:Default
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Default, const CAP: usize> Default for ArrayQueue<T, Boxed, CAP> {
+impl<T: Default, const CAP: usize> Default for Queue<T, Boxed, CAP> {
     /// Returns an empty queue, allocated in the heap,
     /// using the default value to fill the remaining free data.
     ///
@@ -116,7 +114,7 @@ impl<T: Default, const CAP: usize> Default for ArrayQueue<T, Boxed, CAP> {
     /// ```
     fn default() -> Self {
         Self {
-            array: CoreArray::default(),
+            array: Array::default(),
             front: 0,
             back: 0,
             len: 0,
@@ -126,7 +124,7 @@ impl<T: Default, const CAP: usize> Default for ArrayQueue<T, Boxed, CAP> {
 
 /* From<> */
 
-impl<T: Default, I, const CAP: usize> From<I> for ArrayQueue<T, (), CAP>
+impl<T: Default, I, const CAP: usize> From<I> for Queue<T, (), CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -138,8 +136,8 @@ where
     ///
     /// let s: DirectQueue<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> ArrayQueue<T, (), CAP> {
-        let mut s = ArrayQueue::<T, (), CAP>::default();
+    fn from(iterator: I) -> Queue<T, (), CAP> {
+        let mut s = Queue::<T, (), CAP>::default();
         let _ = s.extend(iterator);
         s
     }
@@ -147,7 +145,7 @@ where
 
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-impl<T: Default, I, const CAP: usize> From<I> for ArrayQueue<T, Boxed, CAP>
+impl<T: Default, I, const CAP: usize> From<I> for Queue<T, Boxed, CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -159,17 +157,17 @@ where
     ///
     /// let s: BoxedQueue<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> ArrayQueue<T, Boxed, CAP> {
-        let mut s = ArrayQueue::<T, Boxed, CAP>::default();
+    fn from(iterator: I) -> Queue<T, Boxed, CAP> {
+        let mut s = Queue::<T, Boxed, CAP>::default();
         let _ = s.extend(iterator);
         s
     }
 }
 
 // TODO: CHECK
-impl<T, S: Storage, const CAP: usize> From<ArrayDeque<T, S, CAP>> for ArrayQueue<T, S, CAP> {
-    fn from(deque: ArrayDeque<T, S, CAP>) -> Self {
-        ArrayQueue {
+impl<T, S: Storage, const CAP: usize> From<Deque<T, S, CAP>> for Queue<T, S, CAP> {
+    fn from(deque: Deque<T, S, CAP>) -> Self {
+        Queue {
             array: deque.array,
             front: deque.front,
             back: deque.back,
@@ -178,9 +176,9 @@ impl<T, S: Storage, const CAP: usize> From<ArrayDeque<T, S, CAP>> for ArrayQueue
     }
 }
 // TODO: CHECK
-impl<T, S: Storage, const CAP: usize> From<ArrayStack<T, S, CAP>> for ArrayQueue<T, S, CAP> {
-    fn from(stack: ArrayStack<T, S, CAP>) -> Self {
-        ArrayQueue {
+impl<T, S: Storage, const CAP: usize> From<Stack<T, S, CAP>> for Queue<T, S, CAP> {
+    fn from(stack: Stack<T, S, CAP>) -> Self {
+        Queue {
             array: stack.array,
             len: stack.len,
             front: 0,

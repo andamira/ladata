@@ -1,6 +1,6 @@
 // ladata::unit
 //
-//! Units of data.
+//! Unitary types.
 //!
 //! The fundamental unitary abstractions are:
 //! - `DataCell…` enums that contains both the data and the type information.

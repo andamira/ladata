@@ -1,14 +1,13 @@
-// ladata::adt::linked
+// ladata::list::link::adt
 //
 //!
 //
 
-use super::Collection;
-use crate::error::LadataResult as Result;
+use crate::{base::CollectionAdt, error::LadataResult as Result};
 
 /// An abstract Singly Linked List.
-pub trait SinglyLinked: Collection {
-    type Node: SinglyLinkedNode<Data = Self::Element>;
+pub trait SinglyLinkedListAdt: CollectionAdt {
+    type Node: SinglyLinkedListAdtNode<Data = Self::Element>;
 
     ///
     fn linked_first(&mut self) -> Result<Self::Node>;
@@ -24,7 +23,7 @@ pub trait SinglyLinked: Collection {
 }
 
 /// An abstract Singly Linked List Node.
-pub trait SinglyLinkedNode: Sized {
+pub trait SinglyLinkedListAdtNode: Sized {
     type Data;
     ///
     fn linked_data(&self) -> &Self::Data;
@@ -40,7 +39,7 @@ pub trait SinglyLinkedNode: Sized {
 /* doubly */
 
 /// An abstract Doubly Linked List.
-pub trait DoublyLinked: SinglyLinked {
+pub trait DoublyLinkedListAdt: SinglyLinkedListAdt {
     ///
     fn linked_last(&mut self) -> Result<Option<Self::Node>>;
 
@@ -55,7 +54,7 @@ pub trait DoublyLinked: SinglyLinked {
 }
 
 /// An abstract Doubly Linked List Node.
-pub trait DoublyLinkedNode: SinglyLinkedNode {
+pub trait DoublyLinkedListAdtNode: SinglyLinkedListAdtNode {
     /// Returns a shared reference to the previous node.
     fn linked_prev(&self) -> Option<&Self>;
     /// Returns an exclusive reference to the previous node.
@@ -64,15 +63,15 @@ pub trait DoublyLinkedNode: SinglyLinkedNode {
 
 /* thirdly */
 
-/// An abstract Thirdly Linked List.
-pub trait ThirdlyLinked: DoublyLinked {
-    fn linked_parent(&self) -> Result<Self::Node>;
-}
-
-/// An abstract Thirdly Linked List Node.
-pub trait ThirdlyLinkedNode: DoublyLinkedNode {
-    /// Returns a shared reference to the parent node.
-    fn linked_parent(&self) -> Option<&Self>;
-    /// Returns an excusive reference to the parent node.
-    fn linked_set_parent(&mut self, parent: Option<Self>);
-}
+// /// An abstract Thirdly Linked List.
+// pub trait ThirdlyLinkedListAdt: DoublyLinkedListAdt {
+//     fn linked_parent(&self) -> Result<Self::Node>;
+// }
+//
+// /// An abstract Thirdly Linked List Node.
+// pub trait ThirdlyLinkedListAdtNode: DoublyLinkedListAdtNode {
+//     /// Returns a shared reference to the parent node.
+//     fn linked_parent(&self) -> Option<&Self>;
+//     /// Returns an excusive reference to the parent node.
+//     fn linked_set_parent(&mut self, parent: Option<Self>);
+// }

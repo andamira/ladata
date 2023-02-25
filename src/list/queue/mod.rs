@@ -4,7 +4,7 @@
 //! and removals are made at the opposite end.
 //
 
-use crate::mem::{CoreArray, Storage};
+use crate::{base::CollectionAdt, error::LadataResult as Result, list::Array, mem::Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -12,33 +12,40 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A queue, backed by a [`CoreArray`].
-pub struct ArrayQueue<T, S: Storage, const CAP: usize> {
-    pub(crate) array: CoreArray<T, S, CAP>,
+/// An abstract Queue.
+pub trait QueueAdt: CollectionAdt {
+    fn queue_dequeue(&mut self) -> Result<<Self as CollectionAdt>::Element>;
+    fn queue_enqueue(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
+}
+
+/// A queue, backed by a [`Array`].
+pub struct Queue<T, S: Storage, const CAP: usize> {
+    pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,
     pub(crate) front: usize,
     pub(crate) back: usize,
 }
 
 // /// A queue, backed by a [`Vec`].
-// pub struct ArrayQueue<T> {
+// pub struct Queue<T> {
 //     vec: Vec<T>,
 //     front: usize,
 //     back: usize,
 // }
 
-/// An [`ArrayQueue`] stored in the stack.
-pub type DirectQueue<T, const CAP: usize> = ArrayQueue<T, (), CAP>;
+/// A [`Queue`] stored in the stack.
+pub type DirectQueue<T, const CAP: usize> = Queue<T, (), CAP>;
 
-/// An [`ArrayQueue`] stored in the heap.
+/// A [`Queue`] stored in the heap.
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-pub type BoxedQueue<T, const CAP: usize> = ArrayQueue<T, Boxed, CAP>;
+pub type BoxedQueue<T, const CAP: usize> = Queue<T, Boxed, CAP>;
 
 /* iterators */
 
+/// A queue iterator.
 pub struct QueueIter<'s, T, S: Storage, const CAP: usize> {
-    queue: &'s ArrayQueue<T, S, CAP>,
+    queue: &'s Queue<T, S, CAP>,
     idx: usize,
 }
 

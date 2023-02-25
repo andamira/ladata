@@ -44,7 +44,6 @@
 #![cfg_attr(feature = "safe", forbid(unsafe_code))]
 #![cfg_attr(feature = "nightly", feature(doc_cfg))]
 
-pub mod adt;
 pub mod error;
 pub mod grid;
 pub mod list;
@@ -54,10 +53,12 @@ pub mod mem;
 // pub mod tree;
 pub mod unit;
 
-/// Everything is directly available in here.
+/// All types.
+///
+/// Everything is re-exported from here.
 pub mod all {
     #[doc(inline)]
-    pub use super::adt::*;
+    pub use super::base::*;
 
     #[doc(inline)]
     pub use super::error::*;
@@ -65,21 +66,51 @@ pub mod all {
     #[doc(inline)]
     pub use super::grid::*;
 
+    // TEMP: not exported in lists::all
     #[doc(inline)]
     #[cfg(feature = "bv")]
-    pub use super::list::bit::*;
+    pub use super::list::array::bit::*;
+
     #[doc(inline)]
-    pub use super::list::{deque::*, link::*, queue::*, stack::*};
+    pub use super::list::all::*;
 
     #[doc(inline)]
     #[cfg(feature = "std")]
     pub use super::mem::Boxed;
     #[doc(inline)]
-    pub use super::mem::{array::*, Direct, Storage};
+    pub use super::mem::{Direct, Storage};
 
     // #[doc(inline)]
     // pub use super::tree::*;
 
     #[doc(inline)]
     pub use crate::unit::{bares::*, cells::*, traits::*, types::*};
+}
+
+/// Base types.
+pub mod base {
+    use super::error::LadataResult as Result;
+
+    /// An abstract Collection.
+    pub trait CollectionAdt {
+        type Element;
+        fn collection_is_empty(&self) -> bool;
+        fn collection_len(&self) -> usize;
+
+        // CHECK: size, element, clone
+        fn collection_new() -> Self;
+
+        fn collection_clear(&mut self) -> Result<()>;
+    }
+
+    /// An abstract dynamically-sized Collection.
+    pub trait DynCollectionAdt: CollectionAdt {
+        fn collection_with_capacity(capacity: usize) -> Self;
+        fn collection_capacity(&self) -> usize;
+        fn collection_set_capacity(&mut self, capacity: usize) -> Result<()>;
+        //
+        fn collection_remaining_capacity(&self) -> usize {
+            self.collection_capacity() - self.collection_len()
+        }
+    }
 }

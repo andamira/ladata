@@ -5,7 +5,7 @@
 //! <https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>
 //
 
-use crate::mem::{CoreArray, Storage};
+use crate::{base::CollectionAdt, error::LadataResult as Result, list::Array, mem::Storage};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -13,24 +13,33 @@ use crate::mem::Boxed;
 mod methods;
 mod std_impls;
 
-/// A Stack, backed by a [`CoreArray`].
-pub struct ArrayStack<T, S: Storage, const CAP: usize> {
-    pub(crate) array: CoreArray<T, S, CAP>,
+/// An abstract Stack.
+pub trait StackAdt: CollectionAdt {
+    ///
+    fn stack_pop(&mut self) -> Result<<Self as CollectionAdt>::Element>;
+    ///
+    fn stack_push(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
+}
+
+/// A stack, backed by a [`Array`].
+pub struct Stack<T, S: Storage, const CAP: usize> {
+    pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,
 }
 
-/// An [`ArrayStack`] stored in the stack.
-pub type DirectStack<T, const CAP: usize> = ArrayStack<T, (), CAP>;
+/// A [`Stack`] stored in the stack.
+pub type DirectStack<T, const CAP: usize> = Stack<T, (), CAP>;
 
-/// An [`ArrayStack`] stored in the heap.
+/// A [`Stack`] stored in the heap.
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-pub type BoxedStack<T, const CAP: usize> = ArrayStack<T, Boxed, CAP>;
+pub type BoxedStack<T, const CAP: usize> = Stack<T, Boxed, CAP>;
 
 /* iterators */
 
+/// A stack iterator.
 pub struct StackIter<'s, T, S: Storage, const CAP: usize> {
-    stack: &'s ArrayStack<T, S, CAP>,
+    stack: &'s Stack<T, S, CAP>,
     idx: usize,
 }
 
@@ -40,7 +49,7 @@ impl<'s, T, S: Storage, const CAP: usize> Iterator for StackIter<'s, T, S, CAP> 
     ///
     /// # Example
     /// ```
-    /// use ladata::all::DirectStack;
+    /// use ladata::list::DirectStack;
     ///
     /// let s = DirectStack::<i32, 4>::from([1, 2]);
     ///
