@@ -13,6 +13,8 @@
 use super::macros::*;
 use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
 
+use crate::all::BitArray;
+
 #[cfg(not(feature = "safe"))]
 use super::DataBares;
 
@@ -106,9 +108,8 @@ define_all_sizes! {
     "8-bit signed integer", I8, i8,
     "1-Byte array of bytes", ByteArray1, [u8; 1],
     "Boolean value", Bool, bool,
-    copy_variants_1B_dep:
-    "8-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray8, crate::all::BitArray8, "bv", "bv",
+    "8-bit Array of bits", BitArray8, BitArray<(), 8, 1>,
+    copy_variants_1B_dep: ,
     copy_variants_1B_psize:
         "8-bit usize", Usize, usize, target_pointer_width = "8",
         "8-bit isize", Isize, isize, target_pointer_width = "8",
@@ -124,6 +125,7 @@ define_all_sizes! {
     "16-bit unsigned integer ", U16, u16,
     "16-bit signed integer", I16, i16,
     "2-Byte array of bytes", ByteArray2, [u8; 2],
+    "16-bit Array of bits", BitArray16, BitArray<(), 16, 2>,
     copy_variants_2B_dep:
     "16-bit [`half`](https://crates.io/crates/half)'s `binary16` floating-point number",
         F16, half::f16, "half", "half",
@@ -131,8 +133,6 @@ define_all_sizes! {
         BF16, half::bf16, "half", "half",
     "2-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=1",
         ArrayString1, ArrayString<typenum::U1>, "arraystring", "arraystring",
-    "16-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray16, crate::all::BitArray16, "bv", "bv",
     copy_variants_2B_psize:
         "16-bit usize", Usize, usize, target_pointer_width = "16",
         "16-bit isize", Isize, isize, target_pointer_width = "16",
@@ -149,6 +149,7 @@ define_all_sizes! {
     "32-bit signed integer", I32, i32,
     "32-bit floating-point number", F32, f32,
     "4-Byte array of bytes", ByteArray4, [u8; 4],
+    "32-bit Array of bits", BitArray32, BitArray<(), 32, 4>,
     "4-Byte char ", Char, char,
     copy_variants_4B_dep:
     "4-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=3",
@@ -177,8 +178,6 @@ define_all_sizes! {
         FugitInstant32Millis, fugit::Instant<u32, 1, 1_000>, "fugit", "fugit",
     "32-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
         FugitInstant32Nanos, fugit::Instant<u32, 1, 1_000_000>, "fugit", "fugit",
-    "32-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray32, crate::all::BitArray32, "bv", "bv",
     copy_variants_4B_psize:
         "32-bit usize", Usize, usize, target_pointer_width = "32",
         "32-bit isize", Isize, isize, target_pointer_width = "32",
@@ -195,6 +194,7 @@ define_all_sizes! {
     "64-bit signed integer", I64, i64,
     "64-bit floating-point number", F64, f64,
     "8-Byte array of bytes", ByteArray8, [u8; 8],
+    "64-bit Array of bits", BitArray64, BitArray<(), 64, 8>,
     copy_variants_8B_dep:
     "32-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
         R32, num_rational::Ratio<i32>, "num-rational", "num-rational",
@@ -222,8 +222,6 @@ define_all_sizes! {
         FugitInstant64Millis, fugit::Instant<u64, 1, 1_000>, "fugit", "fugit",
     "64-bit [`fugit`](https://crates.io/crates/fugit)'s `Instant` in nanoseconds",
         FugitInstant64Nanos, fugit::Instant<u64, 1, 1_000_000>, "fugit", "fugit",
-    "64-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray64, crate::all::BitArray64, "bv", "bv",
     copy_variants_8B_psize:
         "64-bit usize", Usize, usize, target_pointer_width = "64",
         "64-bit isize", Isize, isize, target_pointer_width = "64",
@@ -241,6 +239,7 @@ define_all_sizes! {
     "128-bit unsigned integer ", U128, u128,
     "128-bit signed integer", I128, i128,
     "16-Byte array of bytes", ByteArray16, [u8; 16],
+    "128-bit Array of bits", BitArray128, BitArray<(), 128, 16>,
     "128-bit Duration", Duration, core::time::Duration,
     copy_variants_16B_dep:
     "64-bit [`num_rational`](https://crates.io/crates/num_rational)'s `Ratio` rational number",
@@ -263,8 +262,6 @@ define_all_sizes! {
         SystemTime, std::time::SystemTime, "std", "std",
     "128-bit [`time`](https://crates.io/crates/time)'s Instant`",
         TInstant, time::Instant, "std", "time",
-    "128-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray128, crate::all::BitArray128, "bv", "bv",
     copy_variants_16B_psize:
         "128-bit usize", Usize, usize, target_pointer_width = "128",
         "128-bit isize", Isize, isize, target_pointer_width = "128",
@@ -280,12 +277,11 @@ define_all_sizes! {
     // ------------------------------------------------------------------------- 32-B / 256-b
     copy_variants_32B:
     "32-Byte array of bytes", ByteArray32, [u8; 32],
+    "256-bit Array of bits", BitArray256, BitArray<(), 256, 32>,
     copy_variants_32B_dep:
     "128-bit rational number", R128, num_rational::Ratio<i128>, "num-rational", "num-rational",
     "32-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=31",
         ArrayString31, ArrayString<typenum::U31>, "arraystring", "arraystring",
-    "256-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray256, crate::all::BitArray256, "bv", "bv",
     copy_variants_32B_psize: ,
     copy_variants_32B_psize_dep: ,
 
@@ -300,11 +296,10 @@ define_all_sizes! {
     // ------------------------------------------------------------------------- 64 B / 512-b
     copy_variants_64B:
     "64-Byte array of bytes", ByteArray64, [u8; 64],
+    "512-bit Array of bits", BitArray512, BitArray<(), 512, 64>,
     copy_variants_64B_dep:
     "64-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=63",
         ArrayString63, ArrayString<typenum::U63>, "arraystring", "arraystring",
-    "512-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray512, crate::all::BitArray512, "bv", "bv",
     copy_variants_64B_psize: ,
     copy_variants_64B_psize_dep: ,
 
@@ -318,11 +313,10 @@ define_all_sizes! {
     // ------------------------------------------------------------------------- 128-B / 1024-b
     copy_variants_128B:
     "128-Byte array of bytes", ByteArray128, [u8; 128],
+    "1024-bit Array of bits", BitArray1024, BitArray<(), 1024, 128>,
     copy_variants_128B_dep:
     "128-Byte [`arraystring`](https://crates.io/crates/arraystring)'s ArrayString of len()=127",
         ArrayString127, ArrayString<typenum::U127>, "arraystring", "arraystring",
-    "1024-bit Array of bits (implementing [`bv`](https://crates.io/crates/bv/)'s `Bits`)",
-        BitArray1024, crate::all::BitArray1024, "bv", "bv",
     copy_variants_128B_psize: ,
     copy_variants_128B_psize_dep: ,
 

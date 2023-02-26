@@ -5,42 +5,128 @@
 //! <https://en.wikipedia.org/wiki/Bit_array>
 //
 
-use bv::{Bits, BitsMut};
+#[cfg(feature = "std")]
+use crate::mem::Boxed;
+#[cfg(feature = "std")]
+use std::fmt;
 
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
-pub use bv::BitVec;
+use crate::all::{
+    Array, ArrayAdt, CollectionAdt, LadataError as Error, LadataResult as Result, Storage,
+};
 
-macro_rules! build_bit_array {
-    (many $( $b:literal $ty:ty ),+ ) => {
-        $( build_bit_array![$b $ty]; )+
-    };
-    ($b:literal $ty:ty ) => {
-        paste::paste! {
-            #[doc = $b "-bit [`bv`](https://crates.io/crates/bv)'s array of `Bits`."]
-            #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "bv")))]
-            pub struct [< BitArray $b >](pub $ty);
-
-            impl Bits for [< BitArray $b >] {
-                type Block = u8;
-                fn bit_len(&self) -> u64 {
-                    self.0.bit_len()
-                }
-            }
-
-            impl BitsMut for [< BitArray $b >] {}
-        }
-    };
+/// A bit array, backed by an [`Array`] of bytes.
+pub struct BitArray<S: Storage, const LEN: usize, const U8LEN: usize> {
+    array: Array<u8, S, U8LEN>,
 }
 
-// build_bit_array![size: 0 8];
-build_bit_array![many
-    8 [u8; 1],
-    16 [u8; 2],
-    32 [u8; 4],
-    64 [u8; 8],
-    128 [u8; 16],
-    256 [u8; 32],
-    512 [u8; 64],
-    1024 [u8; 128]
-];
+/// A [`BitArray`] stored in the heap.
+#[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+pub type BoxedBitArray<const LEN: usize, const U8LEN: usize> = BitArray<Boxed, LEN, U8LEN>;
+
+/// A [`BitArray`] stored in the stack.
+pub type DirectBitArray<const LEN: usize, const U8LEN: usize> = BitArray<(), LEN, U8LEN>;
+
+impl<const LEN: usize, const U8LEN: usize> Clone for BitArray<(), LEN, U8LEN> {
+    fn clone(&self) -> Self {
+        BitArray { array: self.array }
+    }
+}
+impl<const LEN: usize, const U8LEN: usize> Copy for BitArray<(), LEN, U8LEN> {}
+
+impl<const LEN: usize, const U8LEN: usize> fmt::Debug for BitArray<(), LEN, U8LEN> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut bits = String::new();
+        for byte in self.array.iter() {
+            bits += &format!["{byte:b}"];
+        }
+
+        let mut debug = f.debug_struct(stringify![DirectBitArray]);
+        debug.field("LEN", &LEN);
+        debug.field("U8LEN", &U8LEN);
+        debug.field("", &bits);
+        debug.finish()
+    }
+}
+
+impl<S: Storage, const LEN: usize, const U8LEN: usize> BitArray<S, LEN, U8LEN> {
+    /// Returns an empty bit array, of `LEN` bits, stored in U8LEN bytes.
+    ///
+    /// # Errors
+    /// if `LEN` > `U8LEN` * 8.
+    pub fn new() -> Result<Self> {
+        if U8LEN * 8 >= LEN {
+            Ok(Self {
+                array: Array::new([0_u8; U8LEN]),
+            })
+        } else {
+            Err(Error::DimensionMismatch)
+        }
+    }
+    /// Gets the bit's value at `index`.
+    pub fn get_bit(&self, index: usize) -> Result<bool> {
+        if index >= LEN {
+            return Err(Error::IndexOutOfBounds(index));
+        }
+        let byte_index = index / 8;
+        let bit_within_byte_index = index % 8;
+        let bit_mask = 1 << bit_within_byte_index;
+        Ok(self.array[byte_index] & bit_mask != 0)
+    }
+    /// Sets the bit at `index` to `value`.
+    pub fn set_bit(&mut self, index: usize, value: bool) -> Result<()> {
+        if index >= LEN {
+            return Err(Error::IndexOutOfBounds(index));
+        }
+        let byte_index = index / 8;
+        let bit_within_byte_index = index % 8;
+        let bit_mask = 1 << bit_within_byte_index;
+        if value {
+            self.array[byte_index] |= bit_mask;
+        } else {
+            self.array[byte_index] &= !bit_mask;
+        }
+        Ok(())
+    }
+}
+impl<S: Storage, const LEN: usize, const U8LEN: usize> Default for BitArray<S, LEN, U8LEN> {
+    /// Returns an empty bit array, of `LEN` bits, stored in U8LEN bytes.
+    ///
+    /// # Panics
+    /// if `LEN` > `U8LEN` * 8.
+    fn default() -> Self {
+        assert![U8LEN * 8 >= LEN];
+        Self {
+            array: Array::new([u8::default(); U8LEN]),
+        }
+    }
+}
+
+impl<S: Storage, const LEN: usize, const U8LEN: usize> CollectionAdt for BitArray<S, LEN, U8LEN> {
+    type Element = bool;
+    fn collection_is_empty(&self) -> bool {
+        LEN == 0
+    }
+    fn collection_len(&self) -> usize {
+        LEN
+    }
+    fn collection_byte_len(&self) -> usize {
+        U8LEN
+    }
+}
+
+// FIX: return ref
+// impl<S: Storage, const LEN: usize, const U8LEN: usize> ArrayAdt for BitArray<S, LEN, U8LEN> {
+//     fn array_get(&self, index: usize) -> Result<&<Self as CollectionAdt>::Element> {
+//         if index >= LEN {
+//             return Err(Error::IndexOutOfBounds(index));
+//         }
+//         let byte_index = index / 8;
+//         let bit_within_byte_index = index % 8;
+//         let bit_mask = 1 << bit_within_byte_index;
+//         Ok(&(self.array[byte_index] & bit_mask != 0))
+//     }
+//     fn array_set(&mut self, index: usize, element: <Self as CollectionAdt>::Element) -> Result<()> {
+//         self.set_bit(index, element)
+//     }
+// }

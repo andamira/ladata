@@ -12,11 +12,5 @@ pub mod stack;
 pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
-    pub use super::{
-        array::{Array, ArrayAdt, BoxedArray, DirectArray},
-        deque::*,
-        link::*,
-        queue::*,
-        stack::*,
-    };
+    pub use super::{array::all::*, deque::*, link::*, queue::*, stack::*};
 }

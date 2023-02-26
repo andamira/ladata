@@ -66,11 +66,6 @@ pub mod all {
     #[doc(inline)]
     pub use super::grid::*;
 
-    // TEMP: not exported in lists::all
-    #[doc(inline)]
-    #[cfg(feature = "bv")]
-    pub use super::list::array::bit::*;
-
     #[doc(inline)]
     pub use super::list::all::*;
 
@@ -96,11 +91,7 @@ pub mod base {
         type Element;
         fn collection_is_empty(&self) -> bool;
         fn collection_len(&self) -> usize;
-
-        // CHECK: size, element, clone
-        fn collection_new() -> Self;
-
-        fn collection_clear(&mut self) -> Result<()>;
+        fn collection_byte_len(&self) -> usize;
     }
 
     /// An abstract dynamically-sized Collection.

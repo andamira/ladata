@@ -40,9 +40,6 @@ arraystring = { version = "0.3.0", optional = true } # ArrayString*
 fugit = { version = "0.3.6", optional = true }
 time = { version = "0.3.11", optional = true }
 
-# feature: "dep_bit" (bit arrays):
-bv = { version = "0.11.1", optional = true } # BitArray* (impl `Bits`)
-
 [features]
 default = ["std", "deps_default"]
 std = ["half?/std"]
@@ -56,19 +53,17 @@ deps_all = ["deps_numerical", "deps_categorical"]
 #         #"deps_continuous",
 #             "half", "twofloat",
 #     #"deps_categorical",
-#         "deps_bit",
 #         "deps_string",
 #         #"deps_datetime",
 #             "time", # !"fugit",
 # ]
-deps_default = ["deps_discrete", "half", "twofloat", "deps_bit", "deps_string", "time"]
+deps_default = ["deps_discrete", "half", "twofloat", "deps_string", "time"]
 
 deps_numerical= ["deps_continuous", "deps_discrete"]
 deps_continuous = ["half", "twofloat"]
 deps_discrete = ["num-rational", "num-bigint", "rust_decimal"]
 
-deps_categorical = ["deps_bit", "deps_datetime", "deps_string"]
-deps_bit = ["bv"]
+deps_categorical = ["deps_datetime", "deps_string"]
 deps_datetime = ["fugit", "time"]
 deps_string =  ["arraystring"]
 

@@ -238,7 +238,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),*
                 ;
@@ -286,7 +286,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
@@ -345,7 +345,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
@@ -362,7 +362,7 @@ macro_rules! define_all_sizes {
             copy_variants_psize_dep:
                 $( $cvdoc_1B_psize_dep, $cvname_1B_psize_dep, $cvtype_1B_psize_dep,
                     $cvpsize_dep_1B_psize_dep ),* ,
-                $( $cvdoc_2B_psize_dep, $cvname_2B_psize_dep, $cvtype_2B_psize_dep, ,
+                $( $cvdoc_2B_psize_dep, $cvname_2B_psize_dep, $cvtype_2B_psize_dep,
                     $cvpsize_dep_2B_psize_dep ),* ,
                 $( $cvdoc_4B_psize_dep, $cvname_4B_psize_dep, $cvtype_4B_psize_dep,
                     $cvpsize_dep_4B_psize_dep ),* ,
@@ -417,7 +417,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
@@ -501,7 +501,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
@@ -597,7 +597,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
@@ -708,7 +708,7 @@ macro_rules! define_all_sizes {
                 ;
             copy_variants_dep:
                 $( $cvdoc_1B_dep, $cvname_1B_dep, $cvtype_1B_dep, $cvdep1_1B_dep,
-                    $cvdep2_1B_dep ),* ,
+                    $cvdep2_1B_dep ),* // , // missing-comma
                 $( $cvdoc_2B_dep, $cvname_2B_dep, $cvtype_2B_dep, $cvdep1_2B_dep,
                     $cvdep2_2B_dep ),* ,
                 $( $cvdoc_4B_dep, $cvname_4B_dep, $cvtype_4B_dep, $cvdep1_4B_dep,
