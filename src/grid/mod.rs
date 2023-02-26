@@ -3,7 +3,7 @@
 //! Grid types.
 //
 
-use crate::{all::CollectionAdt, error::LadataResult as Result, mem::Storage};
+use crate::{all::CollectionAdt, error::LadataResult as Result};
 
 #[cfg(feature = "std")]
 mod grid2d;
