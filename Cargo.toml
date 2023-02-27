@@ -41,7 +41,7 @@ fugit = { version = "0.3.6", optional = true }
 time = { version = "0.3.11", optional = true }
 
 [features]
-default = ["std", "deps_default"]
+default = ["std", "safe", "deps_default"]
 std = ["half?/std"]
 nightly = []
 safe = []

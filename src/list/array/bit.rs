@@ -11,7 +11,7 @@ use crate::mem::Boxed;
 use std::fmt;
 
 use crate::all::{
-    Array, ArrayAdt, CollectionAdt, LadataError as Error, LadataResult as Result, Storage,
+    Array, /* ArrayAdt, */ CollectionAdt, LadataError as Error, LadataResult as Result, Storage,
 };
 
 /// A bit array, backed by an [`Array`] of bytes.
