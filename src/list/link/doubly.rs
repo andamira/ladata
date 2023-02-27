@@ -186,7 +186,6 @@ macro_rules! linked_list_array {
             }
         }
 
-
         impl<T: Clone> Clone for [<$name$b Node>]<T> {
             #[inline]
             fn clone(&self) -> Self {
@@ -362,17 +361,18 @@ macro_rules! linked_list_array {
             impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, (), CAP>
                 where [<$name$b Node>]<T>: Default
             {
-                /// Returns an empty, non-circular, doubly linked list.
-                /// allocated in the stack.
-                ///
-                /// # Examples
-                /// ```
-                /// use ladata::all::DoublyLinkedList8;
-                /// let l = DoublyLinkedList8::<u8, (), 100>::default();
-                /// ```
+                /// Returns an empty, non-circular, doubly linked list,
+                /// allocated in the stack, and filled with unlinked `CAP`
+                /// elements set to their default value.
                 ///
                 /// # Panics
                 #[doc = "Panics if `CAP` is > [`" $t "::MAX`]."]
+                ///
+                /// # Examples
+                /// ```
+                /// use ladata::list::DoublyLinkedList8;
+                /// let l = DoublyLinkedList8::<u8, (), 100>::default();
+                /// ```
                 fn default() -> Self {
                     assert![CAP < $t::MAX as usize];
                     Self {
@@ -391,7 +391,8 @@ macro_rules! linked_list_array {
                 where [<$name$b Node>]<T>: Default
             {
                 /// Returns an empty, non-circular, doubly linked list,
-                /// allocated in the heap.
+                /// allocated in the stack, and filled with unlinked `CAP`
+                /// elements set to their default value.
                 ///
                 /// # Examples
                 /// ```
@@ -416,24 +417,30 @@ macro_rules! linked_list_array {
         /// `S=(); T:Clone`
         impl<T: Clone, const CAP: usize> [<$name$b>]<T, (), CAP> {
             /// Returns a doubly linked list, allocated in the stack,
-            /// filled with unlinked `value` elements.
+            /// filled with `CAP` unlinked elements set to `value`.
+            ///
+            /// # Errors
+            #[doc = "If `CAP` is >= [`" $t "::MAX`]."]
             ///
             /// # Examples
             /// ```
-            /// use ladata::all::DoublyLinkedList8;
-            /// let l = DoublyLinkedList8::<u8, (), 100>::new(0);
-            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
             ///
-            /// # Panics
-            #[doc = "Panics if `CAP` is >= [`" $t "::MAX`]."]
-            pub fn new(value: T) -> Self {
-                assert![CAP < $t::MAX as usize];
-                Self {
-                    nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
-                        with([<$name$b Node>]::new_unlinked(value)),
-                    count: $nmt::new(0).unwrap(),
-                    front: None.into(),
-                    back: None.into(),
+            /// let l = DirectDoublyLinkedList8::<u8, 100>::new(0)?;
+            /// # Ok(()) }
+            /// ```
+            pub fn new(value: T) -> Result<Self> {
+                if CAP < $t::MAX as usize {
+                    Ok(Self {
+                        nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
+                            with([<$name$b Node>]::new_unlinked(value)),
+                        count: $nmt::new(0).unwrap(),
+                        front: None.into(),
+                        back: None.into(),
+                    })
+                } else {
+                    Err(Error::DimensionMismatch)
                 }
             }
         }
@@ -443,24 +450,30 @@ macro_rules! linked_list_array {
         #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
         impl<T: Clone, const CAP: usize> [<$name$b>]<T, Boxed, CAP> {
             /// Returns a doubly linked list, allocated in the heap,
-            /// filled with unlinked `value` elements.
+            /// filled with `CAP` unlinked elements set to `value`.
+            ///
+            /// # Errors
+            #[doc = "If `CAP` is >= [`" $t "::MAX`]."]
             ///
             /// # Examples
             /// ```
-            /// use ladata::all::{Boxed, DoublyLinkedList8};
-            /// let l = DoublyLinkedList8::<u8, Boxed, 100>::new(0);
-            /// ```
+            /// use ladata::list::{BoxedDoublyLinkedList8};
+            /// # fn main() -> ladata::error::LadataResult<()> {
             ///
-            /// # Panics
-            #[doc = "Panics if `CAP` is >= [`" $t "::MAX`]."]
-            pub fn new(value: T) -> Self {
-                assert![CAP < $t::MAX as usize];
-                Self {
-                    nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
-                        with([<$name$b Node>]::new_unlinked(value)),
-                    count: $nmt::new(0).unwrap(),
-                    front: None.into(),
-                    back: None.into(),
+            /// let l = BoxedDoublyLinkedList8::<u8, 100>::new(0)?;
+            /// # Ok(()) }
+            /// ```
+            pub fn new(value: T) -> Result<Self> {
+                if CAP < $t::MAX as usize {
+                    Ok(Self {
+                        nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
+                            with([<$name$b Node>]::new_unlinked(value)),
+                        count: $nmt::new(0).unwrap(),
+                        front: None.into(),
+                        back: None.into(),
+                    })
+                } else {
+                    Err(Error::DimensionMismatch)
                 }
             }
         }
@@ -474,36 +487,194 @@ macro_rules! linked_list_array {
                 self.back = None.into();
                 self.reset_all_nodes(value);
             }
+
+            /// Removes the element at the front of the array and returns it.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// assert_eq![Ok(2), s.pop_front()];
+            /// assert_eq![Ok(1), s.pop_front()];
+            /// assert![s.pop_front().is_err()];
+            /// # Ok(()) }
+            /// ```
+            #[cfg(feature = "safe")]
+            // FIXME: test fail `link_push_mixed`
+            pub fn pop_front(&mut self) -> Result<T> {
+                if self.is_empty() {
+                    Err(Error::NotEnoughElements(1))
+                } else {
+                    // get the front node
+                    let front_idx = self.front.as_usize();
+                    let front_node = self.nodes[front_idx].clone();
+
+                    // update the front pointer
+                    self.front = front_node.next;
+                    self.nodes[front_idx].unlink();
+
+                    // update the previous front node
+                    if let Some(prev_idx) = front_node.prev.get() {
+                        self.nodes[prev_idx as usize].next = front_node.next;
+                    } else {
+                        // this was the only element in the list
+                        self.back = None.into();
+                    }
+
+                    // update the element count
+                    self.decrement_count()?;
+
+                    // return the data of the front node
+                    Ok(front_node.data)
+                }
+            }
+
+            /// Removes the element at the back of the array and returns it.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// assert_eq![Ok(1), s.pop_back()];
+            /// assert_eq![Ok(2), s.pop_back()];
+            /// assert![s.pop_back().is_err()];
+            /// # Ok(()) }
+            /// ```
+            #[cfg(feature = "safe")]
+            pub fn pop_back(&mut self) -> Result<T> {
+                if self.is_empty() {
+                    Err(Error::NotEnoughElements(1))
+                } else {
+                    // get the back node
+                    let back_idx = self.back.as_usize();
+                    let back_node = self.nodes[back_idx].clone();
+
+                    // update the back pointer
+                    self.back = back_node.prev;
+                    self.nodes[back_idx].unlink();
+
+                    // update the next node of the previous node
+                    if let Some(next_idx) = back_node.next.get() {
+                        self.nodes[next_idx as usize].prev = back_node.prev;
+                    } else {
+                        // this was the only element in the list
+                        self.front = None.into();
+                    }
+
+                    // update the element count
+                    self.decrement_count()?;
+
+                    // return the data of the back node
+                    Ok(back_node.data)
+                }
+            }
         }
 
         /// `*`
         impl<T, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
             /// Returns the number of elements.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![1, s.len()];
+            /// # Ok(()) }
+            /// ```
             pub const fn len(&self) -> $t {
                 self.count.get()
             }
 
             /// Checks if the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            ///
+            /// let s = DirectDoublyLinkedList8::<i32, 5>::default();
+            /// assert![s.is_empty()];
+            /// ```
             pub const fn is_empty(&self) -> bool {
                 self.front.is_none() && self.back.is_none()
             }
 
             /// Checks if the list is full.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 2>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// assert![s.is_full()];
+            /// # Ok(()) }
+            /// ```
             pub const fn is_full(&self) -> bool {
                 self.len() as usize == CAP
             }
 
             /// Returns the maximum number of elements.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            ///
+            /// let s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// assert_eq![3, s.capacity()];
+            /// ```
             pub const fn capacity(&self) -> usize {
                 CAP
             }
 
             /// Returns the available free elements.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![2, s.remaining_capacity()];
+            /// # Ok(()) }
+            /// ```
             pub const fn remaining_capacity(&self) -> usize {
                 CAP - self.len() as usize
             }
 
             /// Clears the list, unlinking all values.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 2>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// s.clear();
+            /// assert![s.is_empty()];
+            /// # Ok(()) }
+            /// ```
             pub fn clear(&mut self) {
                 self.count = $nmt::new(0).unwrap();
                 self.front = None.into();
@@ -513,8 +684,21 @@ macro_rules! linked_list_array {
 
             /* front & back */
 
-            /// Returns the index of the front element,
-            /// or `None` if the list is empty.
+            /// Returns the index of the front element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![0, s.front_index()?];
+            /// # Ok(()) }
+            /// ```
             pub const fn front_index(&self) -> Result<$t> {
                 if let Some(i) = self.front.get() {
                     Ok(i)
@@ -523,8 +707,21 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Returns the index of the back element,
-            /// or `None` if the list is empty.
+            /// Returns the index of the back element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![0, s.back_index()?];
+            /// # Ok(()) }
+            /// ```
             pub const fn back_index(&self) -> Result<$t> {
                 if let Some(i) = self.back.get() {
                     Ok(i)
@@ -533,8 +730,21 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Returns a shared reference to the front element,
-            /// or `None` if the list is empty.
+            /// Returns a shared reference to the front element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&1, s.front()?];
+            /// # Ok(()) }
+            /// ```
             pub fn front(&self) -> Result<&T> {
                 if self.front.is_some() {
                     Ok(&self.nodes[self.front.as_usize()].data)
@@ -547,6 +757,17 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&1, s.back()?];
+            /// # Ok(()) }
+            /// ```
             pub fn back(&self) -> Result<&T> {
                 if self.back.is_some() {
                     Ok(&self.nodes[self.back.as_usize()].data)
@@ -555,8 +776,21 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Returns an exclusive reference to the front element,
-            /// or `None` if the list is empty.
+            /// Returns an exclusive reference to the front element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&mut 1, s.front_mut()?];
+            /// # Ok(()) }
+            /// ```
             pub fn front_mut(&mut self) -> Result<&mut T> {
                 if self.front.is_some() {
                     Ok(&mut self.nodes[self.front.as_usize()].data)
@@ -569,6 +803,17 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&mut 1, s.back_mut()?];
+            /// # Ok(()) }
+            /// ```
             pub fn back_mut(&mut self) -> Result<&mut T> {
                 if self.back.is_some() {
                     Ok(&mut self.nodes[self.back.as_usize()].data)
@@ -577,8 +822,21 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Returns a shared reference to the element at `index`,
-            /// or `None` if the index is out of bounds.
+            /// Returns a shared reference to the element at `index`.
+            ///
+            /// # Errors
+            /// If the index is out of bounds.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&1, s.at(0)?];
+            /// # Ok(()) }
+            /// ```
             pub fn at(&self, index: $t) -> Result<&T> {
                 if index < self.count.get() {
                     return Ok(&self.nodes[index as usize].data);
@@ -586,8 +844,21 @@ macro_rules! linked_list_array {
                 Err(Error::IndexOutOfBounds(index as usize))
             }
 
-            /// Returns an exclusive reference to the element at `index`,
-            /// or `None` if the index is out of bounds.
+            /// Returns an exclusive reference to the element at `index`.
+            ///
+            /// # Errors
+            /// If the index is out of bounds.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1);
+            /// assert_eq![&mut 1, s.at_mut(0)?];
+            /// # Ok(()) }
+            /// ```
             pub fn at_mut(&mut self, index: $t) -> Result<&mut T> {
                 if index < self.count.get() {
                     return Ok(&mut self.nodes[index as usize].data);
@@ -597,7 +868,19 @@ macro_rules! linked_list_array {
 
             /// Adds an element at the front of the list and returns its index.
             ///
-            /// Returns `None` on overflow.
+            /// # Errors
+            /// If the list is full.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![1, s.len()];
+            /// # Ok(()) }
+            /// ```
             pub fn push_front(&mut self, value: T) -> Result<$t> {
                 if self.is_full() {
                     Err(Error::NotEnoughSpace(Some(1)))
@@ -631,45 +914,155 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Removes the element at the front of the array and returns it.
+            /// Adds an element at the back of the list and returns its index.
             ///
-            /// Returns `None` if the list is empty.
-            // WIP
-            #[allow(warnings)]
-            #[cfg(not(feature = "safe"))]
-            pub fn pop_front(&mut self) -> Option<T> {
-                if self.front.is_none() {
-                    return None;
+            /// # Errors
+            /// If the list is full.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_back(1)?;
+            /// assert_eq![1, s.len()];
+            /// # Ok(()) }
+            /// ```
+            pub fn push_back(&mut self, value: T) -> Result<$t> {
+                if self.is_full() {
+                    Err(Error::NotEnoughSpace(Some(1)))
+                } else {
+                    // Create the new element to put at the back
+                    let element = [<$name$b Node>]::new_back(self.back, value);
+
+                    // Find where the new element will be inserted
+                    let element_idx = self.count;
+
+                    // The first back element is also the front element
+                    if element_idx.get() == 0 {
+                        self.front = element_idx.into();
+                    } else {
+                        // Otherwise, update the next element of the previous back element
+                        self.set_next_at(self.back, element_idx.into())?;
+                    }
+
+                    // Update the element count
+                    self.increment_count()?;
+
+                    // Insert the new element
+                    self.nodes[element_idx.get() as usize] = element;
+
+                    // Update the current back element
+                    self.back = element_idx.into();
+
+                    // Return the index of the inserted element
+                    Ok(self.count.get() - 1)
                 }
-
-                todo![]
-
             }
 
-            // /// Adds an element at the back of the list and returns its index.
-            // ///
-            // /// Returns `None` on overflow.
-            // pub fn push_back(&mut self, value: T) -> Option<$t> {
-            //     if self.is_full() {
-            //         None
-            //     } else {
-            //         // 1. create the new element to put at the back.
-            //         // its previous_index will link to the current back_index
-            //         let element = [<$name$b Node>]::back(self.back, value);
-            //         // 2.
-            //         let prev = self.insert_free_element(element);
-            //
-            //         // ???
-            //         *self.next_of_prev(self.back, true) = prev;
-            //
-            //         self.back = prev;
-            //         self.count += 1;
-            //
-            //         Some(prev - 1)
-            //     }
-            // }
+            /// Removes the element at the front of the array and returns it.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// assert_eq![Ok(2), s.pop_front()];
+            /// assert_eq![Ok(1), s.pop_front()];
+            /// assert![s.pop_front().is_err()];
+            /// # Ok(()) }
+            /// ```
+            #[cfg(not(feature = "safe"))]
+            // FIXME: test fail `link_push_mixed`
+            pub fn pop_front(&mut self) -> Result<T> {
+                if self.is_empty() {
+                    Err(Error::NotEnoughElements(1))
+                } else {
+                    // Get the front node
+                    let front_idx = self.front.as_usize();
+                    let front_node_ptr = &self.nodes[front_idx] as *const [<$name$b Node>]<T>;
 
-            // TODO: pop_back
+                    // SAFETY: we're not gonna access the value, but move it out
+                    // MOTIVATION: to not depend on T: Clone
+                    let front_node = unsafe { core::ptr::read(front_node_ptr) };
+
+                    // Update the front pointer
+                    self.front = front_node.next;
+
+                    // Update the prev node of the next node
+                    if let Some(next_idx) = front_node.next.get() {
+                        self.nodes[next_idx as usize].prev = None.into();
+                    } else {
+                        self.back = None.into();
+                    }
+
+                    // Update the element count
+                    self.decrement_count()?;
+
+                    self.nodes[front_idx].unlink();
+
+                    // Return the data of the front node
+                    Ok(front_node.data)
+                }
+            }
+
+            /// Removes the element at the back of the array and returns it.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectDoublyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectDoublyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// s.push_front(2)?;
+            /// assert_eq![Ok(1), s.pop_back()];
+            /// assert_eq![Ok(2), s.pop_back()];
+            /// assert![s.pop_back().is_err()];
+            /// # Ok(()) }
+            /// ```
+            #[cfg(not(feature = "safe"))]
+            pub fn pop_back(&mut self) -> Result<T> {
+                if self.is_empty() {
+                    Err(Error::NotEnoughElements(1))
+                } else {
+                    // get the back node
+                    let back_idx = self.back.as_usize();
+                    let back_node_ptr = &self.nodes[back_idx] as *const [<$name$b Node>]<T>;
+
+                    // SAFETY: we're not gonna access the value, but move it out
+                    // MOTIVATION: to not depend on T: Clone
+                    let back_node = unsafe { core::ptr::read(back_node_ptr) };
+
+                    // update the back pointer
+                    self.back = back_node.prev;
+
+                    // update the next node of the previous node
+                    if let Some(next_idx) = back_node.next.get() {
+                        self.nodes[next_idx as usize].prev = back_node.prev;
+                    } else {
+                        self.front = None.into();
+                    }
+
+                    // update the element count
+                    self.decrement_count()?;
+
+                    self.nodes[back_idx].unlink();
+
+                    // return the data of the back node
+                    Ok(back_node.data)
+                }
+            }
         }
 
         //
@@ -687,11 +1080,23 @@ macro_rules! linked_list_array {
                     // unsafe { self.count = $nmt::new_unchecked(i); }
                     Ok(())
                 } else {
-                    Err(Error::NotEnoughSpace(None))
+                    Err(Error::NotEnoughSpace(Some(1)))
                 }
             }
-
-            /// Returns a reference to the node at `index`,
+            ///
+            fn decrement_count(&mut self) -> Result<()> {
+                if let Some(i) = self.count.get().checked_sub(1) {
+                    // MAYBE
+                    // #[cfg(feature = "safe")]
+                    { self.count = $nmt::new(i).unwrap(); }
+                    // #[cfg(not(feature = "safe"))]
+                    // unsafe { self.count = $nmt::new_unchecked(i); }
+                    Ok(())
+                } else {
+                    Err(Error::NotEnoughElements(1))
+                }
+            }
+            /// Returns a shared reference to the node at `index`,
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
@@ -713,8 +1118,10 @@ macro_rules! linked_list_array {
                 // )
             }
 
-            /// Returns an exclusive reference to the node at `index`,
-            /// or `None` if either the index is `None`, or out of bounds.
+            /// Returns an exclusive reference to the node at `index`.
+            ///
+            /// # Errors
+            /// If either the index is `None`, or out of bounds.
             fn mut_node_at(&mut self, index: [<$name$b Index>])
                 -> Result<&mut [<$name$b Node>]<T>> {
                 if let Some(i) = index.get() {
@@ -728,10 +1135,8 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Returns the `prev` field of the node at `index`,
+            /// Returns the `prev` field of the node at `index`.
             ///
-            // or `None` if either the index is `None`, or out of bounds. FIX
-            // TODO
             /// # Errors
             /// If either the index is `None`, or out of bounds.
             fn prev_at(&self, index: [<$name$b Index>]) -> Result<[<$name$b Index>]> {
@@ -739,22 +1144,25 @@ macro_rules! linked_list_array {
             }
             /// Sets the `prev` field of the node at `index` with `new_prev`.
             ///
-            /// Returns `None` if either the index is `None`, or out of bounds.
+            /// # Errors
+            /// If either the index is `None`, or out of bounds.
             fn set_prev_at(&mut self, index: [<$name$b Index>], new_prev: [<$name$b Index>])
                 -> Result<()> {
                 self.mut_node_at(index)?.set_prev(new_prev);
                 Ok(())
             }
 
-            /// Returns the `next` field of the provided node-`index`,
-            /// or `None` if either the `index` is `None`, or out of bounds.
+            /// Returns the `next` field of the provided node-`index`.
+            ///
+            /// # Errors
+            /// If either the index is `None`, or out of bounds.
             fn next_at(&self, index: [<$name$b Index>]) -> Result<[<$name$b Index>]> {
                 Ok(self.ref_node_at(index)?.next())
             }
-            /// Sets the `next` field of the provided node-`index`,
-            /// with `new_next`.
+            /// Sets the `next` field of the provided node-`index`, with `new_next`.
             ///
-            /// Returns `None` if either the index is `None`, or out of bounds.
+            /// # Errors
+            /// If either the index is `None`, or out of bounds.
             fn set_next_at(&mut self, index: [<$name$b Index>], new_next: [<$name$b Index>])
                 -> Result<()> {
                 self.mut_node_at(index)?.set_next(new_next);
@@ -792,27 +1200,26 @@ macro_rules! linked_list_array {
     }};
 }
 
-#[cfg(any(
-    target_pointer_width = "8",
-    target_pointer_width = "16",
-    target_pointer_width = "32",
-    target_pointer_width = "64",
-    target_pointer_width = "128"
-))]
+// #[cfg(any(
+//     target_pointer_width = "8",
+//     target_pointer_width = "16",
+//     target_pointer_width = "32",
+//     target_pointer_width = "64",
+//     target_pointer_width = "128"
+// ))]
 linked_list_array![DoublyLinkedList, 1, 8, u8, nonmax::NonMaxU8];
 
-#[cfg(any(
-    target_pointer_width = "16",
-    target_pointer_width = "32",
-    target_pointer_width = "64",
-    target_pointer_width = "128"
-))]
+// #[cfg(any(
+//     target_pointer_width = "16",
+//     target_pointer_width = "32",
+//     target_pointer_width = "64",
+//     target_pointer_width = "128"
+// ))]
 linked_list_array![DoublyLinkedList, 2, 16, u16, nonmax::NonMaxU16];
 
-#[cfg(any(
-    target_pointer_width = "16",
-    target_pointer_width = "32",
-    target_pointer_width = "64",
-    target_pointer_width = "128"
-))]
+// #[cfg(any(
+//     target_pointer_width = "32",
+//     target_pointer_width = "64",
+//     target_pointer_width = "128"
+// ))]
 linked_list_array![DoublyLinkedList, 4, 32, u32, nonmax::NonMaxU32];

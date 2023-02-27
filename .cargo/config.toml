@@ -5,6 +5,7 @@ cl = "clippy"
 clq = "clippy --quiet"
 #
 cl_nostd = "clippy --no-default-features"
+cl_unsafe = "clippy --no-default-features --features=std"
 cl_all = "clippy --features=deps_all"
 
 # CLEAN PACKAGE
@@ -41,6 +42,12 @@ bre = "build --release --example"
 brqb = "build --release --quiet --bin"
 brqe = "build --release --quiet --example"
 #
+b_unsafe = "build --no-default-features --features=std"
+bb_unsafe = "build --bin --no-default-features --features=std"
+be_unsafe = "build --example --no-default-features --features=std"
+bq_unsafe = "build --quiet --no-default-features --features=std"
+br_unsafe = "build --release --no-default-features --features=std"#
+#
 b_nostd = "build --no-default-features"
 bb_nostd = "build --bin --no-default-features"
 be_nostd = "build --example --no-default-features"
@@ -66,9 +73,15 @@ rre = "run --release --example"
 rrqb = "run --release --quiet --bin"
 rrqe = "run --release --quiet --example"
 #
+r_unsafe = "run --no-default-features --features=std"
+rb_unsafe = "run --bin --no-default-features --features=std"
+re_unsafe = "run --no-default-features --features=std --example "
+rq_unsafe = "run --quiet --no-default-features --features=std"
+rr_unsafe = "run --release --no-default-features --features=std"
+#
 r_nostd = "run --no-default-features"
-rb_nostd = "run --bin --no-default-features"
-re_nostd = "run --example --no-default-features"
+rb_nostd = "run --no-default-features --bin "
+re_nostd = "run --no-default-features --example"
 rq_nostd = "run --quiet --no-default-features"
 rr_nostd = "run --release --no-default-features"
 #
@@ -86,6 +99,9 @@ t_1 = "test -- --test-threads 1 --nocapture"
 #
 t_nostd = "test --no-default-features"
 td_nostd = "test --doc --no-default-features"
+#
+t_unsafe = "test --no-default-features --features=std"
+td_unsafe = "test --doc --no-default-features --features=std"
 #
 t_all = "test --features=deps_all"
 td_all = "test --doc --features=deps_all"
