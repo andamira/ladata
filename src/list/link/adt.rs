@@ -3,7 +3,7 @@
 //!
 //
 
-use crate::{base::CollectionAdt, error::LadataResult as Result};
+use crate::{error::LadataResult as Result, misc::CollectionAdt};
 
 /// An abstract Singly Linked List.
 pub trait SinglyLinkedListAdt: CollectionAdt {

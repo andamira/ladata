@@ -17,8 +17,6 @@ use crate::mem::Boxed;
 fn link_sizes_raw() {
     /* 8-bit index list */
 
-    assert_eq!(1, size_of::<DoublyLinkedList8Index>());
-
     // the size of a node is the sum of:
     // - the size of its 2 indexes (2 * 1)
     // - the size of T
@@ -45,8 +43,6 @@ fn link_sizes_raw() {
     assert_eq![8 + 16 + 8, size_of::<DoublyLinkedList8::<u128, (), 1>>()];
 
     /* 16-bit index list */
-
-    assert_eq!(2, size_of::<DoublyLinkedList16Index>());
 
     // the size of a node is the sum of:
     // - the size of its 2 indexes (2 * 2)
@@ -81,8 +77,6 @@ fn link_sizes_raw() {
     assert_eq![8 + (16 + 8) * 10, size_of::<DoublyLinkedList16::<u128, (), 10>>()];
 
     /* 32-bit index list */
-
-    assert_eq!(4, size_of::<DoublyLinkedList32Index>());
 
     assert_eq!(8 + 0 + 0, size_of::<DoublyLinkedList32Node::<()>>());
     assert_eq![8 + 1 + 3, size_of::<DoublyLinkedList32Node::<u8>>()];

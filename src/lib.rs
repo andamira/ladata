@@ -50,6 +50,7 @@ pub mod list;
 // pub mod hybrid;
 // pub mod key;
 pub mod mem;
+pub mod misc;
 // pub mod tree;
 pub mod unit;
 
@@ -58,50 +59,21 @@ pub mod unit;
 /// Everything is re-exported from here.
 pub mod all {
     #[doc(inline)]
-    pub use super::base::*;
-
-    #[doc(inline)]
-    pub use super::error::*;
-
-    #[doc(inline)]
-    pub use super::grid::*;
-
-    #[doc(inline)]
-    pub use super::list::all::*;
+    pub use super::{
+        error::*,
+        grid::*,
+        list::all::*,
+        mem::{Direct, Storage},
+        misc::*,
+    };
 
     #[doc(inline)]
     #[cfg(feature = "std")]
     pub use super::mem::Boxed;
-    #[doc(inline)]
-    pub use super::mem::{Direct, Storage};
 
     // #[doc(inline)]
     // pub use super::tree::*;
 
     #[doc(inline)]
     pub use crate::unit::{bares::*, cells::*, traits::*, types::*};
-}
-
-/// Base types.
-pub mod base {
-    use super::error::LadataResult as Result;
-
-    /// An abstract Collection.
-    pub trait CollectionAdt {
-        type Element;
-        fn collection_is_empty(&self) -> bool;
-        fn collection_len(&self) -> usize;
-        fn collection_byte_len(&self) -> usize;
-    }
-
-    /// An abstract dynamically-sized Collection.
-    pub trait DynCollectionAdt: CollectionAdt {
-        fn collection_with_capacity(capacity: usize) -> Self;
-        fn collection_capacity(&self) -> usize;
-        fn collection_set_capacity(&mut self, capacity: usize) -> Result<()>;
-        //
-        fn collection_remaining_capacity(&self) -> usize {
-            self.collection_capacity() - self.collection_len()
-        }
-    }
 }

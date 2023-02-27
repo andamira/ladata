@@ -5,10 +5,10 @@
 //
 
 use crate::{
-    base::CollectionAdt,
     error::LadataResult as Result,
     list::{Array, QueueAdt},
     mem::Storage,
+    misc::CollectionAdt,
 };
 
 #[cfg(feature = "std")]

@@ -20,6 +20,7 @@ use crate::{
     error::{LadataError as Error, LadataResult as Result},
     list::Array,
     mem::Storage,
+    misc::*,
 };
 
 #[cfg(feature = "std")]
@@ -35,143 +36,14 @@ macro_rules! linked_list_array {
     // $nmt: nonmax inner index type
     ( $name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { paste::paste! {
 
-        // Index ---------------------------------------------------------------
-
-        /// The private list index type.
-        ///
-        /// There's a maximum of `$t::MAX` -1 nodes.
-        #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
-        pub(super) struct [<$name$b Index>](Option<$nmt>);
-
-        impl Debug for [<$name$b Index>] {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f,  "{:?}", self.0)
-            }
-        }
-
-        #[allow(dead_code)]
-        impl [<$name$b Index>] {
-            /// Returns a new index pointing to some node.
-            ///
-            /// # Errors
-            #[doc = "If index is [`" $t "::MAX`]."]
-            #[inline]
-            pub(super) const fn new(index: $t) -> Result<Self> {
-                if let Some(i) = $nmt::new(index) {
-                    Ok(Self(Some(i)))
-                } else {
-                    Err(Error::IndexOutOfBounds(index as usize))
-                }
-            }
-
-            /// Returns a new index that doesn't point to any node.
-            #[inline]
-            pub(super) const fn none() -> Self {
-                Self(None)
-            }
-
-            //
-
-            /// Returns `true` if the index points to some node.
-            #[inline]
-            pub(super) const fn is_some(&self) -> bool {
-                self.0.is_some()
-            }
-
-            /// Returns `true` if the index points to no node.
-            #[inline]
-            pub(super) const fn is_none(&self) -> bool {
-                self.0.is_none()
-            }
-
-            //
-
-            /// Retuns the inner primitive type, or `None` if == `$t::MAX`.
-            #[inline]
-            pub(super) const fn get(&self) -> Option<$t> {
-                if let Some(i) = self.0 {
-                    Some(i.get())
-                } else {
-                    None
-                }
-            }
-
-            /// Returns the inner primitive type as a `usize`.
-            // THINK MAYBE DELETE
-            #[inline]
-            pub(super) const fn as_usize(&self) -> usize {
-                if let Some(v) = self.get() {
-                    v as usize
-                } else {
-                    // RETHINK?
-                    $t::MAX as usize
-                }
-            }
-
-            /// Increments by 1 the inner value, if not `None`.
-            // TODO TEST when very close to MAX... in e.g. push_front
-            // IMPROVE: Result?
-            #[must_use]
-            #[inline]
-            pub(super) fn increment(&mut self) -> Option<()> {
-                if let Some(i) = self.0 {
-                    self.0 = $nmt::new(i.get().checked_add(1)?);
-                    Some(())
-                } else {
-                    None
-                }
-            }
-            /// Decrements by 1 the inner value, if not `None`.
-            // IMPROVE when very close to MAX... in e.g. push_front
-            // IMPROVE Result?
-            #[must_use]
-            #[inline]
-            pub(super) fn decrement(&mut self) -> Option<()> {
-                if let Some(i) = self.0 {
-                    self.0 = $nmt::new(i.get().checked_sub(1)?);
-                    Some(())
-                } else {
-                    None
-                }
-            }
-        }
-
-        impl From<$t> for [<$name$b Index>] {
-            /// Converts $t::MAX to None
-            #[inline]
-            fn from(index: $t) -> Self {
-                if let Some(i) = $nmt::new(index) {
-                    Self(Some(i))
-                } else {
-                    Self(None)
-                }
-            }
-        }
-        impl From<Option<$t>> for [<$name$b Index>] {
-            #[inline]
-            fn from(index: Option<$t>) -> Self {
-                if let Some(i) = index {
-                    Self($nmt::new(i))
-                } else {
-                    Self(None)
-                }
-            }
-        }
-        impl From<$nmt> for [<$name$b Index>] {
-            #[inline]
-            fn from(index: $nmt) -> Self {
-                Self(Some(index))
-            }
-        }
-
         // Node ----------------------------------------------------------------
 
         /// The list node.
         pub(super) struct [<$name$b Node>] <T> {
             /// The index of the previous element, towards the front of the list.
-            prev: [<$name$b Index>],
+            prev: [<Index$b>],
             /// The index of the next element, towards the back of the list.
-            next: [<$name$b Index>],
+            next: [<Index$b>],
             /// The node's data.
             data: T,
         }
@@ -213,8 +85,8 @@ macro_rules! linked_list_array {
             /// Returns a new node, with `data`, and custom `prev`ious and `next` indices.
             #[inline]
             pub(super) const fn new(
-                prev: [<$name$b Index>],
-                next: [<$name$b Index>],
+                prev: [<Index$b>],
+                next: [<Index$b>],
                 data: T
             ) -> Self {
                 Self {
@@ -229,8 +101,8 @@ macro_rules! linked_list_array {
             #[inline]
             pub(super) const fn new_unlinked(data: T) -> Self {
                 Self {
-                    prev: [<$name$b Index>]::none(),
-                    next: [<$name$b Index>]::none(),
+                    prev: [<Index$b>]::none(),
+                    next: [<Index$b>]::none(),
                     data,
                 }
             }
@@ -238,9 +110,9 @@ macro_rules! linked_list_array {
             /// Returns a new node intended to be the new front of the list.
             /// Expects the index of the current front node.
             #[inline]
-            pub(super) const fn new_front(current_front: [<$name$b Index>], data: T) -> Self {
+            pub(super) const fn new_front(current_front: [<Index$b>], data: T) -> Self {
                 Self {
-                    prev: [<$name$b Index>]::none(),
+                    prev: [<Index$b>]::none(),
                     next: current_front,
                     data,
                 }
@@ -249,48 +121,48 @@ macro_rules! linked_list_array {
             /// Returns a new node intended to be the new back of the list.
             /// Expects the index of the current back node.
             #[inline]
-            pub(super) const fn new_back(current_back: [<$name$b Index>], data: T) -> Self {
+            pub(super) const fn new_back(current_back: [<Index$b>], data: T) -> Self {
                 Self {
                     prev: current_back,
-                    next: [<$name$b Index>]::none(),
+                    next: [<Index$b>]::none(),
                     data,
                 }
             }
 
             /// Returns this node's next index (towards the back).
             #[inline]
-            pub(super) fn next(&self) -> [<$name$b Index>] {
+            pub(super) fn next(&self) -> [<Index$b>] {
                 self.next
             }
             /// Sets this node's next index (towards the back).
             #[inline]
-            pub(super) fn set_next(&mut self, index: [<$name$b Index>]) {
+            pub(super) fn set_next(&mut self, index: [<Index$b>]) {
                 self.next = index;
             }
 
             /// Returns this node's previous index (towards the front).
             #[inline]
-            pub(super) fn prev(&self) -> [<$name$b Index>] {
+            pub(super) fn prev(&self) -> [<Index$b>] {
                 self.prev
             }
             /// Sets this node's previous index (towards the front).
             #[inline]
-            pub(super) fn set_prev(&mut self, index: [<$name$b Index>]) {
+            pub(super) fn set_prev(&mut self, index: [<Index$b>]) {
                 self.prev = index;
             }
 
             /// Unlinks the node, clearing both prev and next indexes.
             pub(super) fn unlink(&mut self) {
-                self.next = [<$name$b Index>]::none();
-                self.prev = [<$name$b Index>]::none();
+                self.next = [<Index$b>]::none();
+                self.prev = [<Index$b>]::none();
             }
 
             /// Sets the `value` and unlinks the node,
             /// clearing both prev and next indexes.
             pub(super) fn reset(&mut self, value: T) {
                 self.data = value;
-                self.next = [<$name$b Index>]::none();
-                self.prev = [<$name$b Index>]::none();
+                self.next = [<Index$b>]::none();
+                self.prev = [<Index$b>]::none();
             }
         }
 
@@ -304,12 +176,11 @@ macro_rules! linked_list_array {
         #[doc = "plus any padding."]
         pub struct [<$name$b>]<T, S: Storage, const CAP: usize> {
             /// The current number of nodes.
-            // count: [<$name$b Index>], WIP MAYBE
-            count: $nmt,
+            len: $nmt,
             /// The index of the current element at the front.
-            front: [<$name$b Index>],
+            front: [<Index$b>],
             /// The index of the current element at the back.
-            back: [<$name$b Index>],
+            back: [<Index$b>],
             /// The array of nodes, stored in the generic container.
             nodes: Array<[<$name$b Node>]<T>, S, CAP>,
         }
@@ -323,7 +194,7 @@ macro_rules! linked_list_array {
                 where S::Stored<[[<$name$b Node>]<T>; CAP]>: Clone {
                 fn clone(&self) -> Self {
                     Self {
-                        count: self.count.clone(),
+                        len: self.len.clone(),
                         front: self.front.clone(),
                         back: self.back.clone(),
                         nodes: self.nodes.clone(),
@@ -342,7 +213,7 @@ macro_rules! linked_list_array {
                     let mut debug = f.debug_struct(stringify![[<$name$b>]]);
                     debug
                         .field("CAP", &CAP)
-                        .field("count", &self.count)
+                        .field("len", &self.len)
                         .field("front", &self.front)
                         .field("back", &self.back);
 
@@ -377,7 +248,7 @@ macro_rules! linked_list_array {
                     assert![CAP < $t::MAX as usize];
                     Self {
                         nodes: Array::default(),
-                        count: $nmt::new(0).unwrap(),
+                        len: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
                     }
@@ -406,7 +277,7 @@ macro_rules! linked_list_array {
                     assert![CAP < $t::MAX as usize];
                     Self {
                         nodes: Array::default(),
-                        count: $nmt::new(0).unwrap(),
+                        len: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
                     }
@@ -435,7 +306,7 @@ macro_rules! linked_list_array {
                     Ok(Self {
                         nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
-                        count: $nmt::new(0).unwrap(),
+                        len: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
                     })
@@ -468,7 +339,7 @@ macro_rules! linked_list_array {
                     Ok(Self {
                         nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
-                        count: $nmt::new(0).unwrap(),
+                        len: $nmt::new(0).unwrap(),
                         front: None.into(),
                         back: None.into(),
                     })
@@ -482,7 +353,7 @@ macro_rules! linked_list_array {
         impl<T: Clone, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
             /// Resets the list, unlinking all elements and setting them to `value`.
             pub fn reset(&mut self, value: T) {
-                self.count = $nmt::new(0).unwrap();
+                self.len = $nmt::new(0).unwrap();
                 self.front = None.into();
                 self.back = None.into();
                 self.reset_all_nodes(value);
@@ -507,13 +378,13 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             #[cfg(feature = "safe")]
-            // FIXME: test fail `link_push_mixed`
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
                     // get the front node
-                    let front_idx = self.front.as_usize();
+                    // FIXME?
+                    let front_idx = self.front.as_usize().expect("front_idx");
                     let front_node = self.nodes[front_idx].clone();
 
                     // update the front pointer
@@ -521,15 +392,15 @@ macro_rules! linked_list_array {
                     self.nodes[front_idx].unlink();
 
                     // update the previous front node
-                    if let Some(prev_idx) = front_node.prev.get() {
-                        self.nodes[prev_idx as usize].next = front_node.next;
+                    if let Some(prev_idx) = front_node.prev.as_usize() {
+                        self.nodes[prev_idx].next = front_node.next;
                     } else {
                         // this was the only element in the list
                         self.back = None.into();
                     }
 
-                    // update the element count
-                    self.decrement_count()?;
+                    // update the number of elements
+                    self.decrement_len()?;
 
                     // return the data of the front node
                     Ok(front_node.data)
@@ -560,7 +431,8 @@ macro_rules! linked_list_array {
                     Err(Error::NotEnoughElements(1))
                 } else {
                     // get the back node
-                    let back_idx = self.back.as_usize();
+                    // FIXME?
+                    let back_idx = self.back.as_usize().expect("back_idx");
                     let back_node = self.nodes[back_idx].clone();
 
                     // update the back pointer
@@ -568,15 +440,15 @@ macro_rules! linked_list_array {
                     self.nodes[back_idx].unlink();
 
                     // update the next node of the previous node
-                    if let Some(next_idx) = back_node.next.get() {
-                        self.nodes[next_idx as usize].prev = back_node.prev;
+                    if let Some(next_idx) = back_node.next.as_usize() {
+                        self.nodes[next_idx].prev = back_node.prev;
                     } else {
                         // this was the only element in the list
                         self.front = None.into();
                     }
 
-                    // update the element count
-                    self.decrement_count()?;
+                    // update the number of elements
+                    self.decrement_len()?;
 
                     // return the data of the back node
                     Ok(back_node.data)
@@ -599,7 +471,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub const fn len(&self) -> $t {
-                self.count.get()
+                self.len.get()
             }
 
             /// Checks if the list is empty.
@@ -676,7 +548,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn clear(&mut self) {
-                self.count = $nmt::new(0).unwrap();
+                self.len = $nmt::new(0).unwrap();
                 self.front = None.into();
                 self.back = None.into();
                 self.unlink_all_nodes();
@@ -747,7 +619,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn front(&self) -> Result<&T> {
                 if self.front.is_some() {
-                    Ok(&self.nodes[self.front.as_usize()].data)
+                    Ok(&self.nodes[self.front.as_usize().unwrap()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -770,7 +642,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn back(&self) -> Result<&T> {
                 if self.back.is_some() {
-                    Ok(&self.nodes[self.back.as_usize()].data)
+                    Ok(&self.nodes[self.back.as_usize().unwrap()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -793,7 +665,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn front_mut(&mut self) -> Result<&mut T> {
                 if self.front.is_some() {
-                    Ok(&mut self.nodes[self.front.as_usize()].data)
+                    Ok(&mut self.nodes[self.front.as_usize().unwrap()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -816,7 +688,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn back_mut(&mut self) -> Result<&mut T> {
                 if self.back.is_some() {
-                    Ok(&mut self.nodes[self.back.as_usize()].data)
+                    Ok(&mut self.nodes[self.back.as_usize().unwrap()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -838,7 +710,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn at(&self, index: $t) -> Result<&T> {
-                if index < self.count.get() {
+                if index < self.len.get() {
                     return Ok(&self.nodes[index as usize].data);
                 }
                 Err(Error::IndexOutOfBounds(index as usize))
@@ -860,7 +732,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn at_mut(&mut self, index: $t) -> Result<&mut T> {
-                if index < self.count.get() {
+                if index < self.len.get() {
                     return Ok(&mut self.nodes[index as usize].data);
                 }
                 Err(Error::IndexOutOfBounds(index as usize))
@@ -889,7 +761,7 @@ macro_rules! linked_list_array {
                     let element = [<$name$b Node>]::new_front(self.front, value);
 
                     // find where the new element will be inserted.
-                    let element_idx = self.count;
+                    let element_idx = self.len;
 
                     // the first front element is also the back element.
                     if element_idx.get() == 0 {
@@ -900,8 +772,8 @@ macro_rules! linked_list_array {
                         self.set_prev_at(self.front, element_idx.into())?
                     }
 
-                    // update the element count.
-                    self.increment_count()?;
+                    // update the number of elements.
+                    self.increment_len()?;
 
                     // insert the new element
                     self.nodes[element_idx.get() as usize] = element;
@@ -910,7 +782,7 @@ macro_rules! linked_list_array {
                     self.front = element_idx.into();
 
                     // return the index of the inserted element
-                    Ok(self.count.get() - 1)
+                    Ok(self.len.get() - 1)
                 }
             }
 
@@ -937,7 +809,7 @@ macro_rules! linked_list_array {
                     let element = [<$name$b Node>]::new_back(self.back, value);
 
                     // Find where the new element will be inserted
-                    let element_idx = self.count;
+                    let element_idx = self.len;
 
                     // The first back element is also the front element
                     if element_idx.get() == 0 {
@@ -947,8 +819,8 @@ macro_rules! linked_list_array {
                         self.set_next_at(self.back, element_idx.into())?;
                     }
 
-                    // Update the element count
-                    self.increment_count()?;
+                    // Update the number of elements
+                    self.increment_len()?;
 
                     // Insert the new element
                     self.nodes[element_idx.get() as usize] = element;
@@ -957,7 +829,7 @@ macro_rules! linked_list_array {
                     self.back = element_idx.into();
 
                     // Return the index of the inserted element
-                    Ok(self.count.get() - 1)
+                    Ok(self.len.get() - 1)
                 }
             }
 
@@ -980,13 +852,13 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             #[cfg(not(feature = "safe"))]
-            // FIXME: test fail `link_push_mixed`
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
                     // Get the front node
-                    let front_idx = self.front.as_usize();
+                    // FIXME
+                    let front_idx = self.front.as_usize().expect("front_idx");
                     let front_node_ptr = &self.nodes[front_idx] as *const [<$name$b Node>]<T>;
 
                     // SAFETY: we're not gonna access the value, but move it out
@@ -1003,8 +875,8 @@ macro_rules! linked_list_array {
                         self.back = None.into();
                     }
 
-                    // Update the element count
-                    self.decrement_count()?;
+                    // Update the number of elements
+                    self.decrement_len()?;
 
                     self.nodes[front_idx].unlink();
 
@@ -1037,7 +909,8 @@ macro_rules! linked_list_array {
                     Err(Error::NotEnoughElements(1))
                 } else {
                     // get the back node
-                    let back_idx = self.back.as_usize();
+                    // FIXME
+                    let back_idx = self.back.as_usize().expect("front_idx");
                     let back_node_ptr = &self.nodes[back_idx] as *const [<$name$b Node>]<T>;
 
                     // SAFETY: we're not gonna access the value, but move it out
@@ -1054,8 +927,8 @@ macro_rules! linked_list_array {
                         self.front = None.into();
                     }
 
-                    // update the element count
-                    self.decrement_count()?;
+                    // update the number elements
+                    self.decrement_len()?;
 
                     self.nodes[back_idx].unlink();
 
@@ -1071,26 +944,26 @@ macro_rules! linked_list_array {
         #[allow(dead_code)]
         impl<T, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
             ///
-            fn increment_count(&mut self) -> Result<()> {
-                if let Some(i) = self.count.get().checked_add(1) {
+            fn increment_len(&mut self) -> Result<()> {
+                if let Some(i) = self.len.get().checked_add(1) {
                     // MAYBE
                     // #[cfg(feature = "safe")]
-                    { self.count = $nmt::new(i).unwrap(); }
+                    { self.len = $nmt::new(i).unwrap(); }
                     // #[cfg(not(feature = "safe"))]
-                    // unsafe { self.count = $nmt::new_unchecked(i); }
+                    // unsafe { self.len = $nmt::new_unchecked(i); }
                     Ok(())
                 } else {
                     Err(Error::NotEnoughSpace(Some(1)))
                 }
             }
             ///
-            fn decrement_count(&mut self) -> Result<()> {
-                if let Some(i) = self.count.get().checked_sub(1) {
+            fn decrement_len(&mut self) -> Result<()> {
+                if let Some(i) = self.len.get().checked_sub(1) {
                     // MAYBE
                     // #[cfg(feature = "safe")]
-                    { self.count = $nmt::new(i).unwrap(); }
+                    { self.len = $nmt::new(i).unwrap(); }
                     // #[cfg(not(feature = "safe"))]
-                    // unsafe { self.count = $nmt::new_unchecked(i); }
+                    // unsafe { self.len = $nmt::new_unchecked(i); }
                     Ok(())
                 } else {
                     Err(Error::NotEnoughElements(1))
@@ -1100,9 +973,9 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn ref_node_at(&self, index: [<$name$b Index>]) -> Result<&[<$name$b Node>]<T>> {
+            fn ref_node_at(&self, index: [<Index$b>]) -> Result<&[<$name$b Node>]<T>> {
                 if let Some(i) = index.get() {
-                    if i < self.count.get() {
+                    if i < self.len.get() {
                         self.nodes.get(i as usize).ok_or(Error::IndexOutOfBounds(i as usize))
                     } else {
                         return Err(Error::IndexOutOfBounds(i as usize));
@@ -1122,10 +995,10 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn mut_node_at(&mut self, index: [<$name$b Index>])
+            fn mut_node_at(&mut self, index: [<Index$b>])
                 -> Result<&mut [<$name$b Node>]<T>> {
                 if let Some(i) = index.get() {
-                    if i < self.count.get() {
+                    if i < self.len.get() {
                         self.nodes.get_mut(i as usize).ok_or(Error::IndexOutOfBounds(i as usize))
                     } else {
                         return Err(Error::IndexOutOfBounds(i as usize));
@@ -1139,14 +1012,14 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn prev_at(&self, index: [<$name$b Index>]) -> Result<[<$name$b Index>]> {
+            fn prev_at(&self, index: [<Index$b>]) -> Result<[<Index$b>]> {
                 Ok(self.ref_node_at(index)?.prev())
             }
             /// Sets the `prev` field of the node at `index` with `new_prev`.
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn set_prev_at(&mut self, index: [<$name$b Index>], new_prev: [<$name$b Index>])
+            fn set_prev_at(&mut self, index: [<Index$b>], new_prev: [<Index$b>])
                 -> Result<()> {
                 self.mut_node_at(index)?.set_prev(new_prev);
                 Ok(())
@@ -1156,14 +1029,14 @@ macro_rules! linked_list_array {
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn next_at(&self, index: [<$name$b Index>]) -> Result<[<$name$b Index>]> {
+            fn next_at(&self, index: [<Index$b>]) -> Result<[<Index$b>]> {
                 Ok(self.ref_node_at(index)?.next())
             }
             /// Sets the `next` field of the provided node-`index`, with `new_next`.
             ///
             /// # Errors
             /// If either the index is `None`, or out of bounds.
-            fn set_next_at(&mut self, index: [<$name$b Index>], new_next: [<$name$b Index>])
+            fn set_next_at(&mut self, index: [<Index$b>], new_next: [<Index$b>])
                 -> Result<()> {
                 self.mut_node_at(index)?.set_next(new_next);
                 Ok(())

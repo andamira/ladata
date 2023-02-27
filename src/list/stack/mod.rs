@@ -5,7 +5,7 @@
 //! <https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>
 //
 
-use crate::{base::CollectionAdt, error::LadataResult as Result, list::Array, mem::Storage};
+use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;

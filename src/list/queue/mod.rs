@@ -4,7 +4,7 @@
 //! and removals are made at the opposite end.
 //
 
-use crate::{base::CollectionAdt, error::LadataResult as Result, list::Array, mem::Storage};
+use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
