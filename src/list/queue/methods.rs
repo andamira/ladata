@@ -71,7 +71,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         (self.front + nth) % CAP
     }
 
-    /// Moves an array into a [`full`][Self::is_full] queue.
+    /// Converts an array into a [`full`][Self::is_full] queue.
     ///
     /// # Examples
     /// ```
@@ -471,8 +471,10 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     #[cfg(feature = "std")]
     #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
     pub fn to_vec(&self) -> Vec<T> {
-        let mut vec = Vec::new();
-        if !self.is_empty() {
+        if self.is_empty() {
+            vec![]
+        } else {
+            let mut vec = Vec::new();
             let mut index = self.front;
 
             // makes sure a full queue is not rejected
@@ -483,8 +485,8 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
                 vec.push(self.array[index].clone());
                 index = (index + 1) % CAP;
             }
+            vec
         }
-        vec
     }
 
     /// Returns some `LEN` queued elements as an array, or `None` if the queue

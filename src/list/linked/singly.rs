@@ -164,19 +164,23 @@ macro_rules! linked_list_array {
 
         #[doc = "A singly linked list, backed by an [`Array`], using " $b "-bit indices."]
         ///
-        #[doc = "- It has a maximum length of [`" $t "::MAX`]` -1` elements."]
-        #[doc = "- An empty list has a minimum size of `3 * " $B "` bytes."]
-        #[doc = "- Each element occupies `2 * " $B " + size_of::<T>()` bytes,"]
-        #[doc = "plus any padding."]
+        #[doc = "It has a maximum length of [`" $t "::MAX`]` -1` elements."]
+        ///
+        /// The list remembers the indices of the front and back elements,
+        /// the index of the first free slot and the number of elements.
+        ///
+        /// Each node remembers the index of the next element of the list.
         pub struct [<$name$b>]<T, S: Storage, const CAP: usize> {
             /// The index of the current element at the front.
             front: [<Index$b>],
+            /// The index of the current element at the back.
+            back: [<Index$b>],
+            /// The index of the front free element.
+            free: [<Index$b>],
             /// The current counted number of nodes.
             count: [<Index$b>],
             /// The array of nodes, stored in the generic container.
             nodes: Array<[<$name$b Node>]<T>, S, CAP>,
-            /// The index of the front free element.
-            free: [<Index$b>],
         }
 
         /// impl Clone, Copy, Debug, Default…
@@ -189,6 +193,7 @@ macro_rules! linked_list_array {
                 fn clone(&self) -> Self {
                     Self {
                         front: self.front.clone(),
+                        back: self.back.clone(),
                         free: self.free.clone(),
                         count: self.count.clone(),
                         nodes: self.nodes.clone(),
@@ -204,13 +209,14 @@ macro_rules! linked_list_array {
             impl<T: Debug, S: Storage, const CAP: usize> Debug for [<$name$b>]<T, S, CAP>
                 where S::Stored<[[<$name$b Node>]<T>; CAP]>: Debug {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    write![f, "{} {{ cap:{} len:{} front:{:?} free:{:?} sizeof:{} }}",
+                    write![f, "{} {{ cap:{} len:{} front:{} back:{} free:{} sizeof:{} }}",
                         stringify!([<$name$b>]),
-                        CAP, self.len(), self.front, self.free, size_of::<Self>()]?;
+                        CAP, self.len(), self.front, self.back, self.free, size_of::<Self>()]?;
 
                     if self.len() > 0 {
 
-                        // TODO: save ordered list of indexes, from iteration.
+                        // IMPROVE: save ordered list of indexes, from iteration.
+                        // IMPROVE: limit the number of depicted elements.
 
                         /* show the list diagram */
                         write![f, "\n## array of nodes:"]?;
@@ -223,7 +229,7 @@ macro_rules! linked_list_array {
                         // [__3rd_] [__2nd_] [__1st_] [______]
                         write![f, "\n"]?;
                         for node in self.nodes.iter() {
-                            // if node.is_in_the_list() { // TEMP
+                            // if node.is_in_the_list() { // IMPROVE
                                 let graphemes: String = format!["{:?}",
                                     node.data].graphemes(true).take(6).collect();
                                 write![f, "[{:_^6}] ", graphemes]?;
@@ -240,24 +246,12 @@ macro_rules! linked_list_array {
                         /* show the list of nodes */
                         write![f, "\n## node list from the front:"]?;
 
-                        // A) iterate in array order
-                        // let mut counter = 0;
-                        // let mut idx_ptr = self.front;
-                        // IMPROVE: use iterator when implemented
-                        // for idx in 0..self.len() {
-                        //     write!(f, "\nidx:{idx}: {:?}", self.nodes[idx as usize])?;
-                        // }
-
-                        // B) iterate in list order
                         let mut current_idx = self.front;
                         while current_idx.is_some() {
                             let node = &self.nodes[current_idx.as_usize()];
                             write![f, "\ni{current_idx}: {node:?}"]?;
-                            // current_idx = self.nodes[current_idx.as_usize()].next();
                             current_idx = node.next();
                         }
-
-                        // write![f, "\n{:#?}", self.nodes]?; // TEMP print array
                     }
                     Ok(())
                 }
@@ -283,6 +277,7 @@ macro_rules! linked_list_array {
                     assert![(CAP as $t) < $t::MAX];
                     Self {
                         front: None.into(),
+                        back: None.into(),
                         free: None.into(),
                         count: [<Index$b>]::new(0).unwrap(),
                         nodes: Array::default(),
@@ -312,6 +307,7 @@ macro_rules! linked_list_array {
                     assert![(CAP as $t) < $t::MAX];
                     Self {
                         front: None.into(),
+                        back: None.into(),
                         free: None.into(),
                         count: [<Index$b>]::new(0).unwrap(),
                         nodes: Array::default(),
@@ -340,6 +336,7 @@ macro_rules! linked_list_array {
                 if (CAP as $t) < $t::MAX {
                     Ok(Self {
                         front: None.into(),
+                        back: None.into(),
                         free: None.into(),
                         count: [<Index$b>]::new(0).unwrap(),
                         nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
@@ -373,6 +370,7 @@ macro_rules! linked_list_array {
                 if (CAP as $t) < $t::MAX {
                     Ok(Self {
                         front: None.into(),
+                        back: None.into(),
                         free: None.into(),
                         count: [<Index$b>]::new(0).unwrap(),
                         nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
@@ -413,10 +411,7 @@ macro_rules! linked_list_array {
             /// assert![s.is_empty()];
             /// ```
             pub fn is_empty(&self) -> bool {
-                // debug_assert![
-                //     (self.len() == 0 && self.front.is_none()) ||
-                //     (self.len() > 0 && self.front.is_some())
-                // ];
+                // eprintln!("IS_EMPTY? len:{}, f:{} b:{}", self.len(), self.front, self.back);
                 self.len() == 0
             }
 
@@ -483,34 +478,36 @@ macro_rules! linked_list_array {
             pub fn clear(&mut self) {
                 self.count = [<Index$b>]::new(0).unwrap();
                 self.front = None.into();
+                self.back = None.into();
                 self.free = None.into();
                 self.unlink_all_nodes();
             }
 
             /* front & back */
 
-            /// Returns the index of the front element.
-            ///
-            /// # Errors
-            /// If the list is empty.
-            ///
-            /// # Examples
-            /// ```
-            /// use ladata::list::DirectSinglyLinkedList8;
-            /// # fn main() -> ladata::error::LadataResult<()> {
-            ///
-            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
-            /// s.push_front(1)?;
-            /// assert_eq![0, s.front_index()?];
-            /// # Ok(()) }
-            /// ```
-            pub const fn front_index(&self) -> Result<$t> {
-                if let Some(i) = self.front.get() {
-                    Ok(i)
-                } else {
-                    Err(Error::NotEnoughElements(1))
-                }
-            }
+            // MAYBE
+            // /// Returns the index of the front element.
+            // ///
+            // /// # Errors
+            // /// If the list is empty.
+            // ///
+            // /// # Examples
+            // /// ```
+            // /// use ladata::list::DirectSinglyLinkedList8;
+            // /// # fn main() -> ladata::error::LadataResult<()> {
+            // ///
+            // /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
+            // /// s.push_front(1)?;
+            // /// assert_eq![0, s.front_index()?];
+            // /// # Ok(()) }
+            // /// ```
+            // pub const fn front_index(&self) -> Result<$t> {
+            //     if let Some(i) = self.front.get() {
+            //         Ok(i)
+            //     } else {
+            //         Err(Error::NotEnoughElements(1))
+            //     }
+            // }
 
             /// Returns a shared reference to the front element.
             ///
@@ -558,7 +555,54 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Pushes an element as the new front element of the list,
+
+            /// Returns a shared reference to the back element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&1, s.back()?];
+            /// # Ok(()) }
+            /// ```
+            pub fn back(&self) -> Result<&T> {
+                if self.back.is_some() {
+                    Ok(&self.nodes[self.back.as_usize()].data)
+                } else {
+                    Err(Error::NotEnoughElements(1))
+                }
+            }
+
+            /// Returns an exclusive reference to the back element.
+            ///
+            /// # Errors
+            /// If the list is empty.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
+            /// s.push_front(1)?;
+            /// assert_eq![&mut 1, s.back_mut()?];
+            /// # Ok(()) }
+            /// ```
+            pub fn back_mut(&mut self) -> Result<&mut T> {
+                if self.back.is_some() {
+                    Ok(&mut self.nodes[self.back.as_usize()].data)
+                } else {
+                    Err(Error::NotEnoughElements(1))
+                }
+            }
+
+            /// Pushes an element to the front of the list,
             /// and returns its index.
             ///
             /// # Errors
@@ -577,17 +621,17 @@ macro_rules! linked_list_array {
             //
             // # Diagram
             // ```_
-            // count:0  front:_  free:_
+            // count:0  front:_  back:_  free:_
             //    i0       i1       i2       i3
             // [______] [______] [______] [______]
             //       n_       n_       n_       n_
             //
-            // count:1  front:0  free:_                          push_front()
+            // count:1  front:0  back:0  free:_                     push_front()
             //    i0       i1       i2       i3
             // [__1st_] [______] [______] [______]
             //       n_       n_       n_       n_
             //
-            // count:2  front:1  free:_                          push_front()
+            // count:2  front:1  back:0  free:_                     push_front()
             //    i0       i1       i2       i3
             // [__2nd_] [__1st_] [______] [______]
             //       n_       n0       n_       n_
@@ -604,6 +648,9 @@ macro_rules! linked_list_array {
                     if self.front.is_some() {
                         // …make the new front node point to it.
                         new_node.set_next(self.front);
+                    } else {
+                        // otherwise list was empty and back must equal front.
+                        self.back = new_index;
                     }
 
                     // Update the node, the count and the front index:
@@ -615,29 +662,169 @@ macro_rules! linked_list_array {
                 }
             }
 
-            /// Provides a forward iterator.
+            /// Pushes an element to the back of the list,
+            /// and returns its index.
+            ///
+            /// # Errors
+            /// If the list is full.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
+            /// s.push_back(1)?;
+            /// assert_eq![1, s.len()];
+            /// # Ok(()) }
+            /// ```
+            //
+            // # Diagram
+            // ```_
+            // count:0  front:_  back:_  free:_
+            //    i0       i1       i2       i3
+            // [______] [______] [______] [______]
+            //       n_       n_       n_       n_
+            //
+            // count:1  front:0  back:0  free:_                      push_back()
+            //    i0       i1       i2       i3
+            // [__1st_] [______] [______] [______]
+            //       n_       n_       n_       n_
+            //
+            // count:2  front:0  back:1  free:_                      push_back()
+            //    i0       i1       i2       i3
+            // [__1st_] [__2nd_] [______] [______]
+            //       n1       n_       n_       n_
+            // ```
+            pub fn push_back(&mut self, value: T) -> Result<[<Index$b>]> {
+                if self.is_full() {
+                    Err(Error::NotEnoughSpace(Some(1)))
+                } else {
+                    // The new front node, and its new index:
+                    let mut new_node = [<$name$b Node>]::new_unlinked(value);
+                    let new_index = self.first_free_index();
+
+                    // If there was already a back node…
+                    if self.back.is_some() {
+                        // …make it point to the new node.
+                        self.nodes[self.back.as_usize()].set_next(new_index);
+                    } else {
+                        // otherwise list was empty and front must equal back.
+                        self.front = new_index;
+                    }
+
+                    // Update the node, the count and the back index:
+                    self.nodes[new_index.as_usize()] = new_node;
+                    self.count.increment().unwrap();
+                    self.back = new_index;
+
+                    Ok(new_index)
+                }
+            }
+
+            /// Provides a forward iterator, starting at the front.
             ///
             /// # Example
             /// ```
             /// use ladata::list::DirectSinglyLinkedList8;
             /// # fn main() -> ladata::error::LadataResult<()> {
             ///
-            /// // let l = DirectSinglyLinkedList8::<i32, 4>::from([1, 2]); // TODO
-            /// let mut l = DirectSinglyLinkedList8::<i32, 4>::default();
-            /// l.push_front(1)?;
-            /// l.push_front(2)?;
+            /// let l = DirectSinglyLinkedList8::<i32, 4>::from([1, 2]);
             ///
-            /// let mut li = l.iter();
-            /// assert_eq![Some(&2), li.next()];
+            /// let mut li = l.iter_front();
             /// assert_eq![Some(&1), li.next()];
+            /// assert_eq![Some(&2), li.next()];
             /// assert_eq![None, li.next()];
             /// # Ok(()) }
             /// ```
-            pub fn iter(&self) -> [<$name$b Iter>]<'_, T, S, CAP> {
+            pub fn iter_front(&self) -> [<$name$b Iter>]<'_, T, S, CAP> {
                 [<$name$b Iter>] {
                     list: self,
                     current: self.front,
                 }
+            }
+
+            /// Provides an owning forward iterator, starting at the front.
+            ///
+            /// # Example
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            /// # fn main() -> ladata::error::LadataResult<()> {
+            ///
+            /// let l = DirectSinglyLinkedList8::<i32, 4>::from([1, 2]);
+            ///
+            /// let mut li = l.into_iter_front();
+            /// assert_eq![Some(1), li.next()];
+            /// assert_eq![Some(2), li.next()];
+            /// assert_eq![None, li.next()];
+            /// # Ok(()) }
+            /// ```
+            pub fn into_iter_front(self) -> [<$name$b IntoIter>]<T, S, CAP> {
+                [<$name$b IntoIter>] {
+                    list: self,
+                }
+            }
+
+            /// Extends the front of the list from an iterator.
+            ///
+            /// # Errors
+            /// Errors if the list becomes full before the iterator finishes.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            ///
+            /// let mut l = DirectSinglyLinkedList8::<i32, 5>::default();
+            /// assert![l.extend_front([1, 2, 3]).is_ok()];
+            /// assert_eq![l.iter_front().collect::<Vec<&i32>>(), &[&3, &2, &1]];
+            ///
+            /// assert![l.extend_front([4, 5, 6, 7, 8]).is_err()];
+            /// assert_eq![l.into_iter_front().collect::<Vec<i32>>(), &[5, 4, 3, 2, 1]];
+            /// ```
+            pub fn extend_front<I>(&mut self, iterator: I) -> Result<()>
+            where
+                I: IntoIterator<Item = T>,
+            {
+                let mut iter = iterator.into_iter();
+                while !self.is_full() {
+                    if let Some(e) = iter.next() {
+                        let _ = self.push_front(e);
+                    } else {
+                        return Ok(());
+                    }
+                }
+                Err(Error::NotEnoughSpace(None))
+            }
+
+            /// Extends the back of the list from an iterator.
+            ///
+            /// # Errors
+            /// Errors if the list becomes full before the iterator finishes.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            ///
+            /// let mut l = DirectSinglyLinkedList8::<i32, 5>::default();
+            /// assert![l.extend_back([1, 2, 3]).is_ok()];
+            /// assert_eq![l.iter_front().collect::<Vec<&i32>>(), &[&1, &2, &3]]; 
+            ///
+            /// assert![l.extend_back([4, 5, 6, 7, 8]).is_err()];
+            /// assert_eq![l.into_iter_front().collect::<Vec<i32>>(), &[1, 2, 3, 4, 5]];
+            /// ```
+            pub fn extend_back<I>(&mut self, iterator: I) -> Result<()>
+            where
+                I: IntoIterator<Item = T>,
+            {
+                let mut iter = iterator.into_iter();
+                while !self.is_full() {
+                    if let Some(e) = iter.next() {
+                        let _ = self.push_back(e);
+                    } else {
+                        return Ok(());
+                    }
+                }
+                Err(Error::NotEnoughSpace(None))
             }
         }
 
@@ -653,33 +840,77 @@ macro_rules! linked_list_array {
             /// use ladata::list::DirectSinglyLinkedList8;
             /// # fn main() -> ladata::error::LadataResult<()> {
             ///
-            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::default();
-            /// s.push_front(1)?;
-            /// s.push_front(2)?;
-            /// assert_eq![Ok(2), s.pop_front()];
+            /// let mut s = DirectSinglyLinkedList8::<i32, 3>::from([1, 2]);
             /// assert_eq![Ok(1), s.pop_front()];
+            /// assert_eq![Ok(2), s.pop_front()];
             /// assert![s.pop_front().is_err()];
             /// # Ok(()) }
             /// ```
             //
             // # Diagram
             // ```_
-            // count:2  front:1  free:_
+            // count:2  front:1  back:0  free:_
             //    i0       i1       i2       i3
             // [__2nd_] [__1st_] [______] [______]
             //       n_       n0       n_       n_
             //
-            // count:2  front:0  free:_                           pop_front()
+            // count:1  front:0  back:0  free:_                      pop_front()
             //    i0       i1       i2       i3
             // [__1st_] [______] [______] [______]
             //       n_       n_       n_       n_
+            //
+            // count:0  front:_  back:_  free:_                      pop_front()
+            //    i0       i1       i2       i3
+            // [______] [______] [______] [______]
+            //       n_       n_       n_       n_
             // ```
-            #[cfg(feature = "safe")]
+            // #[cfg(feature = "safe")] // IMPROVE: unsafe version not depending on Clone
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
-                    todo![]
+                    // Save the data of the current front node.
+                    let mut front_index = self.front;
+                    let (front_next, front_data) =
+                        self.nodes[front_index.as_usize()].clone().into_components();
+
+                    // unlink the "next" pointer of the old front node:
+                    self.nodes[front_index.as_usize()].unlink();
+
+                    // Update the front node index, and update the count:
+                    self.front = front_next;
+                    self.count.decrement().unwrap();
+
+                    // if we have popped the last element.
+                    if self.is_empty() {
+                        self.back = None.into();
+                    }
+
+                    Ok(front_data)
+                }
+            }
+
+            /// Returns the list elements as a vector.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::list::DirectSinglyLinkedList8;
+            /// # fn main() -> ladata::all::LadataResult<()> {
+            ///
+            /// let mut l = DirectSinglyLinkedList8::<_, 5>::from([3, 4]);
+            /// l.push_front(2)?;
+            /// l.push_back(5)?;
+            /// l.push_front(1)?;
+            /// assert_eq![l.to_vec(), vec![1, 2, 3, 4, 5]];
+            /// # Ok(()) }
+            /// ```
+            #[cfg(feature = "std")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+            pub fn to_vec(&self) -> Vec<T> {
+                if self.is_empty() {
+                    vec![]
+                } else {
+                    self.iter_front().cloned().collect::<Vec<T>>()
                 }
             }
 
@@ -721,6 +952,73 @@ macro_rules! linked_list_array {
 
         impl<'a, T, S: Storage, const CAP: usize>
             ExactSizeIterator for [<$name$b Iter>]<'a, T, S, CAP> {}
+
+        // IntoIter ------------------------------------------------------------
+
+        #[doc ="A `" [<$name$b>] "` owning iterator."]
+        pub struct [<$name$b IntoIter>]<T, S: Storage, const CAP: usize> {
+            list: [<$name$b>]<T, S, CAP>,
+        }
+
+        impl<T: Clone, S: Storage, const CAP: usize> Iterator for [<$name$b IntoIter>]<T, S, CAP> {
+            type Item = T;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                if self.list.is_empty() {
+                    None
+                } else {
+                    self.list.pop_front().ok()
+                }
+            }
+
+            fn size_hint(&self) -> (usize, Option<usize>) {
+                (self.list.len(), Some(self.list.len()))
+            }
+        }
+
+        impl<T: Clone, S: Storage, const CAP: usize>
+            ExactSizeIterator for [<$name$b IntoIter>]<T, S, CAP> {}
+
+        // From ----------------------------------------------------------------
+
+        impl<T: Default, I, const CAP: usize> From<I> for [<$name$b>]<T, (), CAP>
+        where
+            I: IntoIterator<Item = T>,
+        {
+            /// Returns a list filled with an iterator, in the stack.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::all::DirectSinglyLinkedList8;
+            ///
+            /// let s: DirectSinglyLinkedList8<_, 3> = [1, 2, 3].into();
+            /// ```
+            fn from(iterator: I) -> [<$name$b>]<T, (), CAP> {
+                let mut s = [<$name$b>]::<T, (), CAP>::default();
+                let _ = s.extend_back(iterator);
+                s
+            }
+        }
+
+        #[cfg(feature = "std")]
+        impl<T: Default, I, const CAP: usize> From<I> for [<$name$b>]<T, Boxed, CAP>
+        where
+            I: IntoIterator<Item = T>,
+        {
+            /// Returns a queue filled with an iterator, in the heap.
+            ///
+            /// # Examples
+            /// ```
+            /// use ladata::all::BoxedSinglyLinkedList8;
+            ///
+            /// let s: BoxedSinglyLinkedList8<_, 3> = [1, 2, 3].into();
+            /// ```
+            fn from(iterator: I) -> [<$name$b>]<T, Boxed, CAP> {
+                let mut s = [<$name$b>]::<T, Boxed, CAP>::default();
+                let _ = s.extend_back(iterator);
+                s
+            }
+        }
 
         // Private -------------------------------------------------------------
 

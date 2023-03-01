@@ -873,7 +873,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
 
 // ``
 impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
-    /// Moves an array into a [`full`][Self::is_full] stack.
+    /// Converts an array into a [`full`][Self::is_full] stack.
     ///
     /// # Examples
     /// ```
