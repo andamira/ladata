@@ -3,7 +3,7 @@
 //! An type that allows indexing a limited number of elements, or
 //
 
-use core::fmt::{self, Debug};
+use core::fmt;
 
 use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
@@ -25,9 +25,18 @@ macro_rules! inner_index {
         #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
         pub struct $name(Option<$nmt>);
 
-        impl Debug for $name {
+        impl fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f,  "{:?}", self.0)
+                if let Some(index) = self.0 {
+                    write!(f,  "{}", index)
+                } else {
+                    write!(f,  "_")
+                }
+            }
+        }
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                write!(f,  "{:?}", self)
             }
         }
 
@@ -77,12 +86,24 @@ macro_rules! inner_index {
             }
 
             /// Returns the inner primitive type as a `usize`.
+            ///
+            /// If the index pointed to nothing, the maximum primitive value
+            /// casted to usize will be returned.
             #[inline]
-            pub const fn as_usize(&self) -> Option<usize> {
-                if let Some(v) = self.get() {
-                    Some(v as usize)
+            pub fn as_usize(&self) -> usize {
+                core::cmp::min(self.as_primitive(), usize::MAX as $t) as usize
+            }
+
+            /// Retuns the inner primitive type.
+            ///
+            /// If the index pointed to nothing, the maximum primitive value
+            /// will be returned.
+            #[inline]
+            pub const fn as_primitive(&self) -> $t {
+                if let Some(i) = self.0 {
+                    i.get()
                 } else {
-                    None
+                    $t::MAX
                 }
             }
 

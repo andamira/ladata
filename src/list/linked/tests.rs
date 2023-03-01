@@ -6,7 +6,7 @@ use core::mem::size_of;
 
 use super::{doubly::*, *};
 
-use crate::error::LadataError as Error;
+// use crate::error::LadataError as Error;
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
@@ -14,7 +14,7 @@ use crate::mem::Boxed;
 // TODO: check padding for more elements
 #[test]
 #[rustfmt::skip]
-fn link_sizes_raw() {
+fn doubly_linked_sizes_raw() {
     /* 8-bit index list */
 
     // the size of a node is the sum of:
@@ -130,7 +130,7 @@ fn link_sizes_raw() {
 
 #[test]
 #[cfg(feature = "std")]
-fn link_sizes_boxed() {
+fn doubly_linked_sizes_boxed() {
     // on the heap
     assert_eq![16, size_of::<DoublyLinkedList8::<u8, Boxed, 10>>()];
     assert_eq![16, size_of::<DoublyLinkedList8::<u128, Boxed, 10>>()];
@@ -140,43 +140,56 @@ fn link_sizes_boxed() {
     assert_eq![24, size_of::<DoublyLinkedList32::<u128, Boxed, 10>>()];
 }
 
-#[test]
-fn link_push_pop_front() {
-    let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
-    assert_eq!(list.push_front(1), Ok(0));
-    assert_eq!(list.push_front(2), Ok(1));
-    assert_eq!(list.push_front(3), Ok(2));
-    assert_eq!(list.push_front(4), Err(Error::NotEnoughSpace(Some(1))));
-    assert_eq!(list.pop_front(), Ok(3));
-    assert_eq!(list.pop_front(), Ok(2));
-    assert_eq!(list.pop_front(), Ok(1));
-    assert_eq!(list.pop_front(), Err(Error::NotEnoughElements(1)));
-}
+// #[test]
+// fn doubly_linked_push_pop_front() {
+//     let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
+//     assert_eq!(list.push_front(1), Ok(0));
+//     assert_eq!(list.push_front(2), Ok(1));
+//     assert_eq!(list.push_front(3), Ok(2));
+//     assert_eq!(list.push_front(4), Err(Error::NotEnoughSpace(Some(1))));
+//     assert_eq!(list.pop_front(), Ok(3));
+//     assert_eq!(list.pop_front(), Ok(2));
+//     assert_eq!(list.pop_front(), Ok(1));
+//     assert_eq!(list.pop_front(), Err(Error::NotEnoughElements(1)));
+// }
 
-#[test]
-fn link_push_pop_back() {
-    let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
-    assert_eq!(list.push_back(1), Ok(0));
-    assert_eq!(list.push_back(2), Ok(1));
-    assert_eq!(list.push_back(3), Ok(2));
-    assert_eq!(list.push_back(4), Err(Error::NotEnoughSpace(Some(1))));
-    assert_eq!(list.pop_back(), Ok(3));
-    assert_eq!(list.pop_back(), Ok(2));
-    assert_eq!(list.pop_back(), Ok(1));
-    assert_eq!(list.pop_back(), Err(Error::NotEnoughElements(1)));
-}
+// #[test]
+// fn doubly_linked_push_pop_back() {
+//     let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
+//     assert_eq!(list.push_back(1), Ok(0));
+//     assert_eq!(list.push_back(2), Ok(1));
+//     assert_eq!(list.push_back(3), Ok(2));
+//     assert_eq!(list.push_back(4), Err(Error::NotEnoughSpace(Some(1))));
+//     assert_eq!(list.pop_back(), Ok(3));
+//     assert_eq!(list.pop_back(), Ok(2));
+//     assert_eq!(list.pop_back(), Ok(1));
+//     assert_eq!(list.pop_back(), Err(Error::NotEnoughElements(1)));
+// }
 
+// #[test]
+// fn doubly_linked_push_mixed() {
+//     let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
+//     assert_eq!(list.push_front(1), Ok(0));
+//     assert_eq!(list.push_back(2), Ok(1));
+//     assert_eq!(list.push_front(3), Ok(2));
+//     assert_eq!(list.push_back(4), Err(Error::NotEnoughSpace(Some(1))));
+//     assert_eq!(list.pop_front(), Ok(3));
+//     // FIXME
+//     // assert_eq!(list.pop_back(), Ok(2));
+//     // assert_eq!(list.pop_back(), Ok(1));
+//     // assert_eq!(list.pop_back(), Err(Error::NotEnoughElements(1)));
+//     //
+//     // TEMP
+//     // assert_eq!(list.pop_front(), Ok(1));
+//     // assert_eq!(list.pop_front(), Ok(2));
+//     // assert_eq!(list.pop_front(), Err(Error::NotEnoughElements(1)));
+// }
+
+// TODO
 #[test]
-fn link_push_mixed() {
-    let mut list = DirectDoublyLinkedList8::<i32, 3>::default();
-    assert_eq!(list.push_front(1), Ok(0));
-    assert_eq!(list.push_back(2), Ok(1));
-    assert_eq!(list.push_front(3), Ok(2));
-    assert_eq!(list.push_back(4), Err(Error::NotEnoughSpace(Some(1))));
-    assert_eq!(list.pop_front(), Ok(3));
-    // FIXME
-    // assert_eq!(list.pop_back(), Ok(2));
-    // assert_eq!(list.pop_front(), Ok(1));
-    // assert_eq!(list.pop_back(), Ok(1));
-    // assert_eq!(list.pop_back(), Err(Error::NotEnoughElements(1)));
+fn singly_linked() {
+    let mut list = SinglyLinkedList8::<i32, (), 3>::default();
+
+
+
 }

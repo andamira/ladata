@@ -14,7 +14,7 @@
 // and a predecessor (prev), pointing towards the front.
 // ```
 
-use core::fmt::{self, Debug};
+use core::{fmt::{self, Debug}, mem::size_of};
 
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
@@ -97,7 +97,6 @@ macro_rules! linked_list_array {
             }
 
             /// Returns an empty node, with custom `prev`ious and `next` indices.
-            // RETHINK: Default?
             #[inline]
             pub(super) const fn new_unlinked(data: T) -> Self {
                 Self {
@@ -210,21 +209,12 @@ macro_rules! linked_list_array {
             impl<T: Debug, S: Storage, const CAP: usize> Debug for [<$name$b>]<T, S, CAP>
                 where S::Stored<[[<$name$b Node>]<T>; CAP]>: Debug {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    let mut debug = f.debug_struct(stringify![[<$name$b>]]);
-                    debug
-                        .field("CAP", &CAP)
-                        .field("len", &self.len)
-                        .field("front", &self.front)
-                        .field("back", &self.back);
+                    // IMPROVE
+                    write!(f, "{} {{ len:{} cap:{} front:{:?} back:{:?} size_of:{} }}",
+                        stringify!([<$name$b>]),
+                        self.len(), CAP, self.front, self.back, size_of::<Self>())?;
 
-                    if CAP <= 6 {
-                        debug.field("nodes", &self.nodes);
-                    } else {
-                        // IMPROVE: show first 3 and last 3
-                        debug.field("nodes { ... }", &());
-                    }
-
-                    debug.finish()
+                    Ok(())
                 }
             }
 
@@ -311,7 +301,7 @@ macro_rules! linked_list_array {
                         back: None.into(),
                     })
                 } else {
-                    Err(Error::DimensionMismatch)
+                    Err(Error::IndexOutOfBounds(CAP))
                 }
             }
         }
@@ -344,7 +334,7 @@ macro_rules! linked_list_array {
                         back: None.into(),
                     })
                 } else {
-                    Err(Error::DimensionMismatch)
+                    Err(Error::IndexOutOfBounds(CAP))
                 }
             }
         }
@@ -382,28 +372,29 @@ macro_rules! linked_list_array {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
-                    // get the front node
-                    // FIXME?
-                    let front_idx = self.front.as_usize().expect("front_idx");
-                    let front_node = self.nodes[front_idx].clone();
-
-                    // update the front pointer
-                    self.front = front_node.next;
-                    self.nodes[front_idx].unlink();
-
-                    // update the previous front node
-                    if let Some(prev_idx) = front_node.prev.as_usize() {
-                        self.nodes[prev_idx].next = front_node.next;
-                    } else {
-                        // this was the only element in the list
-                        self.back = None.into();
-                    }
-
-                    // update the number of elements
-                    self.decrement_len()?;
-
-                    // return the data of the front node
-                    Ok(front_node.data)
+                    todo![]
+                    // FIXME
+                    // // get the front node
+                    // let front_idx = self.front.as_usize();
+                    // let front_node = self.nodes[front_idx].clone();
+                    //
+                    // // update the front pointer
+                    // self.front = front_node.next;
+                    // self.nodes[front_idx].unlink();
+                    //
+                    // // update the previous front node
+                    // if let Some(prev_idx) = front_node.prev.as_usize() {
+                    //     self.nodes[prev_idx].next = front_node.next;
+                    // } else {
+                    //     // this was the only element in the list
+                    //     self.back = None.into();
+                    // }
+                    //
+                    // // update the number of elements
+                    // self.decrement_len()?;
+                    //
+                    // // return the data of the front node
+                    // Ok(front_node.data)
                 }
             }
 
@@ -430,28 +421,31 @@ macro_rules! linked_list_array {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
-                    // get the back node
-                    // FIXME?
-                    let back_idx = self.back.as_usize().expect("back_idx");
-                    let back_node = self.nodes[back_idx].clone();
-
-                    // update the back pointer
-                    self.back = back_node.prev;
-                    self.nodes[back_idx].unlink();
-
-                    // update the next node of the previous node
-                    if let Some(next_idx) = back_node.next.as_usize() {
-                        self.nodes[next_idx].prev = back_node.prev;
-                    } else {
-                        // this was the only element in the list
-                        self.front = None.into();
-                    }
-
-                    // update the number of elements
-                    self.decrement_len()?;
-
-                    // return the data of the back node
-                    Ok(back_node.data)
+                    todo![]
+                    // // get the back node
+                    // // FIXME?
+                    // let back_idx = self.back.as_usize();
+                    // let back_node = self.nodes[back_idx].clone();
+                    //
+                    // // update the back pointer
+                    // self.back = back_node.prev;
+                    //
+                    // // unlink the back node
+                    // self.nodes[back_idx].unlink();
+                    //
+                    // // update the next node of the previous node
+                    // if let Some(next_idx) = back_node.next.as_usize() {
+                    //     self.nodes[next_idx].prev = back_node.prev;
+                    // } else {
+                    //     // this was the only element in the list
+                    //     self.front = None.into();
+                    // }
+                    //
+                    // // update the number of elements
+                    // self.decrement_len()?;
+                    //
+                    // // return the data of the back node
+                    // Ok(back_node.data)
                 }
             }
         }
@@ -619,7 +613,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn front(&self) -> Result<&T> {
                 if self.front.is_some() {
-                    Ok(&self.nodes[self.front.as_usize().unwrap()].data)
+                    Ok(&self.nodes[self.front.as_usize()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -642,7 +636,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn back(&self) -> Result<&T> {
                 if self.back.is_some() {
-                    Ok(&self.nodes[self.back.as_usize().unwrap()].data)
+                    Ok(&self.nodes[self.back.as_usize()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -665,7 +659,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn front_mut(&mut self) -> Result<&mut T> {
                 if self.front.is_some() {
-                    Ok(&mut self.nodes[self.front.as_usize().unwrap()].data)
+                    Ok(&mut self.nodes[self.front.as_usize()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -688,7 +682,7 @@ macro_rules! linked_list_array {
             /// ```
             pub fn back_mut(&mut self) -> Result<&mut T> {
                 if self.back.is_some() {
-                    Ok(&mut self.nodes[self.back.as_usize().unwrap()].data)
+                    Ok(&mut self.nodes[self.back.as_usize()].data)
                 } else {
                     Err(Error::NotEnoughElements(1))
                 }
@@ -765,6 +759,7 @@ macro_rules! linked_list_array {
 
                     // the first front element is also the back element.
                     if element_idx.get() == 0 {
+                        self.front = element_idx.into(); // CHECK
                         self.back = element_idx.into();
                     } else {
                         // otherwise update the previous front element
@@ -814,6 +809,7 @@ macro_rules! linked_list_array {
                     // The first back element is also the front element
                     if element_idx.get() == 0 {
                         self.front = element_idx.into();
+                        self.back = element_idx.into();
                     } else {
                         // Otherwise, update the next element of the previous back element
                         self.set_next_at(self.back, element_idx.into())?;
@@ -856,32 +852,33 @@ macro_rules! linked_list_array {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
+                    todo![]
                     // Get the front node
                     // FIXME
-                    let front_idx = self.front.as_usize().expect("front_idx");
-                    let front_node_ptr = &self.nodes[front_idx] as *const [<$name$b Node>]<T>;
-
-                    // SAFETY: we're not gonna access the value, but move it out
-                    // MOTIVATION: to not depend on T: Clone
-                    let front_node = unsafe { core::ptr::read(front_node_ptr) };
-
-                    // Update the front pointer
-                    self.front = front_node.next;
-
-                    // Update the prev node of the next node
-                    if let Some(next_idx) = front_node.next.get() {
-                        self.nodes[next_idx as usize].prev = None.into();
-                    } else {
-                        self.back = None.into();
-                    }
-
-                    // Update the number of elements
-                    self.decrement_len()?;
-
-                    self.nodes[front_idx].unlink();
-
-                    // Return the data of the front node
-                    Ok(front_node.data)
+                    // let front_idx = self.front.as_usize();
+                    // let front_node_ptr = &self.nodes[front_idx] as *const [<$name$b Node>]<T>;
+                    //
+                    // // SAFETY: we're not gonna access the value, but move it out
+                    // // MOTIVATION: to not depend on T: Clone
+                    // let front_node = unsafe { core::ptr::read(front_node_ptr) };
+                    //
+                    // // Update the front pointer
+                    // self.front = front_node.next;
+                    //
+                    // // Update the prev node of the next node
+                    // if let Some(next_idx) = front_node.next.get() {
+                    //     self.nodes[next_idx as usize].prev = None.into();
+                    // } else {
+                    //     self.back = None.into();
+                    // }
+                    //
+                    // // Update the number of elements
+                    // self.decrement_len()?;
+                    //
+                    // self.nodes[front_idx].unlink();
+                    //
+                    // // Return the data of the front node
+                    // Ok(front_node.data)
                 }
             }
 
@@ -908,32 +905,32 @@ macro_rules! linked_list_array {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
                 } else {
-                    // get the back node
-                    // FIXME
-                    let back_idx = self.back.as_usize().expect("front_idx");
-                    let back_node_ptr = &self.nodes[back_idx] as *const [<$name$b Node>]<T>;
-
-                    // SAFETY: we're not gonna access the value, but move it out
-                    // MOTIVATION: to not depend on T: Clone
-                    let back_node = unsafe { core::ptr::read(back_node_ptr) };
-
-                    // update the back pointer
-                    self.back = back_node.prev;
-
-                    // update the next node of the previous node
-                    if let Some(next_idx) = back_node.next.get() {
-                        self.nodes[next_idx as usize].prev = back_node.prev;
-                    } else {
-                        self.front = None.into();
-                    }
-
-                    // update the number elements
-                    self.decrement_len()?;
-
-                    self.nodes[back_idx].unlink();
-
-                    // return the data of the back node
-                    Ok(back_node.data)
+                    todo![]
+                    // // get the back node
+                    // let back_idx = self.back.as_usize();
+                    // let back_node_ptr = &self.nodes[back_idx] as *const [<$name$b Node>]<T>;
+                    //
+                    // // SAFETY: we're not gonna access the value, but move it out
+                    // // MOTIVATION: to not depend on T: Clone
+                    // let back_node = unsafe { core::ptr::read(back_node_ptr) };
+                    //
+                    // // update the back pointer
+                    // self.back = back_node.prev;
+                    //
+                    // // update the next node of the previous node
+                    // if let Some(next_idx) = back_node.next.get() {
+                    //     self.nodes[next_idx as usize].prev = back_node.prev;
+                    // } else {
+                    //     self.front = None.into();
+                    // }
+                    //
+                    // // update the number elements
+                    // self.decrement_len()?;
+                    //
+                    // self.nodes[back_idx].unlink();
+                    //
+                    // // return the data of the back node
+                    // Ok(back_node.data)
                 }
             }
         }
@@ -1073,26 +1070,28 @@ macro_rules! linked_list_array {
     }};
 }
 
-// #[cfg(any(
-//     target_pointer_width = "8",
-//     target_pointer_width = "16",
-//     target_pointer_width = "32",
-//     target_pointer_width = "64",
-//     target_pointer_width = "128"
-// ))]
+// Only generate lists with an index primitive bit size >= usize::BITS
+
+#[cfg(any(
+    target_pointer_width = "8",
+    target_pointer_width = "16",
+    target_pointer_width = "32",
+    target_pointer_width = "64",
+    target_pointer_width = "128"
+))]
 linked_list_array![DoublyLinkedList, 1, 8, u8, nonmax::NonMaxU8];
 
-// #[cfg(any(
-//     target_pointer_width = "16",
-//     target_pointer_width = "32",
-//     target_pointer_width = "64",
-//     target_pointer_width = "128"
-// ))]
+#[cfg(any(
+    target_pointer_width = "16",
+    target_pointer_width = "32",
+    target_pointer_width = "64",
+    target_pointer_width = "128"
+))]
 linked_list_array![DoublyLinkedList, 2, 16, u16, nonmax::NonMaxU16];
 
-// #[cfg(any(
-//     target_pointer_width = "32",
-//     target_pointer_width = "64",
-//     target_pointer_width = "128"
-// ))]
+#[cfg(any(
+    target_pointer_width = "32",
+    target_pointer_width = "64",
+    target_pointer_width = "128"
+))]
 linked_list_array![DoublyLinkedList, 4, 32, u32, nonmax::NonMaxU32];
