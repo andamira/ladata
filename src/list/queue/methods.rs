@@ -28,7 +28,7 @@ impl<T: Clone, const CAP: usize> Queue<T, (), CAP> {
     /// ```
     /// use ladata::list::Queue;
     ///
-    /// let q = Queue::<_, (), 16>::new('\0');
+    /// let q = Queue::<_, (), 16>::new(0);
     /// ```
     pub fn new(element: T) -> Self {
         Self {
@@ -51,7 +51,7 @@ impl<T: Clone, const CAP: usize> Queue<T, Boxed, CAP> {
     /// ```
     /// use ladata::list::BoxedQueue;
     ///
-    /// let q = BoxedQueue::<_, 16>::new('\0');
+    /// let q = BoxedQueue::<_, 16>::new(0);
     /// ```
     pub fn new(element: T) -> Self {
         Self {

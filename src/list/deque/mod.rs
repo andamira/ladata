@@ -34,7 +34,7 @@ pub trait DequeAdt: CollectionAdt + QueueAdt {
     }
 }
 
-/// A double-ended queue, backed by a [`Array`].
+/// A double-ended queue, backed by an [`Array`].
 ///
 /// It has the [`DirectQueue`] and [`DirectStack`] methods implemented for both
 /// the front and the back sides.

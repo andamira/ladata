@@ -1,4 +1,4 @@
-// ladata::grid::grid2d
+// ladata::grid::dyn2d
 //
 //!
 //
@@ -9,30 +9,36 @@ use core::{
     ops::{Index, IndexMut},
 };
 
-/// A dynamic 2D grid, abstracted over a [`Vec`].
+/// A dynamic 2D grid, backed by a [`Vec`].
 ///
 /// Internally the elements are stored in *row major order*,
 /// meaning the elements of each row are stored sequentially.
-#[derive(Clone, PartialEq, Eq)]
-pub struct Grid2d<T> {
-    rows: usize,
+pub struct DynGrid2D<T> {
     cols: usize,
+    rows: usize,
     grid: Vec<T>,
 }
 
 /// # constructors
-impl<T: Clone> Grid2d<T> {
-    /// Creates a new `Grid2d` with a size of rows, cols, filled with `element`.
+impl<T: Clone> DynGrid2D<T> {
+    /// Creates a new `DynGrid2D` with a size of `cols` × `rows`, filled with `element`.
+    ///
+    /// # Examples
+    /// ```
+    /// use ladata::grid::DynGrid2D;
+    ///
+    /// let mut s = DynGrid2D::new(' ', 10, 10);
+    /// ```
     #[inline]
-    pub fn new(element: T, rows: usize, cols: usize) -> Self {
+    pub fn new(element: T, cols: usize, rows: usize) -> Self {
         Self {
-            grid: vec![element; rows * cols],
-            rows,
             cols,
+            rows,
+            grid: vec![element; cols * rows],
         }
     }
 
-    /// Creates a new `Grid2d` from a slice of rows.
+    /// Creates a new `DynGrid2D` from a slice of rows.
     ///
     /// All rows must have the same length.
     pub fn from_rows(rows: &[Vec<T>]) -> Result<Self> {
@@ -41,13 +47,13 @@ impl<T: Clone> Grid2d<T> {
             return Err(Error::DimensionMismatch);
         }
         Ok(Self {
-            grid: Self::flatten(rows),
-            rows: rows.len(),
             cols: row_len,
+            rows: rows.len(),
+            grid: Self::flatten(rows),
         })
     }
 
-    /// Creates a new `Grid2d` from a slice of `columns`.
+    /// Creates a new `DynGrid2D` from a slice of `columns`.
     ///
     /// All columns must have the same length.
     pub fn from_cols(columns: &[Vec<T>]) -> Result<Self> {
@@ -57,95 +63,94 @@ impl<T: Clone> Grid2d<T> {
         }
         let rows = col_len;
         let cols = columns.len();
-        let indices_row_order = (0..rows).flat_map(move |row| (0..cols).map(move |col| (row, col)));
+        let indices_row_order = (0..rows).flat_map(move |row| (0..cols).map(move |col| (col, row)));
         let grid = indices_row_order
-            .map(|(row, col)| columns[col][row].clone())
+            .map(|(col, row)| columns[col][row].clone())
             .collect();
-        Ok(Grid2d { grid, rows, cols })
+        Ok(DynGrid2D { cols, rows, grid })
     }
 
-    /// Creates a new `Grid2d` from the given flat slice of `elements`, in *row major order*.
+    /// Creates a new `DynGrid2D` from the given flat slice of `elements`, in *row major order*.
     ///
-    /// The number of `elements` must equal `rows`×`cols`.
-    pub fn from_row_order(elements: &[T], rows: usize, cols: usize) -> Result<Self> {
-        let total_len = rows * cols;
+    /// The number of `elements` must equal `cols`×`rows`.
+    pub fn from_row_order(elements: &[T], cols: usize, rows: usize) -> Result<Self> {
+        let total_len = cols * rows;
         if total_len != elements.len() {
             return Err(Error::DimensionMismatch);
         }
         Ok(Self {
-            grid: elements.to_vec(),
-            rows,
             cols,
+            rows,
+            grid: elements.to_vec(),
         })
     }
 
-    /// Creates a new `Grid2d` from the given flat slice of `elements`, in *column major order*.
+    /// Creates a new `DynGrid2D` from the given flat slice of `elements`, in *column major order*.
     ///
-    /// The number of `elements` must equal `rows`×`cols`.
-    pub fn from_col_order(elements: &[T], rows: usize, cols: usize) -> Result<Self> {
-        let total_len = rows * cols;
+    /// The number of `elements` must equal `cols`×`rows`.
+    pub fn from_col_order(elements: &[T], cols: usize, rows: usize) -> Result<Self> {
+        let total_len = cols * rows;
         if total_len != elements.len() {
             return Err(Error::DimensionMismatch);
         }
-        let indices_row_order =
-            (0..rows).flat_map(move |row| (0..cols).map(move |column| (row, column)));
+        let indices_row_order = (0..rows).flat_map(move |row| (0..cols).map(move |col| (col, row)));
         let grid = indices_row_order
-            .map(|(row, column)| {
-                let index = column * rows + row;
+            .map(|(col, row)| {
+                let index = col * rows + row;
                 elements[index].clone()
             })
             .collect();
-        Ok(Grid2d { grid, rows, cols })
+        Ok(DynGrid2D { cols, rows, grid })
     }
 
-    /// Creates a new `Grid2d` with the specified number of `rows` and `col`umn`s`,
+    /// Creates a new `DynGrid2D` with the specified number of `rows` and `col`umn`s`,
     /// filling each element with the result of calling the given function.
     ///
     /// The `function` is called once for every location going in *row major order*.
-    pub fn from_fn_row_order<F: FnMut() -> T>(mut function: F, rows: usize, cols: usize) -> Self {
-        let len = rows * cols;
+    pub fn from_fn_row_order<F: FnMut() -> T>(mut function: F, cols: usize, rows: usize) -> Self {
+        let len = cols * rows;
         let grid = (0..len).map(|_| function()).collect();
-        Grid2d { grid, rows, cols }
+        DynGrid2D { cols, rows, grid }
     }
 
-    /// Creates a new `Grid2d` with the specified number of `rows` and `col`umn`s`,
+    /// Creates a new `DynGrid2D` with the specified number of `rows` and `col`umn`s`,
     /// filling each element with the result of calling the given function.
     ///
     /// The `function` is called once for every location going in *column major order*.
-    pub fn from_fn_col_order<F: FnMut() -> T>(mut function: F, rows: usize, cols: usize) -> Self {
-        let len = rows * cols;
+    pub fn from_fn_col_order<F: FnMut() -> T>(mut function: F, cols: usize, rows: usize) -> Self {
+        let len = cols * rows;
         let grid_col_order = (0..len).map(|_| function()).collect::<Vec<_>>();
-        Grid2d::from_col_order(&grid_col_order, rows, cols)
+        DynGrid2D::from_col_order(&grid_col_order, rows, cols)
             .expect("from_fn_col_order should never fail")
     }
 
-    /// Creates a new `Grid2d` with the specified number of `rows` and `col`umn`s`,
+    /// Creates a new `DynGrid2D` with the specified number of `rows` and `col`umn`s`,
     /// filling each element with the elements produced by the provided `iterator`.
     ///
     /// The elements are inserted into the grid in *row major order*.
-    pub fn from_iter_row_order<I>(iterator: I, rows: usize, cols: usize) -> Result<Self>
+    pub fn from_iter_row_order<I>(iterator: I, cols: usize, rows: usize) -> Result<Self>
     where
         I: Iterator<Item = T>,
     {
-        let len = rows * cols;
+        let len = cols * rows;
         let grid = iterator.take(len).collect::<Vec<_>>();
         if grid.len() < len {
             return Err(Error::NotEnoughElements(len));
         }
-        Ok(Grid2d { grid, rows, cols })
+        Ok(DynGrid2D { cols, rows, grid })
     }
 
-    /// Creates a new `Grid2d` with the specified number of `rows` and `col`umn`s`,
+    /// Creates a new `DynGrid2D` with the specified number of `rows` and `col`umn`s`,
     /// filling each element with the elements produced by the provided `iterator`.
     ///
     /// The elements are inserted into the grid in *column major order*.
-    pub fn from_iter_col_order<I>(iterator: I, rows: usize, cols: usize) -> Result<Self>
+    pub fn from_iter_col_order<I>(iterator: I, cols: usize, rows: usize) -> Result<Self>
     where
         I: Iterator<Item = T>,
     {
-        let total_len = rows * cols;
+        let total_len = cols * rows;
         let grid_col_order = iterator.take(total_len).collect::<Vec<_>>();
-        Grid2d::from_col_order(&grid_col_order, rows, cols)
+        DynGrid2D::from_col_order(&grid_col_order, cols, rows)
             .map_err(|_| Error::NotEnoughElements(total_len))
     }
 
@@ -157,21 +162,22 @@ impl<T: Clone> Grid2d<T> {
 }
 
 /// # constructors (Copy)
-impl<T: Copy> Grid2d<T> {
-    /// Creates a new `Grid2d` by concatenating the elements inside `chunk`,
+impl<T: Copy> DynGrid2D<T> {
+    /// Creates a new `DynGrid2D` by concatenating the elements inside `chunk`,
     /// with a total capacity of `rows`×`cols`×`chunk.len()`.
-    pub fn from_chunks(chunk: &[T], rows: usize, cols: usize) -> Self {
-        let grid = chunk.repeat(rows * cols);
-        Grid2d { grid, rows, cols }
+    pub fn from_chunks(chunk: &[T], cols: usize, rows: usize) -> Self {
+        let grid = chunk.repeat(cols * rows);
+        DynGrid2D { grid, cols, rows }
     }
 }
 
 /// # general query methods
-impl<T> Grid2d<T> {
-    /// Returns the capacity of the grid (`rows` × `cols`).
+impl<T> DynGrid2D<T> {
+    /// Returns the length of the grid (`rows` × `cols`).
     #[inline]
-    pub const fn capacity(&self) -> usize {
-        self.rows * self.cols
+    #[allow(clippy::len_without_is_empty)]
+    pub const fn len(&self) -> usize {
+        self.cols * self.rows
     }
 
     /// Returns the number of rows.
@@ -198,33 +204,36 @@ impl<T> Grid2d<T> {
         self.rows
     }
 
-    /// Translates 2D `row`,`col` coordinates into a 1D column index.
+    /// Translates 2D `col`,`row` coordinates into a 1D index.
     #[inline]
-    pub const fn get_index(&self, row: usize, col: usize) -> Result<usize> {
+    pub const fn get_index(&self, col: usize, row: usize) -> Result<usize> {
         if row < self.rows && col < self.cols {
-            Ok(row * self.row_len() + col)
+            Ok(self.get_index_unchecked(col, row))
         } else {
-            Err(Error::Indices2dOutOfBounds(row, col))
+            Err(Error::Indices2dOutOfBounds(col, row))
         }
     }
-    /// Translates 2D `row`,`col` coordinates into a 1D column index.
-    /// Panics if out of bounds.
+    /// Translates 2D `col`,`row` coordinates into a 1D index.
+    ///
+    /// This function doesn't check whether the dimensions are right.
     #[inline]
-    pub const fn get_index_unchecked(&self, row: usize, col: usize) -> usize {
+    pub const fn get_index_unchecked(&self, col: usize, row: usize) -> usize {
         row * self.row_len() + col
     }
 
-    /// Translates 1D column index into 2D `row`,`col` coordinates.
+    /// Translates 1D index into 2D `col`,`row` coordinates.
     #[inline]
     pub const fn get_coords(&self, index: usize) -> Result<(usize, usize)> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok((index / self.cols, index % self.cols))
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
-    /// Translates 1D column index into 2D `row`,`col` coordinates.
-    /// Panics if out of bounds.
+    /// Translates 1D index into 2D `col`,`row` coordinates.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub const fn get_coords_unchecked(&self, index: usize) -> (usize, usize) {
         (index / self.cols, index % self.cols)
@@ -235,7 +244,7 @@ impl<T> Grid2d<T> {
     /// Returns the number of chunks (`capacity()`/`chunk_len`).
     #[inline]
     pub const fn chunked_capacity(&self, chunk_len: usize) -> usize {
-        self.capacity() / chunk_len
+        self.len() / chunk_len
     }
 
     /// Returns the number of chunks per row.
@@ -244,20 +253,22 @@ impl<T> Grid2d<T> {
         self.row_len() / chunk_len
     }
 
-    /// Translates 2D `row`,`col` coordinates, with chunk length, into a 1D column index.
+    /// Translates 2D `col`,`row` coordinates, with chunk length, into a 1D index.
     ///
     /// - it assumes the `row_len` to be an exact multiple of `chunk_len`.
     /// - only full chunks are allowed.
-    pub const fn get_chunk_index(&self, chunk_len: usize, row: usize, col: usize) -> Result<usize> {
+    pub const fn get_chunk_index(&self, chunk_len: usize, col: usize, row: usize) -> Result<usize> {
         if row < self.rows && col < (self.cols / chunk_len) {
             Ok(row * self.row_len() + col * chunk_len)
         } else {
-            Err(Error::Indices2dOutOfBounds(row, col))
+            Err(Error::Indices2dOutOfBounds(col, row))
         }
     }
 
-    /// Translates 2D `row`,`col` coordinates, with chunk length, into a 1D column index.
-    /// Panics if out of bounds.
+    /// Translates 2D `col`,`row` coordinates, with chunk length, into a 1D index.
+    ///
+    /// # Panics
+    /// If out of bounds.
     pub const fn get_chunk_index_unchecked(
         &self,
         chunk_len: usize,
@@ -269,32 +280,36 @@ impl<T> Grid2d<T> {
 }
 
 /// # single element get/set methods
-impl<T> Grid2d<T> {
+impl<T> DynGrid2D<T> {
     // get_ref
 
     /// Returns a reference to the element at the given `row` and `col`umn.
     #[inline]
-    pub fn get_ref(&self, row: usize, col: usize) -> Result<&T> {
-        self.get_index(row, col).map(|idx| &self.grid[idx])
+    pub fn get_ref(&self, col: usize, row: usize) -> Result<&T> {
+        self.get_index(col, row).map(|idx| &self.grid[idx])
     }
     /// Returns a reference to the element at the given `row` and `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
-    pub fn get_ref_unchecked(&self, row: usize, col: usize) -> &T {
-        &self.grid[self.get_index_unchecked(row, col)]
+    pub fn get_ref_unchecked(&self, col: usize, row: usize) -> &T {
+        &self.grid[self.get_index_unchecked(col, row)]
     }
 
     /// Returns a reference to the element at the given 1D index, in *row major order*.
     #[inline]
     pub fn get_ref_row_order(&self, index: usize) -> Result<&T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(&self.grid[index])
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
     /// Returns a reference to the element at the given 1D index, in *row major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_ref_row_order_unchecked(&self, index: usize) -> &T {
         &self.grid[index]
@@ -303,40 +318,44 @@ impl<T> Grid2d<T> {
     /// Returns a reference to the element at the given 1D index, in *column major order*.
     #[inline]
     pub fn get_ref_col_order(&self, index: usize) -> Result<&T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(self.get_ref_col_order_unchecked(index))
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
     /// Returns a reference to the element at the given 1D index, in *column major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_ref_col_order_unchecked(&self, index: usize) -> &T {
         let col = index / self.rows;
         let row = index % self.rows;
-        self.get_ref_unchecked(row, col)
+        self.get_ref_unchecked(col, row)
     }
 
     // get mut
 
     /// Returns a mutable reference to the element at the given `row` and `col`umn.
     #[inline]
-    pub fn get_ref_mut(&mut self, row: usize, col: usize) -> Result<&mut T> {
-        self.get_index(row, col).map(|idx| &mut self.grid[idx])
+    pub fn get_ref_mut(&mut self, col: usize, row: usize) -> Result<&mut T> {
+        self.get_index(col, row).map(|idx| &mut self.grid[idx])
     }
     /// Returns a mutable reference to the element at the given `row` and `col`umn.
-    /// Panics if any out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
-    pub fn get_ref_mut_unchecked(&mut self, row: usize, col: usize) -> &mut T {
-        let idx = self.get_index_unchecked(row, col);
+    pub fn get_ref_mut_unchecked(&mut self, col: usize, row: usize) -> &mut T {
+        let idx = self.get_index_unchecked(col, row);
         &mut self.grid[idx]
     }
 
     /// Returns a mutable reference to the element at the given 1D index, in *row major order*.
     #[inline]
     pub fn get_ref_mut_row_order(&mut self, index: usize) -> Result<&mut T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(&mut self.grid[index])
         } else {
             Err(Error::IndexOutOfBounds(index))
@@ -344,7 +363,9 @@ impl<T> Grid2d<T> {
     }
 
     /// Returns a mutable reference to the element at the given 1D index, in *row major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_ref_mut_row_order_unchecked(&mut self, index: usize) -> &mut T {
         &mut self.grid[index]
@@ -353,7 +374,7 @@ impl<T> Grid2d<T> {
     /// Returns a mutable reference to the element at the given 1D index, in *column major order*.
     #[inline]
     pub fn get_ref_mut_col_order(&mut self, index: usize) -> Result<&mut T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(self.get_ref_mut_col_order_unchecked(index))
         } else {
             Err(Error::IndexOutOfBounds(index))
@@ -361,28 +382,32 @@ impl<T> Grid2d<T> {
     }
 
     /// Returns a mutable reference to the element at the given 1D index, in *column major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_ref_mut_col_order_unchecked(&mut self, index: usize) -> &mut T {
         let col = index / self.rows;
         let row = index % self.rows;
-        self.get_ref_mut_unchecked(row, col)
+        self.get_ref_mut_unchecked(col, row)
     }
 
     // set
 
     /// Sets the `element` at the given `row` and `col`umn.
     #[inline]
-    pub fn set(&mut self, element: T, row: usize, col: usize) -> Result<()> {
-        self.get_ref_mut(row, col).map(|index| {
+    pub fn set(&mut self, element: T, col: usize, row: usize) -> Result<()> {
+        self.get_ref_mut(col, row).map(|index| {
             *index = element;
         })
     }
     /// Sets the `element` at the given `row` and `col`umn.
-    /// Panics if any out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
-    pub fn set_unchecked(&mut self, element: T, row: usize, col: usize) {
-        let index = self.get_ref_mut_unchecked(row, col);
+    pub fn set_unchecked(&mut self, element: T, col: usize, row: usize) {
+        let index = self.get_ref_mut_unchecked(col, row);
         *index = element;
     }
 
@@ -394,7 +419,9 @@ impl<T> Grid2d<T> {
         })
     }
     /// Sets the element at the given 1D index, in *row major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn set_row_order_unchecked(&mut self, element: T, index: usize) {
         *self.get_ref_mut_row_order_unchecked(index) = element;
@@ -408,7 +435,9 @@ impl<T> Grid2d<T> {
         })
     }
     /// Returns a mutable reference to the element at the given 1D index, in *column major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn set_col_order_unchecked(&mut self, element: T, index: usize) {
         *self.get_ref_mut_col_order_unchecked(index) = element;
@@ -416,32 +445,36 @@ impl<T> Grid2d<T> {
 }
 
 /// # single element get methods (Copy)
-impl<T: Copy> Grid2d<T> {
+impl<T: Copy> DynGrid2D<T> {
     // get
 
     /// Returns the element at the given `row` and `col`umn.
     #[inline]
-    pub fn get(&self, row: usize, col: usize) -> Result<T> {
-        self.get_index(row, col).map(|idx| self.grid[idx])
+    pub fn get(&self, col: usize, row: usize) -> Result<T> {
+        self.get_index(col, row).map(|idx| self.grid[idx])
     }
     /// Returns the element at the given `row` and `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
-    pub fn get_unchecked(&self, row: usize, col: usize) -> T {
-        self.grid[self.get_index_unchecked(row, col)]
+    pub fn get_unchecked(&self, col: usize, row: usize) -> T {
+        self.grid[self.get_index_unchecked(col, row)]
     }
 
     /// Returns the element at the given 1D index, in *row major order*.
     #[inline]
     pub fn get_row_order(&self, index: usize) -> Result<T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(self.grid[index])
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
     /// Returns the element at the given 1D index, in *row major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_row_order_unchecked(&self, index: usize) -> T {
         self.grid[index]
@@ -450,24 +483,26 @@ impl<T: Copy> Grid2d<T> {
     /// Returns the element at the given 1D index, in *column major order*.
     #[inline]
     pub fn get_col_order(&self, index: usize) -> Result<T> {
-        if index < self.capacity() {
+        if index < self.len() {
             Ok(self.get_col_order_unchecked(index))
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
     /// Returns the element at the given 1D index, in *column major order*.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_col_order_unchecked(&self, index: usize) -> T {
         let col = index / self.rows;
         let row = index % self.rows;
-        self.get_unchecked(row, col)
+        self.get_unchecked(col, row)
     }
 }
 
 /// # iterators
-impl<T> Grid2d<T> {
+impl<T> DynGrid2D<T> {
     // all elements iter
 
     /// Returns an iterator over references to all elements in *row major order*.
@@ -485,7 +520,7 @@ impl<T> Grid2d<T> {
     /// Returns an iterator over references to all elements in *col major order*.
     #[inline]
     pub fn iter_ref_col_order(&self) -> impl DoubleEndedIterator<Item = &T> {
-        (0..self.cols).flat_map(move |col| (0..self.rows).map(move |row| &self[(row, col)]))
+        (0..self.cols).flat_map(move |col| (0..self.rows).map(move |row| &self[(col, row)]))
     }
 
     // // TODO FIXME
@@ -498,15 +533,17 @@ impl<T> Grid2d<T> {
     /// Returns an iterator over references to all elements in the given row.
     #[inline]
     pub fn row_iter_ref(&self, row: usize) -> Result<impl DoubleEndedIterator<Item = &T>> {
-        let start = self.get_index(row, 0)?;
+        let start = self.get_index(0, row)?;
         let end = start + self.row_len();
         Ok(self.grid[start..end].iter())
     }
     /// Returns an iterator over references to all elements in the given row.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn row_iter_ref_unchecked(&self, row: usize) -> impl DoubleEndedIterator<Item = &T> {
-        let start = self.get_index_unchecked(row, 0);
+        let start = self.get_index_unchecked(0, row);
         let end = start + self.row_len();
         self.grid[start..end].iter()
     }
@@ -517,18 +554,20 @@ impl<T> Grid2d<T> {
         &mut self,
         row: usize,
     ) -> Result<impl DoubleEndedIterator<Item = &mut T>> {
-        let start = self.get_index(row, 0)?;
+        let start = self.get_index(0, row)?;
         let end = start + self.row_len();
         Ok(self.grid[start..end].iter_mut())
     }
     /// Returns an iterator over mutable references to all elements in the given row.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn row_iter_ref_mut_unchecked(
         &mut self,
         row: usize,
     ) -> impl DoubleEndedIterator<Item = &mut T> {
-        let start = self.get_index_unchecked(row, 0);
+        let start = self.get_index_unchecked(0, row);
         let end = start + self.row_len();
         self.grid[start..end].iter_mut()
     }
@@ -541,16 +580,18 @@ impl<T> Grid2d<T> {
         if col >= self.cols {
             return Err(Error::Indices2dOutOfBounds(0, col));
         }
-        Ok((0..self.col_len()).map(move |row| &self[(row, col)]))
+        Ok((0..self.col_len()).map(move |row| &self[(col, row)]))
     }
     /// Returns an iterator over references to all elements in the given `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn col_iter_ref_unchecked(&self, col: usize) -> impl DoubleEndedIterator<Item = &T> {
-        (0..self.col_len()).map(move |row| &self[(row, col)])
+        (0..self.col_len()).map(move |row| &self[(col, row)])
     }
 
-    /// Returns an iterator over references to all elements in the given row.
+    /// Returns an iterator over references to all elements in the given `col`umn.
     // IMPROVE: DoubleEndedIterator?
     #[inline]
     pub fn col_iter_ref_mut(&mut self, col: usize) -> Result<impl Iterator<Item = &mut T>> {
@@ -560,8 +601,10 @@ impl<T> Grid2d<T> {
         let col_len = self.col_len();
         Ok(self.iter_ref_mut().skip(col).step_by(col_len))
     }
-    /// Returns an iterator over references to all elements in the given row.
-    /// Panics if out of bounds.
+    /// Returns an iterator over references to all elements in the given `col`umn.
+    ///
+    /// # Panics
+    /// If out of bounds.
     // IMPROVE: DoubleEndedIterator?
     #[inline]
     pub fn col_iter_ref_mut_unchecked(&mut self, col: usize) -> impl Iterator<Item = &mut T> {
@@ -611,14 +654,17 @@ impl<T> Grid2d<T> {
     // chunks iter
 
     /// Returns an iterator over `chunk_len` references to elements in *row major order*.
-    /// Panics if `chunk_size` is 0.
+    ///
+    /// # Panics
+    /// If `chunk_size` is 0.
     #[inline]
     pub fn chunks_iter_ref(&self, chunk_size: usize) -> impl DoubleEndedIterator<Item = &[T]> {
         self.grid.chunks(chunk_size)
     }
 
     /// Returns an iterator over `chunk_len` mutable references to elements in *row major order*.
-    /// Panics if `chunk_size` is 0.
+    /// # Panics
+    /// If `chunk_size` is 0.
     #[inline]
     pub fn chunks_iter_ref_mut(
         &mut self,
@@ -629,7 +675,7 @@ impl<T> Grid2d<T> {
 }
 
 /// # iterators (Copy)
-impl<T: Copy> Grid2d<T> {
+impl<T: Copy> DynGrid2D<T> {
     // all elements iter
 
     /// Returns an iterator over copies of all elements in *row major order*.
@@ -641,7 +687,7 @@ impl<T: Copy> Grid2d<T> {
     /// Returns an iterator over references to all elements in *col major order*.
     #[inline]
     pub fn iter_col_order(&self) -> impl DoubleEndedIterator<Item = T> + '_ {
-        (0..self.cols).flat_map(move |col| (0..self.rows).map(move |row| self[(row, col)]))
+        (0..self.cols).flat_map(move |col| (0..self.rows).map(move |row| self[(col, row)]))
     }
 
     // row iter
@@ -649,16 +695,18 @@ impl<T: Copy> Grid2d<T> {
     /// Returns an iterator over references to all elements in the given row.
     #[inline]
     pub fn row_iter(&self, row: usize) -> Result<impl DoubleEndedIterator<Item = T> + '_> {
-        let start = self.get_index(row, 0)?;
+        let start = self.get_index(0, row)?;
         let end = start + self.row_len();
         Ok(self.grid[start..end].iter().copied())
     }
 
     /// Returns an iterator over references to all elements in the given row.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn row_iter_unchecked(&self, row: usize) -> impl DoubleEndedIterator<Item = T> + '_ {
-        let start = self.get_index_unchecked(row, 0);
+        let start = self.get_index_unchecked(0, row);
         let end = start + self.row_len();
         self.grid[start..end].iter().copied()
     }
@@ -676,13 +724,13 @@ impl<T: Copy> Grid2d<T> {
     ) -> Result<impl DoubleEndedIterator<Item = T> + '_> {
         println!("\nrow_iter_bounded → row:{row}, col:{col}, len:{len}");
         println!(
-            "grid row_len:{}, col_len:{} cap:{}",
+            "grid row_len:{}, col_len:{} len:{}",
             self.row_len(),
             self.col_len(),
-            self.capacity()
+            self.len()
         );
 
-        let start = self.get_index(row, col)?;
+        let start = self.get_index(col, row)?;
         println!("start: ({row},{col}) = index {start}");
         let end = min(start + len, start + self.row_len());
         println!("end = min({0}+{1}, {0}+{2})", start, len, self.row_len());
@@ -713,13 +761,15 @@ impl<T: Copy> Grid2d<T> {
         if col >= self.cols {
             return Err(Error::Indices2dOutOfBounds(0, col));
         }
-        Ok((0..self.col_len()).map(move |row| self[(row, col)]))
+        Ok((0..self.col_len()).map(move |row| self[(col, row)]))
     }
     /// Returns an iterator over copies of all elements in the given `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn col_iter_unchecked(&self, col: usize) -> impl DoubleEndedIterator<Item = T> + '_ {
-        (0..self.col_len()).map(move |row| self[(row, col)])
+        (0..self.col_len()).map(move |row| self[(col, row)])
     }
 
     /// Returns an iterator over all rows.
@@ -744,8 +794,8 @@ impl<T: Copy> Grid2d<T> {
 }
 
 /// # collecting to Vec
-impl<T: Clone> Grid2d<T> {
-    /// Collects the `Grid2d` into a `Vec` of rows.
+impl<T: Clone> DynGrid2D<T> {
+    /// Collects the `DynGrid2D` into a `Vec` of rows.
     #[inline]
     pub fn as_rows(&self) -> Vec<Vec<T>> {
         self.rows_iter_ref()
@@ -753,7 +803,7 @@ impl<T: Clone> Grid2d<T> {
             .collect()
     }
 
-    /// Collects the `Grid2d` into a `Vec` of columns.
+    /// Collects the `DynGrid2D` into a `Vec` of columns.
     #[inline]
     pub fn as_cols(&self) -> Vec<Vec<T>> {
         self.cols_iter_ref()
@@ -761,13 +811,13 @@ impl<T: Clone> Grid2d<T> {
             .collect()
     }
 
-    /// Collects the `Grid2d` into a `Vec` of elements in *row major order*.
+    /// Collects the `DynGrid2D` into a `Vec` of elements in *row major order*.
     #[inline]
     pub fn as_row_order(&self) -> Vec<T> {
         self.iter_ref().cloned().collect()
     }
 
-    /// Collects the `Grid2d` into a `Vec` of elements in *column major order*.
+    /// Collects the `DynGrid2D` into a `Vec` of elements in *column major order*.
     #[inline]
     pub fn as_col_order(&self) -> Vec<T> {
         self.iter_ref_col_order().cloned().collect()
@@ -775,28 +825,28 @@ impl<T: Clone> Grid2d<T> {
 }
 
 /// # exposing the inner Vec
-impl<T> Grid2d<T> {
+impl<T> DynGrid2D<T> {
     /// Returns the underlying Vec.
     #[inline]
-    pub fn vec(self) -> Vec<T> {
+    pub fn into_vec(self) -> Vec<T> {
         self.grid
     }
 
-    /// Returns a reference to the underlying Vec.
+    /// Returns a shared reference to the underlying Vec.
     #[inline]
-    pub fn vec_ref(&self) -> &Vec<T> {
+    pub fn ref_vec(&self) -> &Vec<T> {
         &self.grid
     }
 
-    /// Returns a mutable reference to the underlying Vec.
+    /// Returns an exclusive reference to the underlying Vec.
     #[inline]
-    pub fn vec_ref_mut(&mut self) -> &mut Vec<T> {
+    pub fn mut_vec(&mut self) -> &mut Vec<T> {
         &mut self.grid
     }
 }
 
 /// # slices
-impl<T> Grid2d<T> {
+impl<T> DynGrid2D<T> {
     /// Returns a slice of the grid.
     #[inline]
     pub fn as_slice(&self) -> &[T] {
@@ -812,16 +862,18 @@ impl<T> Grid2d<T> {
     /// Returns a slice of requested `row`.
     #[inline]
     pub fn row_slice(&self, row: usize) -> Result<&[T]> {
-        let start = self.get_index(row, 0)?;
+        let start = self.get_index(0, row)?;
         let end = start + self.row_len();
         Ok(&self.grid[start..end])
     }
 
     /// Returns a slice of requested `row`.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn row_slice_unchecked(&self, row: usize) -> &[T] {
-        let start = self.get_index_unchecked(row, 0);
+        let start = self.get_index_unchecked(0, row);
         let end = start + self.row_len();
         &self.grid[start..end]
     }
@@ -829,46 +881,52 @@ impl<T> Grid2d<T> {
     /// Returns a mutable slice of requested `row`.
     #[inline]
     pub fn row_mut_slice(&mut self, row: usize) -> Result<&mut [T]> {
-        let start = self.get_index(row, 0)?;
+        let start = self.get_index(0, row)?;
         let end = start + self.row_len();
         Ok(&mut self.grid[start..end])
     }
 
     /// Returns a mutable slice of requested `row`.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn row_mut_slice_unchecked(&mut self, row: usize) -> &mut [T] {
-        let start = self.get_index_unchecked(row, 0);
+        let start = self.get_index_unchecked(0, row);
         let end = start + self.row_len();
         &mut self.grid[start..end]
     }
 }
 
 /// # get chunks
-impl<T> Grid2d<T> {
+impl<T> DynGrid2D<T> {
     /// Returns a slice of the chunk of elements at the given `row` and `col`umn.
     #[inline]
-    pub fn get_chunk(&self, chunk_len: usize, row: usize, col: usize) -> Result<&[T]> {
-        self.get_chunk_index(chunk_len, row, col)
+    pub fn get_chunk(&self, chunk_len: usize, col: usize, row: usize) -> Result<&[T]> {
+        self.get_chunk_index(chunk_len, col, row)
             .map(|index| &self.grid[index..index + chunk_len])
     }
     /// Returns a slice of the chunk of elements at the given `row` and `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
-    pub fn get_chunk_unchecked(&self, chunk_len: usize, row: usize, col: usize) -> &[T] {
-        let index = self.get_chunk_index_unchecked(chunk_len, row, col);
+    pub fn get_chunk_unchecked(&self, chunk_len: usize, col: usize, row: usize) -> &[T] {
+        let index = self.get_chunk_index_unchecked(chunk_len, col, row);
         &self.grid[index..index + chunk_len]
     }
 
     /// Returns a mutable slice of the chunk of elements at the given `row` and `col`umn.
     #[inline]
-    pub fn get_chunk_mut(&mut self, chunk_len: usize, row: usize, col: usize) -> Result<&mut [T]> {
-        self.get_chunk_index(chunk_len, row, col)
+    pub fn get_chunk_mut(&mut self, chunk_len: usize, col: usize, row: usize) -> Result<&mut [T]> {
+        self.get_chunk_index(chunk_len, col, row)
             .map(move |index| &mut self.grid[index..index + chunk_len])
     }
 
     /// Returns a mutable slice of the chunk of elements at the given `row` and `col`umn.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn get_chunk_mut_unchecked(
         &mut self,
@@ -876,13 +934,13 @@ impl<T> Grid2d<T> {
         row: usize,
         col: usize,
     ) -> &mut [T] {
-        let index = self.get_chunk_index_unchecked(chunk_len, row, col);
+        let index = self.get_chunk_index_unchecked(chunk_len, col, row);
         &mut self.grid[index..index + chunk_len]
     }
 }
 
 /// # set chunks
-impl<T: Clone> Grid2d<T> {
+impl<T: Clone> DynGrid2D<T> {
     /// Sets the elements on a chunk.
     #[inline]
     pub fn set_chunk(
@@ -892,7 +950,7 @@ impl<T: Clone> Grid2d<T> {
         col: usize,
         elements: &[T],
     ) -> Result<()> {
-        let chunk = self.get_chunk_mut(chunk_len, row, col)?;
+        let chunk = self.get_chunk_mut(chunk_len, col, row)?;
         for (n, element) in chunk.iter_mut().enumerate() {
             *element = elements[n].clone();
         }
@@ -900,7 +958,9 @@ impl<T: Clone> Grid2d<T> {
     }
 
     /// Sets the elements on a chunk.
-    /// Panics if out of bounds.
+    ///
+    /// # Panics
+    /// If out of bounds.
     #[inline]
     pub fn set_chunk_unchecked(
         &mut self,
@@ -909,7 +969,7 @@ impl<T: Clone> Grid2d<T> {
         col: usize,
         elements: &[T],
     ) {
-        let chunk = self.get_chunk_mut_unchecked(chunk_len, row, col);
+        let chunk = self.get_chunk_mut_unchecked(chunk_len, col, row);
         for (n, element) in chunk.iter_mut().enumerate() {
             *element = elements[n].clone();
         }
@@ -917,15 +977,37 @@ impl<T: Clone> Grid2d<T> {
 }
 
 mod std_impls {
-    use super::{Grid2d, Index, IndexMut};
+    use super::{DynGrid2D, Index, IndexMut};
     use core::any::type_name;
     use std::fmt;
 
-    impl<T> fmt::Debug for Grid2d<T> {
+    // T:Clone
+    impl<T: Clone> Clone for DynGrid2D<T> {
+        fn clone(&self) -> Self {
+            Self {
+                cols: self.cols,
+                rows: self.rows,
+                grid: self.grid.clone(),
+            }
+        }
+    }
+
+    // T:PartialEq
+    impl<T: PartialEq> PartialEq for DynGrid2D<T> {
+        fn eq(&self, other: &Self) -> bool {
+            self.grid == other.grid && self.cols == other.cols && self.rows == other.rows
+        }
+    }
+    // T:Eq
+    impl<T: Eq> Eq for DynGrid2D<T> {}
+
+    //
+
+    impl<T> fmt::Debug for DynGrid2D<T> {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(
                 f,
-                "Grid2d {{ {}×{}, {} }}",
+                "DynGrid2D {{ {}×{}, {} }}",
                 self.rows,
                 self.cols,
                 type_name::<T>()
@@ -933,18 +1015,18 @@ mod std_impls {
         }
     }
 
-    impl<T> Index<(usize, usize)> for Grid2d<T> {
+    impl<T> Index<(usize, usize)> for DynGrid2D<T> {
         type Output = T;
-        fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
-            self.get_ref(row, col)
-                .unwrap_or_else(|_| panic!("Index indices {}, {} out of bounds", row, col))
+        fn index(&self, (col, row): (usize, usize)) -> &Self::Output {
+            self.get_ref(col, row)
+                .unwrap_or_else(|_| panic!("Index indices {}, {} out of bounds", col, row))
         }
     }
 
-    impl<T> IndexMut<(usize, usize)> for Grid2d<T> {
-        fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
-            self.get_ref_mut(row, col)
-                .unwrap_or_else(|_| panic!("Index mut indices {}, {} out of bounds", row, col))
+    impl<T> IndexMut<(usize, usize)> for DynGrid2D<T> {
+        fn index_mut(&mut self, (col, row): (usize, usize)) -> &mut Self::Output {
+            self.get_ref_mut(col, row)
+                .unwrap_or_else(|_| panic!("Index mut indices {}, {} out of bounds", col, row))
         }
     }
 }

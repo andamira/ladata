@@ -25,7 +25,7 @@ impl<T: Clone, const CAP: usize> Stack<T, (), CAP> {
     /// ```
     /// use ladata::list::DirectStack;
     ///
-    /// let s = DirectStack::<_, 16>::new('\0');
+    /// let s = DirectStack::<_, 16>::new(0);
     /// ```
     pub fn new(element: T) -> Self {
         Self {

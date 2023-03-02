@@ -21,7 +21,7 @@ pub trait StackAdt: CollectionAdt {
     fn stack_push(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
 }
 
-/// A stack, backed by a [`Array`].
+/// A stack, backed by an [`Array`].
 pub struct Stack<T, S: Storage, const CAP: usize> {
     pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,

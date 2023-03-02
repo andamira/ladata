@@ -175,7 +175,7 @@ macro_rules! linked_list_array {
             front: [<Index$b>],
             /// The index of the current element at the back.
             back: [<Index$b>],
-            /// The index of the front free element.
+            /// The index of the first free element.
             free: [<Index$b>],
             /// The current counted number of nodes.
             count: [<Index$b>],
@@ -807,7 +807,7 @@ macro_rules! linked_list_array {
             ///
             /// let mut l = DirectSinglyLinkedList8::<i32, 5>::default();
             /// assert![l.extend_back([1, 2, 3]).is_ok()];
-            /// assert_eq![l.iter_front().collect::<Vec<&i32>>(), &[&1, &2, &3]]; 
+            /// assert_eq![l.iter_front().collect::<Vec<&i32>>(), &[&1, &2, &3]];
             ///
             /// assert![l.extend_back([4, 5, 6, 7, 8]).is_err()];
             /// assert_eq![l.into_iter_front().collect::<Vec<i32>>(), &[1, 2, 3, 4, 5]];
@@ -1025,7 +1025,7 @@ macro_rules! linked_list_array {
         /// Private utility methods
         #[allow(dead_code)]
         impl<T, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
-            /// Returns the index of the front free node.
+            /// Returns the index of the first free node.
             const fn first_free_index(&self) -> [<Index$b>] {
                 if self.free.is_some() {
                     self.free

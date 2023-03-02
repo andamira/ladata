@@ -1,35 +1,35 @@
 // ladata::grid::tests
 
-use super::Grid2d;
+use super::DynGrid2D;
 use crate::error::LadataError as Error;
 
 #[test]
 fn constructors() {
-    let g1 = Grid2d::new(0, 2, 3);
-    assert_eq![vec![0, 0, 0, 0, 0, 0], g1.vec()];
+    let g1 = DynGrid2D::new(0, 3, 2);
+    assert_eq![vec![0, 0, 0, 0, 0, 0], g1.into_vec()];
 
-    let g2 = Grid2d::from_row_order(&[1, 2, 3, 4, 5, 6], 2, 3).unwrap();
-    assert_eq![vec![1, 2, 3, 4, 5, 6], g2.vec()];
+    let g2 = DynGrid2D::from_row_order(&[1, 2, 3, 4, 5, 6], 2, 3).unwrap();
+    assert_eq![vec![1, 2, 3, 4, 5, 6], g2.into_vec()];
 
-    let g3 = Grid2d::from_rows(&[vec![1, 2, 3], vec![4, 5, 6]]).unwrap();
-    assert_eq![vec![1, 2, 3, 4, 5, 6], g3.vec()];
+    let g3 = DynGrid2D::from_rows(&[vec![1, 2, 3], vec![4, 5, 6]]).unwrap();
+    assert_eq![vec![1, 2, 3, 4, 5, 6], g3.into_vec()];
 }
 
 #[test]
 fn general_query() {
-    let g = Grid2d::new(0, 2, 3);
+    let g = DynGrid2D::new(0, 3, 2);
     assert_eq![2, g.num_rows()];
     assert_eq![3, g.num_cols()];
-    assert_eq![6, g.capacity()];
+    assert_eq![6, g.len()];
     assert_eq![3, g.row_len()];
     assert_eq![2, g.col_len()];
 }
 
 #[test]
 fn indexing() {
-    let g = Grid2d::new('a', 4, 4);
-    assert_eq![Ok(7), g.get_index(1, 3)];
-    assert_eq![7, g.get_index_unchecked(1, 3)];
+    let g = DynGrid2D::new('a', 4, 4);
+    assert_eq![Ok(7), g.get_index(3, 1)];
+    assert_eq![7, g.get_index_unchecked(3, 1)];
     assert_eq![Ok((1, 3)), g.get_coords(7)];
     assert_eq![(1, 3), g.get_coords_unchecked(7)];
 }
@@ -38,13 +38,13 @@ fn indexing() {
 fn single() {
     // 1 2 3 4
     // 5 6 7 8
-    let mut g = Grid2d::from_rows(&[vec![1, 2, 3, 4], vec![5, 6, 7, 8]]).unwrap();
+    let mut g = DynGrid2D::from_rows(&[vec![1, 2, 3, 4], vec![5, 6, 7, 8]]).unwrap();
 
     // get (Copy)
 
-    assert_eq![Ok(7), g.get(1, 2)];
-    assert_eq![7, g.get_unchecked(1, 2)];
-    assert_eq![Err(Error::Indices2dOutOfBounds(3, 4)), g.get(3, 4)];
+    assert_eq![Ok(7), g.get(2, 1)];
+    assert_eq![7, g.get_unchecked(2, 1)];
+    assert_eq![Err(Error::Indices2dOutOfBounds(4, 3)), g.get(4, 3)];
 
     assert_eq![Ok(5), g.get_row_order(4)];
     assert_eq![5, g.get_row_order_unchecked(4)];
@@ -53,9 +53,9 @@ fn single() {
 
     // get_ref
 
-    assert_eq![Ok(&7), g.get_ref(1, 2)];
-    assert_eq![&7, g.get_ref_unchecked(1, 2)];
-    assert_eq![Err(Error::Indices2dOutOfBounds(3, 4)), g.get_ref(3, 4)];
+    assert_eq![Ok(&7), g.get_ref(2, 1)];
+    assert_eq![&7, g.get_ref_unchecked(2, 1)];
+    assert_eq![Err(Error::Indices2dOutOfBounds(4, 3)), g.get_ref(4, 3)];
 
     assert_eq![Ok(&5), g.get_ref_row_order(4)];
     assert_eq![&5, g.get_ref_row_order_unchecked(4)];
@@ -64,8 +64,8 @@ fn single() {
 
     // get_ref_mut
 
-    assert_eq![Ok(&mut 7), g.get_ref_mut(1, 2)];
-    assert_eq![&mut 7, g.get_ref_mut_unchecked(1, 2)];
+    assert_eq![Ok(&mut 7), g.get_ref_mut(2, 1)];
+    assert_eq![&mut 7, g.get_ref_mut_unchecked(2, 1)];
 
     assert_eq![Ok(&mut 5), g.get_ref_mut_row_order(4)];
     assert_eq![&mut 5, g.get_ref_mut_row_order_unchecked(4)];
@@ -76,13 +76,13 @@ fn single() {
 
     // 1 2 3 4
     // 5 6 A 8
-    assert_eq![Ok(()), g.set(0xA, 1, 2)];
-    assert_eq![Err(Error::Indices2dOutOfBounds(3, 2)), g.set(0xB, 3, 2)];
-    assert_eq![Ok(0xA), g.get(1, 2)];
+    assert_eq![Ok(()), g.set(0xA, 2, 1)];
+    assert_eq![Err(Error::Indices2dOutOfBounds(2, 3)), g.set(0xB, 2, 3)];
+    assert_eq![Ok(0xA), g.get(2, 1)];
     // 1 2 3 4
     // 5 6 C 8
-    assert_eq![(), g.set_unchecked(0xC, 1, 2)];
-    assert_eq![0xC, g.get_unchecked(1, 2)];
+    assert_eq![(), g.set_unchecked(0xC, 2, 1)];
+    assert_eq![0xC, g.get_unchecked(2, 1)];
 
     // 1 E 3 4
     // 5 6 C 8
@@ -102,14 +102,14 @@ fn single() {
     assert_eq![(), g.set_col_order_unchecked(0xF, 1)];
     assert_eq![0xF, g.get_col_order_unchecked(1)];
 
-    assert_eq![vec![1, 0xF, 3, 4, 0xF, 6, 0xC, 8], g.vec()];
+    assert_eq![vec![1, 0xF, 3, 4, 0xF, 6, 0xC, 8], g.into_vec()];
 }
 
 #[test]
 fn iterators() {
     // all elements iter
 
-    let mut g1 = Grid2d::from_rows(&[vec![1, 2], vec![3, 4], vec![5, 6]]).unwrap();
+    let mut g1 = DynGrid2D::from_rows(&[vec![1, 2], vec![3, 4], vec![5, 6]]).unwrap();
     {
         let mut i1 = g1.iter();
         assert_eq![Some(1), i1.next()];
@@ -153,7 +153,7 @@ fn iterators() {
 
     // row iter
 
-    let mut g2 = Grid2d::from_rows(&[
+    let mut g2 = DynGrid2D::from_rows(&[
         vec![1, 2, 3, 4],
         vec![5, 6, 7, 8],
         vec![9, 10, 11, 12],

@@ -28,7 +28,7 @@ impl<T: Clone, const CAP: usize> Deque<T, (), CAP> {
     /// ```
     /// use ladata::list::Deque;
     ///
-    /// let q = Deque::<_, (), 16>::new('\0');
+    /// let q = Deque::<_, (), 16>::new(0);
     /// ```
     pub fn new(element: T) -> Self {
         Self {
@@ -51,7 +51,7 @@ impl<T: Clone, const CAP: usize> Deque<T, Boxed, CAP> {
     /// ```
     /// use ladata::list::BoxedDeque;
     ///
-    /// let q = BoxedDeque::<_, 16>::new('\0');
+    /// let q = BoxedDeque::<_, 16>::new(0);
     /// ```
     pub fn new(element: T) -> Self {
         Self {

@@ -18,7 +18,7 @@ pub trait QueueAdt: CollectionAdt {
     fn queue_enqueue(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
 }
 
-/// A queue, backed by a [`Array`].
+/// A queue, backed by an [`Array`].
 pub struct Queue<T, S: Storage, const CAP: usize> {
     pub(crate) array: Array<T, S, CAP>,
     pub(crate) len: usize,

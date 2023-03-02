@@ -32,7 +32,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
     /// ```
     /// use ladata::list::Array;
     ///
-    /// let s = Array::<_, (), 16>::with('\0');
+    /// let s = Array::<_, (), 16>::with(0);
     /// ```
     pub fn with(element: T) -> Self {
         #[cfg(not(feature = "safe"))]
