@@ -5,7 +5,10 @@
 
 use super::error::LadataResult as Result;
 
+mod count;
 mod index;
+
+pub use count::*;
 pub use index::*;
 
 /// An abstract Collection.

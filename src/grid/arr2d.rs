@@ -9,7 +9,6 @@ use crate::{
     mem::{Boxed, Storage},
 };
 use core::{
-    cmp::min,
     ops::{Index, IndexMut},
 };
 

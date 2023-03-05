@@ -1,6 +1,6 @@
 // ladata::misc::index
 //
-//! An type that allows indexing a limited number of elements, or
+//! A type that allows indexing a limited number of elements.
 //
 
 use core::fmt;
@@ -8,7 +8,7 @@ use core::fmt;
 use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
 #[rustfmt::skip]
-macro_rules! inner_index {
+macro_rules! index {
     // $name : the type name
     // $B : byte size
     // $b : bit size
@@ -106,39 +106,10 @@ macro_rules! inner_index {
                     $t::MAX
                 }
             }
-
-            /// Increments by 1 the inner value,
-            /// as long as the index is pointing to something,
-            /// and the index is not out of bounds.
-            // IMPROVE: return Result
-            #[must_use]
-            #[inline]
-            pub fn increment(&mut self) -> Option<()> {
-                if let Some(i) = self.0 {
-                    self.0 = $nmt::new(i.get().checked_add(1)?);
-                    Some(())
-                } else {
-                    None
-                }
-            }
-            /// Decrements by 1 the inner value,
-            /// as long as the index is pointing to something,
-            /// and the index is not out of bounds.
-            // IMPROVE return Result
-            #[must_use]
-            #[inline]
-            pub fn decrement(&mut self) -> Option<()> {
-                if let Some(i) = self.0 {
-                    self.0 = $nmt::new(i.get().checked_sub(1)?);
-                    Some(())
-                } else {
-                    None
-                }
-            }
         }
 
         impl From<$t> for $name {
-            /// Converts $t::MAX to None
+            // converts $t::MAX to None
             #[inline]
             fn from(index: $t) -> Self {
                 if let Some(i) = $nmt::new(index) {
@@ -167,18 +138,18 @@ macro_rules! inner_index {
     }};
 }
 
-inner_index![Index8, 1, 8, u8, NonMaxU8];
-inner_index![Index16, 2, 16, u16, NonMaxU16];
-inner_index![Index32, 4, 32, u32, NonMaxU32];
+index![Index8, 1, 8, u8, NonMaxU8];
+index![Index16, 2, 16, u16, NonMaxU16];
+index![Index32, 4, 32, u32, NonMaxU32];
 
 #[cfg(target_pointer_width = "8")]
-inner_index![IndexUsize, 1, 8, u8, NonMaxUsize];
+index![IndexUsize, 1, 8, u8, NonMaxUsize];
 #[cfg(target_pointer_width = "16")]
-inner_index![IndexUsize, 2, 16, u16, NonMaxUsize];
+index![IndexUsize, 2, 16, u16, NonMaxUsize];
 #[cfg(target_pointer_width = "32")]
-inner_index![IndexUsize, 4, 32, u32, NonMaxUsize];
+index![IndexUsize, 4, 32, u32, NonMaxUsize];
 #[cfg(target_pointer_width = "64")]
-inner_index![IndexUsize, 8, 64, usize, NonMaxUsize];
+index![IndexUsize, 8, 64, usize, NonMaxUsize];
 
 #[cfg(test)]
 mod tests {

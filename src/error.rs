@@ -36,6 +36,12 @@ pub enum LadataError {
     /// The given indices 2d were out of bounds for a chunk of the given length.
     ChunkIndices2dOutOfBounds(usize, usize, usize),
 
+    ///
+    Overflow,
+
+    ///
+    Underflow,
+
     /// The dimensions given did not match the elements provided
     DimensionMismatch,
 
@@ -77,6 +83,9 @@ mod std_impls {
                     f,
                     "Indices 2d {i}, {j} are out of bounds for a chunk of length {k}."
                 ),
+                LadataError::Overflow => write!(f, "Overflow."),
+                LadataError::Underflow => write!(f, "Underflow."),
+
                 LadataError::DimensionMismatch => write!(f, "Dimension Mismatch."),
                 LadataError::EmptyNode => write!(f, "The node is empty."),
             }

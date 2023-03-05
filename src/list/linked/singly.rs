@@ -178,7 +178,7 @@ macro_rules! linked_list_array {
             /// The index of the first free element.
             free: [<Index$b>],
             /// The current counted number of nodes.
-            count: [<Index$b>],
+            count: [<Count$b>],
             /// The array of nodes, stored in the generic container.
             nodes: Array<[<$name$b Node>]<T>, S, CAP>,
         }
@@ -279,7 +279,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Index$b>]::new(0).unwrap(),
+                        count: [<Count$b>]::default(),
                         nodes: Array::default(),
                     }
                 }
@@ -309,7 +309,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Index$b>]::new(0).unwrap(),
+                        count: [<Count$b>]::default(),
                         nodes: Array::default(),
                     }
                 }
@@ -338,7 +338,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Index$b>]::new(0).unwrap(),
+                        count: [<Count$b>]::new(),
                         nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
                     })
@@ -372,7 +372,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Index$b>]::new(0).unwrap(),
+                        count: [<Count$b>]::new(),
                         nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
                     })
@@ -397,7 +397,6 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn len(&self) -> usize {
-                debug_assert![self.count.as_primitive() < $t::MAX];
                 self.count.as_usize()
             }
 
@@ -476,7 +475,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn clear(&mut self) {
-                self.count = [<Index$b>]::new(0).unwrap();
+                self.count = [<Count$b>]::new();
                 self.front = None.into();
                 self.back = None.into();
                 self.free = None.into();
@@ -655,7 +654,7 @@ macro_rules! linked_list_array {
 
                     // Update the node, the count and the front index:
                     self.nodes[new_index.as_usize()] = new_node;
-                    self.count.increment().unwrap();
+                    self.count.increment()?;
                     self.front = new_index;
 
                     Ok(new_index)
@@ -701,7 +700,7 @@ macro_rules! linked_list_array {
                     Err(Error::NotEnoughSpace(Some(1)))
                 } else {
                     // The new front node, and its new index:
-                    let mut new_node = [<$name$b Node>]::new_unlinked(value);
+                    let new_node = [<$name$b Node>]::new_unlinked(value);
                     let new_index = self.first_free_index();
 
                     // If there was already a back node…
@@ -715,7 +714,7 @@ macro_rules! linked_list_array {
 
                     // Update the node, the count and the back index:
                     self.nodes[new_index.as_usize()] = new_node;
-                    self.count.increment().unwrap();
+                    self.count.increment()?;
                     self.back = new_index;
 
                     Ok(new_index)
@@ -870,7 +869,7 @@ macro_rules! linked_list_array {
                     Err(Error::NotEnoughElements(1))
                 } else {
                     // Save the data of the current front node.
-                    let mut front_index = self.front;
+                    let front_index = self.front;
                     let (front_next, front_data) =
                         self.nodes[front_index.as_usize()].clone().into_components();
 
@@ -879,7 +878,7 @@ macro_rules! linked_list_array {
 
                     // Update the front node index, and update the count:
                     self.front = front_next;
-                    self.count.decrement().unwrap();
+                    self.count.decrement()?;
 
                     // if we have popped the last element.
                     if self.is_empty() {
@@ -918,7 +917,7 @@ macro_rules! linked_list_array {
             pub fn reset(&mut self, value: T) {
                 self.front = None.into();
                 self.free = None.into();
-                self.count = [<Index$b>]::new(0).unwrap();
+                self.count = [<Count$b>]::new();
                 self.reset_all_nodes(value);
             }
         }
@@ -1026,11 +1025,11 @@ macro_rules! linked_list_array {
         #[allow(dead_code)]
         impl<T, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
             /// Returns the index of the first free node.
-            const fn first_free_index(&self) -> [<Index$b>] {
+            fn first_free_index(&self) -> [<Index$b>] {
                 if self.free.is_some() {
                     self.free
                 } else {
-                    self.count
+                    self.count.into()
                 }
             }
 
