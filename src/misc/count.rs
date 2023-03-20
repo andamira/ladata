@@ -136,11 +136,11 @@ count![Count16, 2, 16, u16, NonMaxU16, Index16];
 count![Count32, 4, 32, u32, NonMaxU32, Index32];
 
 #[cfg(target_pointer_width = "8")]
-count![CountUsize, 1, 8, u8, NonMaxUsize, IndexUsize];
+count![CountUsize, 1, 8, usize, NonMaxUsize, IndexUsize];
 #[cfg(target_pointer_width = "16")]
-count![CountUsize, 2, 16, u16, NonMaxUsize, IndexUsize];
+count![CountUsize, 2, 16, usize, NonMaxUsize, IndexUsize];
 #[cfg(target_pointer_width = "32")]
-count![CountUsize, 4, 32, u32, NonMaxUsize, IndexUsize];
+count![CountUsize, 4, 32, usize, NonMaxUsize, IndexUsize];
 #[cfg(target_pointer_width = "64")]
 count![CountUsize, 8, 64, usize, NonMaxUsize, IndexUsize];
 

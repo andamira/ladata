@@ -10,11 +10,14 @@ use crate::{all::CollectionAdt, error::LadataResult as Result};
 mod tests;
 
 mod arr2d;
-
 #[cfg(feature = "std")]
 mod dyn2d;
 
-pub use arr2d::{BoxedGrid2D, DirectGrid2D, Grid2D};
+pub use arr2d::{DirectGrid2D, Grid2D};
+
+#[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+pub use arr2d::BoxedGrid2D;
 
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]

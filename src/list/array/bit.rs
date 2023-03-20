@@ -7,8 +7,8 @@
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
-#[cfg(feature = "std")]
-use std::fmt;
+
+use core::fmt;
 
 use crate::all::{
     Array, /* ArrayAdt, */ CollectionAdt, LadataError as Error, LadataResult as Result,
@@ -37,7 +37,9 @@ impl<const LEN: usize, const U8LEN: usize> Copy for BitArray<(), LEN, U8LEN> {}
 
 impl<const LEN: usize, const U8LEN: usize> fmt::Debug for BitArray<(), LEN, U8LEN> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        #[cfg(feature = "std")]
         let mut bits = String::new();
+        #[cfg(feature = "std")]
         for byte in self.array.iter() {
             bits += &format!["{byte:b}"];
         }
@@ -45,7 +47,10 @@ impl<const LEN: usize, const U8LEN: usize> fmt::Debug for BitArray<(), LEN, U8LE
         let mut debug = f.debug_struct(stringify![DirectBitArray]);
         debug.field("LEN", &LEN);
         debug.field("U8LEN", &U8LEN);
+
+        #[cfg(feature = "std")]
         debug.field("", &bits);
+
         debug.finish()
     }
 }

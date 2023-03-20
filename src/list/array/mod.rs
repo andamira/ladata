@@ -8,6 +8,7 @@ use core::{marker::PhantomData, mem::size_of};
 
 #[cfg(feature = "std")]
 use crate::mem::Boxed;
+
 use crate::{
     all::CollectionAdt,
     error::{LadataError as Error, LadataResult as Result},
@@ -45,10 +46,12 @@ pub type DirectArray<T, const LEN: usize> = Array<T, (), LEN>;
 
 pub use all::*;
 pub(crate) mod all {
+    #[cfg(feature = "std")]
+    pub use super::{bit::BoxedBitArray, BoxedArray};
     #[doc(inline)]
     pub use super::{
-        bit::{BitArray, BoxedBitArray, DirectBitArray},
-        Array, ArrayAdt, BoxedArray, DirectArray,
+        bit::{BitArray, DirectBitArray},
+        Array, ArrayAdt, DirectArray,
     };
 }
 

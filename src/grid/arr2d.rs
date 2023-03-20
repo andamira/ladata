@@ -3,14 +3,16 @@
 //!
 //
 
+use core::ops::{Index, IndexMut};
+
 use crate::{
     error::{LadataError as Error, LadataResult as Result},
     list::Array,
-    mem::{Boxed, Storage},
+    mem::Storage,
 };
-use core::{
-    ops::{Index, IndexMut},
-};
+
+#[cfg(feature = "std")]
+use crate::mem::Boxed;
 
 /// A 2D grid, backed by an [`Array`].
 ///
@@ -397,6 +399,8 @@ impl<T, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
 
 // T: Clone
 // FIX
+#[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
     // /// Creates a new `Grid2D` from a slice of rows.
     // ///
@@ -884,6 +888,8 @@ impl<T: Copy, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
 }
 
 /// # collecting to Vec
+#[cfg(feature = "std")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
 impl<T: Clone, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
     /// Collects the `Grid2D` into a `Vec` of rows.
     #[inline]
@@ -1076,10 +1082,9 @@ impl<T: Clone, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
     }
 }
 
-mod std_impls {
-    use super::{Array, Boxed, Grid2D, Index, IndexMut, Storage};
-    use core::any::type_name;
-    use std::fmt;
+mod core_impls {
+    use super::{Array, Grid2D, Index, IndexMut, Storage};
+    use core::{any::type_name, fmt};
 
     // T:Clone
     impl<T: Clone, S: Storage, const SIZE: usize> Clone for Grid2D<T, S, SIZE>
@@ -1152,6 +1157,26 @@ mod std_impls {
         }
     }
 
+    impl<T, S: Storage, const SIZE: usize> Index<(usize, usize)> for Grid2D<T, S, SIZE> {
+        type Output = T;
+        fn index(&self, (col, row): (usize, usize)) -> &Self::Output {
+            self.get_ref(col, row)
+                .unwrap_or_else(|_| panic!("Index indices {}, {} out of bounds", col, row))
+        }
+    }
+
+    impl<T, S: Storage, const SIZE: usize> IndexMut<(usize, usize)> for Grid2D<T, S, SIZE> {
+        fn index_mut(&mut self, (col, row): (usize, usize)) -> &mut Self::Output {
+            self.get_ref_mut(col, row)
+                .unwrap_or_else(|_| panic!("Index mut indices {}, {} out of bounds", col, row))
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+mod std_impls {
+    use super::{Array, Boxed, Grid2D};
+
     // S:Boxed + T:Default
     #[cfg(feature = "std")]
     #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
@@ -1177,21 +1202,6 @@ mod std_impls {
                 rows: SIZE / 2,
                 grid: Array::default(),
             }
-        }
-    }
-
-    impl<T, S: Storage, const SIZE: usize> Index<(usize, usize)> for Grid2D<T, S, SIZE> {
-        type Output = T;
-        fn index(&self, (col, row): (usize, usize)) -> &Self::Output {
-            self.get_ref(col, row)
-                .unwrap_or_else(|_| panic!("Index indices {}, {} out of bounds", col, row))
-        }
-    }
-
-    impl<T, S: Storage, const SIZE: usize> IndexMut<(usize, usize)> for Grid2D<T, S, SIZE> {
-        fn index_mut(&mut self, (col, row): (usize, usize)) -> &mut Self::Output {
-            self.get_ref_mut(col, row)
-                .unwrap_or_else(|_| panic!("Index mut indices {}, {} out of bounds", col, row))
         }
     }
 }

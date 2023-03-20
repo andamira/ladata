@@ -4,8 +4,7 @@ description = "A simple & modular data model."
 version = "0.0.27"
 edition = "2021"
 resolver = "2"
-# MSRV because: GATs, let-else
-rust-version = "1.65" # https://releases.rs/docs/1.65.0/
+rust-version = "1.65"
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
 repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
@@ -20,32 +19,12 @@ categories = [ "no-std", "data-structures" ]
 keywords = [ "data", "type", "cell" ] # dataframe
 publish = true
 
-[dependencies]
-nonmax = "0.5.3"
-paste = "1.0.11"
-unicode-segmentation = "1.10.1"
-
-# feature: "deps_continuous" (continuous numbers):
-half = { version = "2.2.1", optional = true, default-features = false } # F16 BF16
-twofloat = { version = "0.6.1", optional = true, default-features = false } # F128
-
-# feature: "deps_discrete" (discrete numbers):
-num-rational = { version = "0.4.1", optional = true } # Ratio
-num-bigint = { version = "0.4.3", optional = true } # BigInt
-rust_decimal = { version = "1.25.0", optional = true } # Decimal
-
-# feature: "deps_string" (strings):
-arraystring = { version = "0.3.0", optional = true } # ArrayString*
-
-# feature: "dep_datetime" (date/time):
-fugit = { version = "0.3.6", optional = true }
-time = { version = "0.3.11", optional = true }
 
 [features]
 default = ["std", "safe", "deps_default"]
 std = ["half?/std"]
 safe = []
-nightly = []
+nightly = [] # only for docs
 
 deps_all = ["deps_numerical", "deps_categorical"]
 # deps_default = [
@@ -68,10 +47,33 @@ deps_categorical = ["deps_datetime", "deps_string"]
 deps_datetime = ["fugit", "time"]
 deps_string =  ["arraystring"]
 
+
+[dependencies]
+nonmax = { version = "0.5.3", default-features = false }
+paste = "1.0.11"
+unicode-segmentation = "1.10.1"
+
+# feature: "deps_continuous" (continuous numbers):
+half = { version = "2.2.1", optional = true, default-features = false } # F16 BF16
+twofloat = { version = "0.6.1", optional = true, default-features = false } # F128
+
+# feature: "deps_discrete" (discrete numbers):
+num-rational = { version = "0.4.1", optional = true } # Ratio
+num-bigint = { version = "0.4.3", optional = true } # BigInt
+rust_decimal = { version = "1.25.0", optional = true } # Decimal
+
+# feature: "deps_string" (strings):
+arraystring = { version = "0.3.0", optional = true } # ArrayString*
+
+# feature: "dep_datetime" (date/time):
+fugit = { version = "0.3.6", optional = true }
+time = { version = "0.3.11", optional = true }
+
 [dev-dependencies]
 
+
 [package.metadata.docs.rs]
-features = ["deps_all", "nightly"]
+features = ["nightly", "deps_all"]
 
 [badges]
-maintenance = { status = "actively-developed" }
+maintenance = { status = "experimental" }

@@ -143,11 +143,11 @@ index![Index16, 2, 16, u16, NonMaxU16];
 index![Index32, 4, 32, u32, NonMaxU32];
 
 #[cfg(target_pointer_width = "8")]
-index![IndexUsize, 1, 8, u8, NonMaxUsize];
+index![IndexUsize, 1, 8, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "16")]
-index![IndexUsize, 2, 16, u16, NonMaxUsize];
+index![IndexUsize, 2, 16, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "32")]
-index![IndexUsize, 4, 32, u32, NonMaxUsize];
+index![IndexUsize, 4, 32, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "64")]
 index![IndexUsize, 8, 64, usize, NonMaxUsize];
 

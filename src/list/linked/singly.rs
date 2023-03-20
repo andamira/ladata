@@ -17,8 +17,6 @@
 // each node has a successor (next), pointing towards the back.
 // ```
 
-use unicode_segmentation::UnicodeSegmentation;
-
 use core::{
     fmt::{self, Debug},
     mem::size_of,
@@ -228,17 +226,24 @@ macro_rules! linked_list_array {
                         }
                         // [__3rd_] [__2nd_] [__1st_] [______]
                         write![f, "\n"]?;
-                        for node in self.nodes.iter() {
-                            // if node.is_in_the_list() { // IMPROVE
-                                let graphemes: String = format!["{:?}",
-                                    node.data].graphemes(true).take(6).collect();
-                                write![f, "[{:_^6}] ", graphemes]?;
-                            // } else {
-                            //     write![f, "[______] "]?;
-                            // }
+
+                        #[cfg(feature = "std")]
+                        {
+                            use unicode_segmentation::UnicodeSegmentation;
+
+                            for node in self.nodes.iter() {
+                                // if node.is_in_the_list() { // IMPROVE
+                                    let graphemes: String = format!["{:?}",
+                                        node.data].graphemes(true).take(6).collect();
+                                    write![f, "[{:_^6}] ", graphemes]?;
+                                // } else {
+                                //     write![f, "[______] "]?;
+                                // }
+                            }
+                            //       n_       n0       n1       n_
+                            write![f, "\n"]?;
                         }
-                        //       n_       n0       n1       n_
-                        write![f, "\n"]?;
+
                         for node in self.nodes.iter() {
                             write![f, "      n{} ", node.next]?;
                         }
