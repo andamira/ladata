@@ -1,17 +1,18 @@
-// ladata::list::deque::std_impls
+// ladata::list::queue::impls
 //
 //!
 //
 
 use core::fmt;
 
-use super::{Array, Deque, Storage};
+use super::{Queue, Storage};
+use crate::list::{Array, Deque, Stack};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 // T:Clone
-impl<T: Clone, S: Storage, const CAP: usize> Clone for Deque<T, S, CAP>
+impl<T: Clone, S: Storage, const CAP: usize> Clone for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: Clone,
 {
@@ -26,16 +27,16 @@ where
 }
 
 // T:Copy
-impl<T: Copy, S: Storage, const CAP: usize> Copy for Deque<T, S, CAP> where S::Stored<[T; CAP]>: Copy
+impl<T: Copy, S: Storage, const CAP: usize> Copy for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Copy
 {}
 
 // T:Debug
-impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for Deque<T, S, CAP>
+impl<T: fmt::Debug, S: Storage, const CAP: usize> fmt::Debug for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: fmt::Debug,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut debug = f.debug_struct(stringify![DirectDeque]);
+        let mut debug = f.debug_struct(stringify![Queue]);
         debug
             .field("CAP", &CAP)
             .field("len", &self.len)
@@ -53,7 +54,7 @@ where
 }
 
 // T:PartialEq
-impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for Deque<T, S, CAP>
+impl<T: PartialEq, S: Storage, const CAP: usize> PartialEq for Queue<T, S, CAP>
 where
     S::Stored<[T; CAP]>: PartialEq,
 {
@@ -65,12 +66,12 @@ where
     }
 }
 // T:Eq
-impl<T: Eq, S: Storage, const CAP: usize> Eq for Deque<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
+impl<T: Eq, S: Storage, const CAP: usize> Eq for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Eq {}
 
 // TODO: WIP
 // T:PartialOrd
 // use core::cmp::Ordering;
-// impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for Deque<T, S, CAP>
+// impl<T: PartialOrd, S: Storage, const CAP: usize> PartialEq for Queue<T, S, CAP>
 // where
 //     S::Stored<[T; CAP]>: PartialOrd,
 // {
@@ -82,10 +83,10 @@ impl<T: Eq, S: Storage, const CAP: usize> Eq for Deque<T, S, CAP> where S::Store
 //     }
 // }
 // // T:Ord
-// impl<T: Ord, S: Storage, const CAP: usize> Ord for Deque<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
+// impl<T: Ord, S: Storage, const CAP: usize> Ord for Queue<T, S, CAP> where S::Stored<[T; CAP]>: Ord {}
 
 // S:() + T:Default
-impl<T: Default, const CAP: usize> Default for Deque<T, (), CAP> {
+impl<T: Default, const CAP: usize> Default for Queue<T, (), CAP> {
     /// Returns an empty queue, allocated in the stack,
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
@@ -99,16 +100,17 @@ impl<T: Default, const CAP: usize> Default for Deque<T, (), CAP> {
 }
 
 // S:Boxed + T:Default
-#[cfg(feature = "std")]
-impl<T: Default, const CAP: usize> Default for Deque<T, Boxed, CAP> {
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
+impl<T: Default, const CAP: usize> Default for Queue<T, Boxed, CAP> {
     /// Returns an empty queue, allocated in the heap,
     /// using the default value to fill the remaining free data.
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::BoxedDeque;
+    /// use ladata::all::BoxedQueue;
     ///
-    /// let mut s = BoxedDeque::<i32, 100>::default();
+    /// let mut s = BoxedQueue::<i32, 100>::default();
     /// ```
     fn default() -> Self {
         Self {
@@ -120,7 +122,9 @@ impl<T: Default, const CAP: usize> Default for Deque<T, Boxed, CAP> {
     }
 }
 
-impl<T: Default, I, const CAP: usize> From<I> for Deque<T, (), CAP>
+/* From<> */
+
+impl<T: Default, I, const CAP: usize> From<I> for Queue<T, (), CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -128,19 +132,20 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::DirectDeque;
+    /// use ladata::list::DirectQueue;
     ///
-    /// let s: DirectDeque<_, 3> = [1, 2, 3].into();
+    /// let s: DirectQueue<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> Deque<T, (), CAP> {
-        let mut s = Deque::<T, (), CAP>::default();
-        let _ = s.extend_back(iterator);
+    fn from(iterator: I) -> Queue<T, (), CAP> {
+        let mut s = Queue::<T, (), CAP>::default();
+        let _ = s.extend(iterator);
         s
     }
 }
 
-#[cfg(feature = "std")]
-impl<T: Default, I, const CAP: usize> From<I> for Deque<T, Boxed, CAP>
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
+impl<T: Default, I, const CAP: usize> From<I> for Queue<T, Boxed, CAP>
 where
     I: IntoIterator<Item = T>,
 {
@@ -148,13 +153,36 @@ where
     ///
     /// # Examples
     /// ```
-    /// use ladata::all::BoxedDeque;
+    /// use ladata::all::BoxedQueue;
     ///
-    /// let s: BoxedDeque<_, 3> = [1, 2, 3].into();
+    /// let s: BoxedQueue<_, 3> = [1, 2, 3].into();
     /// ```
-    fn from(iterator: I) -> Deque<T, Boxed, CAP> {
-        let mut s = Deque::<T, Boxed, CAP>::default();
-        let _ = s.extend_back(iterator);
+    fn from(iterator: I) -> Queue<T, Boxed, CAP> {
+        let mut s = Queue::<T, Boxed, CAP>::default();
+        let _ = s.extend(iterator);
         s
+    }
+}
+
+// TODO: CHECK
+impl<T, S: Storage, const CAP: usize> From<Deque<T, S, CAP>> for Queue<T, S, CAP> {
+    fn from(deque: Deque<T, S, CAP>) -> Self {
+        Queue {
+            array: deque.array,
+            front: deque.front,
+            back: deque.back,
+            len: deque.len,
+        }
+    }
+}
+// TODO: CHECK
+impl<T, S: Storage, const CAP: usize> From<Stack<T, S, CAP>> for Queue<T, S, CAP> {
+    fn from(stack: Stack<T, S, CAP>) -> Self {
+        Queue {
+            array: stack.array,
+            len: stack.len,
+            front: 0,
+            back: stack.len,
+        }
     }
 }

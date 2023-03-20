@@ -5,22 +5,22 @@
 
 use crate::{all::CollectionAdt, error::LadataResult as Result};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 #[cfg(test)]
 mod tests;
 
 mod arr2d;
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 mod dyn2d;
 
 pub use arr2d::{DirectGrid2D, Grid2D};
 
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub use arr2d::BoxedGrid2D;
 
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub use dyn2d::DynGrid2D;
 
 /// An abstract Grid.

@@ -3,7 +3,11 @@
 use super::DynGrid2D;
 use crate::error::LadataError as Error;
 
+#[cfg(feature = "alloc")]
+use alloc::vec;
+
 #[test]
+#[cfg(feature = "alloc")]
 fn constructors() {
     let g1 = DynGrid2D::new(0, 3, 2);
     assert_eq![vec![0, 0, 0, 0, 0, 0], g1.into_vec()];

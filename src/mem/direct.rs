@@ -2,7 +2,7 @@
 //
 //! Direct storage doesn't affect its content.
 //
-// API based on https://doc.rust-lang.org/std/boxed/struct.Box.html
+// API based on https://doc.rust-lang.org/alloc/boxed/struct.Box.html
 
 use core::{cmp, fmt, hash, ops};
 

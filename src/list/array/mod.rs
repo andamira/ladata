@@ -6,7 +6,7 @@
 
 use core::{marker::PhantomData, mem::size_of};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 use crate::{
@@ -17,8 +17,8 @@ use crate::{
 
 pub mod bit;
 
+mod impls;
 mod methods;
-mod std_impls;
 
 /// An abstract Array.
 ///
@@ -37,8 +37,8 @@ pub struct Array<T, S: Storage, const LEN: usize> {
 }
 
 /// An [`Array`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedArray<T, const LEN: usize> = Array<T, Boxed, LEN>;
 
 /// An [`Array`] stored in the stack.
@@ -46,8 +46,10 @@ pub type DirectArray<T, const LEN: usize> = Array<T, (), LEN>;
 
 pub use all::*;
 pub(crate) mod all {
-    #[cfg(feature = "std")]
+    #[doc(inline)]
+    #[cfg(feature = "alloc")]
     pub use super::{bit::BoxedBitArray, BoxedArray};
+
     #[doc(inline)]
     pub use super::{
         bit::{BitArray, DirectBitArray},

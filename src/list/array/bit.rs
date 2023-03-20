@@ -5,8 +5,11 @@
 //! <https://en.wikipedia.org/wiki/Bit_array>
 //
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[cfg(feature = "alloc")]
+use {
+    crate::mem::Boxed,
+    alloc::{format, string::String},
+};
 
 use core::fmt;
 
@@ -21,8 +24,8 @@ pub struct BitArray<S: Storage, const LEN: usize, const U8LEN: usize> {
 }
 
 /// A [`BitArray`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray<const LEN: usize, const U8LEN: usize> = BitArray<Boxed, LEN, U8LEN>;
 
 /// A [`BitArray`] stored in the stack.
@@ -37,9 +40,9 @@ impl<const LEN: usize, const U8LEN: usize> Copy for BitArray<(), LEN, U8LEN> {}
 
 impl<const LEN: usize, const U8LEN: usize> fmt::Debug for BitArray<(), LEN, U8LEN> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         let mut bits = String::new();
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         for byte in self.array.iter() {
             bits += &format!["{byte:b}"];
         }
@@ -48,7 +51,7 @@ impl<const LEN: usize, const U8LEN: usize> fmt::Debug for BitArray<(), LEN, U8LE
         debug.field("LEN", &LEN);
         debug.field("U8LEN", &U8LEN);
 
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         debug.field("", &bits);
 
         debug.finish()

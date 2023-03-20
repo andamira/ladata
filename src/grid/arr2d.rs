@@ -11,8 +11,8 @@ use crate::{
     mem::Storage,
 };
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[cfg(feature = "alloc")]
+use {crate::mem::Boxed, alloc::vec::Vec};
 
 /// A 2D grid, backed by an [`Array`].
 ///
@@ -28,8 +28,8 @@ pub struct Grid2D<T, S: Storage, const SIZE: usize> {
 pub type DirectGrid2D<T, const SIZE: usize> = Grid2D<T, (), SIZE>;
 
 /// A [`Grid2D`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedGrid2D<T, const SIZE: usize> = Grid2D<T, Boxed, SIZE>;
 
 // `S:() + T:Clone`
@@ -60,8 +60,8 @@ impl<T: Clone, const SIZE: usize> Grid2D<T, (), SIZE> {
 }
 
 // `S:Boxed + T:Clone`
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, const SIZE: usize> Grid2D<T, Boxed, SIZE> {
     /// Returns a 2d grid, allocated in the heap,
     /// using `element` to fill the remaining free data.
@@ -399,8 +399,8 @@ impl<T, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
 
 // T: Clone
 // FIX
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
     // /// Creates a new `Grid2D` from a slice of rows.
     // ///
@@ -888,8 +888,8 @@ impl<T: Copy, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
 }
 
 /// # collecting to Vec
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, S: Storage, const SIZE: usize> Grid2D<T, S, SIZE> {
     /// Collects the `Grid2D` into a `Vec` of rows.
     #[inline]
@@ -1173,13 +1173,12 @@ mod core_impls {
     }
 }
 
-#[cfg(feature = "std")]
-mod std_impls {
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
+mod alloc_impls {
     use super::{Array, Boxed, Grid2D};
 
     // S:Boxed + T:Default
-    #[cfg(feature = "std")]
-    #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
     impl<T: Default, const SIZE: usize> Default for Grid2D<T, Boxed, SIZE> {
         /// Returns a square grid of side `SIZE / 2`, allocated in the stack,
         /// using the default value to fill the data.

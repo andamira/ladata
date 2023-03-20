@@ -6,11 +6,11 @@
 
 use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod impls;
 mod methods;
-mod std_impls;
 
 /// An abstract Queue.
 pub trait QueueAdt: CollectionAdt {
@@ -37,8 +37,8 @@ pub struct Queue<T, S: Storage, const CAP: usize> {
 pub type DirectQueue<T, const CAP: usize> = Queue<T, (), CAP>;
 
 /// A [`Queue`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedQueue<T, const CAP: usize> = Queue<T, Boxed, CAP>;
 
 /* iterators */

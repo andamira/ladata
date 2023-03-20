@@ -16,8 +16,11 @@ use crate::{
     mem::Storage,
 };
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[cfg(feature = "alloc")]
+use {
+    crate::mem::Boxed,
+    alloc::{vec, vec::Vec},
+};
 
 // `S:() + T:Clone`
 impl<T: Clone, const CAP: usize> Queue<T, (), CAP> {
@@ -41,8 +44,8 @@ impl<T: Clone, const CAP: usize> Queue<T, (), CAP> {
 }
 
 // `S:Boxed + T:Clone`
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, const CAP: usize> Queue<T, Boxed, CAP> {
     /// Returns an empty queue, allocated in the stack,
     /// using `element` to fill the remaining free data.
@@ -468,8 +471,8 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// assert_eq![q.to_vec(), vec![1, 2, 3, 4, 5]];
     /// # Ok(()) }
     /// ```
-    #[cfg(feature = "std")]
-    #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+    #[cfg(feature = "alloc")]
+    #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
     pub fn to_vec(&self) -> Vec<T> {
         if self.is_empty() {
             vec![]
@@ -492,7 +495,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// Returns some `LEN` queued elements as an array, or `None` if the queue
     /// is empty, or there are not at least `LEN` elements.
     ///
-    /// This is a `no_std` alternative method to [`to_vec`][Self::to_vec].
+    /// This is a no `alloc` alternative method to [`to_vec`][Self::to_vec].
     ///
     /// # Panics
     /// Panics if the new LEN sized array can't be allocated.

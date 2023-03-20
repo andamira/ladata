@@ -7,11 +7,11 @@
 
 use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod impls;
 mod methods;
-mod std_impls;
 
 /// An abstract Stack.
 pub trait StackAdt: CollectionAdt {
@@ -31,8 +31,8 @@ pub struct Stack<T, S: Storage, const CAP: usize> {
 pub type DirectStack<T, const CAP: usize> = Stack<T, (), CAP>;
 
 /// A [`Stack`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedStack<T, const CAP: usize> = Stack<T, Boxed, CAP>;
 
 /* iterators */

@@ -1,4 +1,4 @@
-// ladata::list::array::std_impls
+// ladata::list::array::impls
 //
 //!
 //
@@ -14,8 +14,11 @@ use core::{
 
 use crate::all::{Array, Direct, Storage};
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[cfg(feature = "alloc")]
+use {
+    crate::mem::Boxed,
+    alloc::{boxed::Box, vec::Vec},
+};
 
 // Deref
 impl<T, S: Storage, const LEN: usize> Deref for Array<T, S, LEN> {
@@ -99,8 +102,8 @@ impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
 }
 
 // S:Boxed + T:Default
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
     /// Returns an empty array, allocated in the heap,
     /// using the default value to fill the remaining free data.
@@ -152,8 +155,8 @@ impl<T, const LEN: usize> From<Array<T, (), LEN>> for [T; LEN] {
         array.array.0
     }
 }
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T, const LEN: usize> From<Array<T, Boxed, LEN>> for Box<[T; LEN]> {
     fn from(array: Array<T, Boxed, LEN>) -> Box<[T; LEN]> {
         array.array
@@ -209,8 +212,8 @@ where
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Default, I, const LEN: usize> From<I> for Array<T, Boxed, LEN>
 where
     I: IntoIterator<Item = T>,

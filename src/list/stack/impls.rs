@@ -1,4 +1,4 @@
-// ladata::list::stack::std_impls
+// ladata::list::stack::impls
 //
 //!
 //
@@ -7,7 +7,7 @@ use core::fmt;
 
 use super::{Array, Stack, Storage};
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 // T:Clone
@@ -71,8 +71,8 @@ impl<T: Default, const CAP: usize> Default for Stack<T, (), CAP> {
 }
 
 // S:Boxed + T:Default
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Default, const CAP: usize> Default for Stack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using the default value to fill the remaining free data.
@@ -112,8 +112,8 @@ where
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Default, I, const CAP: usize> From<I> for Stack<T, Boxed, CAP>
 where
     I: IntoIterator<Item = T>,

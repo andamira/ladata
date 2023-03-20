@@ -3,7 +3,7 @@
 //! Linked lists are linear lists of linked internal nodes.
 //
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 // TEMP
@@ -32,25 +32,25 @@ pub type DirectSinglyLinkedList8<T, const CAP: usize> = SinglyLinkedList8<T, (),
 // pub type DirectSinglyLinkedList32<T, const CAP: usize> = SinglyLinkedList32<T, (), CAP>;
 //
 /// A [`SinglyLinkedList8`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedSinglyLinkedList8<T, const CAP: usize> = SinglyLinkedList8<T, Boxed, CAP>;
 // /// A [`SinglyLinkedList16`] stored in the heap.
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 // pub type BoxedSinglyLinkedList16<T, const CAP: usize> = SinglyLinkedList16<T, Boxed, CAP>;
 // /// A [`SinglyLinkedList32`] stored in the heap.
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 // pub type BoxedSinglyLinkedList32<T, const CAP: usize> = SinglyLinkedList32<T, Boxed, CAP>;
 
 /* doubly aliases */
 
-// /// A dynamic doubly linked list, re-exported from `std`.
+// /// A dynamic doubly linked list, re-exported from `alloc`.
 // ///
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-// pub use std::collections::LinkedList as DynDoublyLinkedList;
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
+// pub use alloc::collections::LinkedList as DynDoublyLinkedList;
 
 // /// A [`DoublyLinkedList8`] stored in the stack.
 // pub type DirectDoublyLinkedList8<T, const CAP: usize> = DoublyLinkedList8<T, (), CAP>;
@@ -60,14 +60,14 @@ pub type BoxedSinglyLinkedList8<T, const CAP: usize> = SinglyLinkedList8<T, Boxe
 // pub type DirectDoublyLinkedList32<T, const CAP: usize> = DoublyLinkedList32<T, (), CAP>;
 //
 // /// A [`DoublyLinkedList8`] stored in the heap.
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 // pub type BoxedDoublyLinkedList8<T, const CAP: usize> = DoublyLinkedList8<T, Boxed, CAP>;
 // /// A [`DoublyLinkedList16`] stored in the heap.
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 // pub type BoxedDoublyLinkedList16<T, const CAP: usize> = DoublyLinkedList16<T, Boxed, CAP>;
 // /// A [`DoublyLinkedList32`] stored in the heap.
-// #[cfg(feature = "std")]
-// #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+// #[cfg(feature = "alloc")]
+// #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 // pub type BoxedDoublyLinkedList32<T, const CAP: usize> = DoublyLinkedList32<T, Boxed, CAP>;

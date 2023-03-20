@@ -8,7 +8,7 @@ use super::{doubly::*, *};
 
 // use crate::error::LadataError as Error;
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 // TODO: check padding for more elements
@@ -129,7 +129,7 @@ fn doubly_linked_sizes_raw() {
 }
 
 #[test]
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 fn doubly_linked_sizes_boxed() {
     // on the heap
     assert_eq![16, size_of::<DoublyLinkedList8::<u8, Boxed, 10>>()];

@@ -3,7 +3,7 @@
 //! Error types.
 //
 
-use core::result;
+use core::{fmt, result};
 
 /// `ladata` result type.
 pub type LadataResult<N> = result::Result<N, LadataError>;
@@ -49,46 +49,40 @@ pub enum LadataError {
     EmptyNode,
 }
 
-/// impl Display & Error
 #[cfg(feature = "std")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
-mod std_impls {
-    use super::LadataError;
-    use std::{error::Error as StdError, fmt};
+impl std::error::Error for LadataError {}
 
-    impl StdError for LadataError {}
-
-    impl fmt::Display for LadataError {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match self {
-                LadataError::NotEnoughElements(n) => {
-                    write!(f, "Not enough elements. Needs at least `{n}` elements.")
-                }
-                LadataError::NotEnoughSpace(n) => {
-                    if let Some(n) = n {
-                        write!(
-                            f,
-                            "Not enough space. Needs at least `{n}` free space for elements."
-                        )
-                    } else {
-                        write!(f, "Not enough space.")
-                    }
-                }
-                LadataError::KeyAlreadyExists => write!(f, "The key already exists."),
-                LadataError::IndexOutOfBounds(i) => write!(f, "Index {i} is out of bounds."),
-                LadataError::Indices2dOutOfBounds(i, j) => {
-                    write!(f, "Indices 2d: {i}, {j} are out of bounds.")
-                }
-                LadataError::ChunkIndices2dOutOfBounds(i, j, k) => write!(
-                    f,
-                    "Indices 2d {i}, {j} are out of bounds for a chunk of length {k}."
-                ),
-                LadataError::Overflow => write!(f, "Overflow."),
-                LadataError::Underflow => write!(f, "Underflow."),
-
-                LadataError::DimensionMismatch => write!(f, "Dimension Mismatch."),
-                LadataError::EmptyNode => write!(f, "The node is empty."),
+impl fmt::Display for LadataError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            LadataError::NotEnoughElements(n) => {
+                write!(f, "Not enough elements. Needs at least `{n}` elements.")
             }
+            LadataError::NotEnoughSpace(n) => {
+                if let Some(n) = n {
+                    write!(
+                        f,
+                        "Not enough space. Needs at least `{n}` free space for elements."
+                    )
+                } else {
+                    write!(f, "Not enough space.")
+                }
+            }
+            LadataError::KeyAlreadyExists => write!(f, "The key already exists."),
+            LadataError::IndexOutOfBounds(i) => write!(f, "Index {i} is out of bounds."),
+            LadataError::Indices2dOutOfBounds(i, j) => {
+                write!(f, "Indices 2d: {i}, {j} are out of bounds.")
+            }
+            LadataError::ChunkIndices2dOutOfBounds(i, j, k) => write!(
+                f,
+                "Indices 2d {i}, {j} are out of bounds for a chunk of length {k}."
+            ),
+            LadataError::Overflow => write!(f, "Overflow."),
+            LadataError::Underflow => write!(f, "Underflow."),
+
+            LadataError::DimensionMismatch => write!(f, "Dimension Mismatch."),
+            LadataError::EmptyNode => write!(f, "The node is empty."),
         }
     }
 }

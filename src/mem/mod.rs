@@ -57,7 +57,7 @@ pub use direct::Direct;
 /// assert_eq![100, size_of::<MyStructure::<u8, (), 100>>()];
 ///
 /// // The array is stored in the heap.
-/// #[cfg(feature = "std")]
+/// #[cfg(feature = "alloc")]
 /// assert_eq![8, size_of::<MyStructure::<u8, ladata::mem::Boxed, 100>>()];
 ///
 /// ```
@@ -66,14 +66,14 @@ pub trait Storage {
 }
 
 /// A storage type that wraps its data in a [`Box`].
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub struct Boxed;
 
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl Storage for Boxed {
-    type Stored<T> = Box<T>;
+    type Stored<T> = alloc::boxed::Box<T>;
 }
 
 /// A storage type that wraps its data in a [`Direct`].

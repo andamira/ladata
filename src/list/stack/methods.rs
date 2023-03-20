@@ -13,7 +13,7 @@ use crate::{
     mem::Storage,
 };
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 // `S:() + T:Clone`
@@ -36,8 +36,8 @@ impl<T: Clone, const CAP: usize> Stack<T, (), CAP> {
 }
 
 // `S:Boxed + T:Clone`
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, const CAP: usize> Stack<T, Boxed, CAP> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.

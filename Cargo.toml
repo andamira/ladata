@@ -22,7 +22,11 @@ publish = true
 
 [features]
 default = ["std", "safe", "deps_default"]
-std = ["half?/std"]
+#
+std = ["alloc", "half?/std"]
+alloc = []
+no-std = []
+#
 safe = []
 nightly = [] # only for docs
 

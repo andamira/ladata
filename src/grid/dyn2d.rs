@@ -4,10 +4,13 @@
 //
 
 use crate::error::{LadataError as Error, LadataResult as Result};
+
 use core::{
     cmp::min,
     ops::{Index, IndexMut},
 };
+
+use alloc::{vec, vec::Vec};
 
 /// A dynamic 2D grid, backed by a [`Vec`].
 ///
@@ -722,23 +725,30 @@ impl<T: Copy> DynGrid2D<T> {
         col: usize,
         len: usize,
     ) -> Result<impl DoubleEndedIterator<Item = T> + '_> {
-        println!("\nrow_iter_bounded → row:{row}, col:{col}, len:{len}");
-        println!(
-            "grid row_len:{}, col_len:{} len:{}",
-            self.row_len(),
-            self.col_len(),
-            self.len()
-        );
+        #[cfg(feature = "std")] // DEBUG
+        {
+            println!("\nrow_iter_bounded → row:{row}, col:{col}, len:{len}");
+            println!(
+                "grid row_len:{}, col_len:{} len:{}",
+                self.row_len(),
+                self.col_len(),
+                self.len()
+            );
+        }
 
         let start = self.get_index(col, row)?;
+        #[cfg(feature = "std")] // DEBUG
         println!("start: ({row},{col}) = index {start}");
         let end = min(start + len, start + self.row_len());
+        #[cfg(feature = "std")] // DEBUG
         println!("end = min({0}+{1}, {0}+{2})", start, len, self.row_len());
 
-        let len2 = min(len, self.row_len().saturating_sub(col));
-        println!("len1:{len} vs len2:{len2}");
-
-        println!();
+        let _len2 = min(len, self.row_len().saturating_sub(col));
+        #[cfg(feature = "std")] // DEBUG
+        {
+            println!("len1:{len} vs len2:{_len2}");
+            println!();
+        }
 
         // THINK:
         // EXAMPLE for row_len:4
@@ -976,10 +986,10 @@ impl<T: Clone> DynGrid2D<T> {
     }
 }
 
-mod std_impls {
+mod core_impls {
     use super::{DynGrid2D, Index, IndexMut};
     use core::any::type_name;
-    use std::fmt;
+    use core::fmt;
 
     // T:Clone
     impl<T: Clone> Clone for DynGrid2D<T> {

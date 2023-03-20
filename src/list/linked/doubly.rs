@@ -23,7 +23,7 @@ use crate::{
     misc::*,
 };
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
 /// Generates a doubly linked list backed by an array, with custom index size.
@@ -246,8 +246,8 @@ macro_rules! linked_list_array {
             }
 
             /// `S=Boxed; T:Default`
-            #[cfg(feature = "std")]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+            #[cfg(feature = "alloc")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
             impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, Boxed, CAP>
                 where [<$name$b Node>]<T>: Default
             {
@@ -307,8 +307,8 @@ macro_rules! linked_list_array {
         }
 
         /// `S:Boxed + T:Clone`
-        #[cfg(feature = "std")]
-        #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+        #[cfg(feature = "alloc")]
+        #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
         impl<T: Clone, const CAP: usize> [<$name$b>]<T, Boxed, CAP> {
             /// Returns a doubly linked list, allocated in the heap,
             /// filled with `CAP` unlinked elements set to `value`.

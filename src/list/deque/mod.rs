@@ -11,11 +11,11 @@ use crate::{
     misc::CollectionAdt,
 };
 
-#[cfg(feature = "std")]
+#[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod impls;
 mod methods;
-mod std_impls;
 
 /// An abstract Deque.
 pub trait DequeAdt: CollectionAdt + QueueAdt {
@@ -52,8 +52,8 @@ pub struct Deque<T, S: Storage, const CAP: usize> {
 pub type DirectDeque<T, const CAP: usize> = Deque<T, (), CAP>;
 
 /// A [`Deque`] stored in the heap.
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedDeque<T, const CAP: usize> = Deque<T, Boxed, CAP>;
 
 /* iterators */

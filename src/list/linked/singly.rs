@@ -29,8 +29,11 @@ use crate::{
     misc::*,
 };
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[cfg(feature = "alloc")]
+use {
+    crate::mem::Boxed,
+    alloc::{format, string::String, vec, vec::Vec},
+};
 
 /// Generates a singly linked list backed by an array, with custom index size.
 #[rustfmt::skip]
@@ -227,7 +230,7 @@ macro_rules! linked_list_array {
                         // [__3rd_] [__2nd_] [__1st_] [______]
                         write![f, "\n"]?;
 
-                        #[cfg(feature = "std")]
+                        #[cfg(feature = "alloc")]
                         {
                             use unicode_segmentation::UnicodeSegmentation;
 
@@ -291,8 +294,8 @@ macro_rules! linked_list_array {
             }
 
             /// `S=Boxed; T:Default`
-            #[cfg(feature = "std")]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+            #[cfg(feature = "alloc")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
             impl<T: Default, const CAP: usize> Default for [<$name$b>]<T, Boxed, CAP>
                 where [<$name$b Node>]<T>: Default
             {
@@ -354,8 +357,8 @@ macro_rules! linked_list_array {
         }
 
         /// `S:Boxed + T:Clone`
-        #[cfg(feature = "std")]
-        #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+        #[cfg(feature = "alloc")]
+        #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
         impl<T: Clone, const CAP: usize> [<$name$b>]<T, Boxed, CAP> {
             /// Returns a singly linked list, allocated in the heap,
             /// filled with `CAP` unlinked elements set to `value`.
@@ -908,8 +911,8 @@ macro_rules! linked_list_array {
             /// assert_eq![l.to_vec(), vec![1, 2, 3, 4, 5]];
             /// # Ok(()) }
             /// ```
-            #[cfg(feature = "std")]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+            #[cfg(feature = "alloc")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
             pub fn to_vec(&self) -> Vec<T> {
                 if self.is_empty() {
                     vec![]
@@ -1004,7 +1007,7 @@ macro_rules! linked_list_array {
             }
         }
 
-        #[cfg(feature = "std")]
+        #[cfg(feature = "alloc")]
         impl<T: Default, I, const CAP: usize> From<I> for [<$name$b>]<T, Boxed, CAP>
         where
             I: IntoIterator<Item = T>,

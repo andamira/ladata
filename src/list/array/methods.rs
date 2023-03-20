@@ -10,8 +10,12 @@ use core::marker::PhantomData;
 
 use crate::all::{Array, Direct, Storage};
 
-#[cfg(feature = "std")]
-use crate::mem::Boxed;
+#[allow(unused)]
+#[cfg(feature = "alloc")]
+use {
+    crate::mem::Boxed,
+    alloc::{boxed::Box, vec::Vec},
+};
 
 // ``
 impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
@@ -61,8 +65,8 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
 }
 
 // `S:Boxed + T:Clone`
-#[cfg(feature = "std")]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "std")))]
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
     /// Returns an empty stack, allocated in the heap,
     /// using `element` to fill the remaining free data.
