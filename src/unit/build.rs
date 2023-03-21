@@ -11,12 +11,12 @@
 //
 
 use super::macros::*;
-use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataType, DataTypeCopy, DataUnit, DataUnitCopy};
 
 use crate::all::BitArray;
 
 #[cfg(not(feature = "safe"))]
-use super::DataBares;
+use super::RawData;
 
 // 1. Mockups for substituting unused dependencies
 // -----------------------------------------------------------------------------
@@ -100,7 +100,7 @@ mod time {
 // rules. The macro must be updated in the necessary places, by adding or
 // removing commas as needed. See for example the `NOTE:missing-commas` tags.
 define_all_sizes! {
-    DataType, DataCell, DataBare,
+    DataType, DataUnit, RawData,
 
     // -------------------------------------------------------- 1-B / 8-b
     copy_variants_1B:

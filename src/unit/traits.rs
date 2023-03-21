@@ -2,11 +2,11 @@
 //
 //! The traits for unitary data.
 //
-// - DataTypes
-// - DataTypesCopy
-// - DataCells
-// - DataCellsCopy
-// - DataBares
+// - DataType
+// - DataTypeCopy
+// - DataUnit
+// - DataUnitCopy
+// - RawData
 
 use core::fmt::Debug;
 
@@ -15,10 +15,10 @@ use core::fmt::Debug;
 /// Allows extending `DataType*`**`With`** versions with custom *types*.
 ///
 /// # See also
-/// - [`DataTypesCopy`]
-/// - [`DataCellsCopy`]
-/// - [`DataCells`]
-pub trait DataTypes: Copy + Debug {
+/// - [`DataTypeCopy`]
+/// - [`DataUnitCopy`]
+/// - [`DataUnit`]
+pub trait DataType: Copy + Debug {
     /// Returns the alignment of the data represented by the current type.
     fn data_align(&self) -> usize;
 
@@ -35,55 +35,57 @@ pub trait DataTypes: Copy + Debug {
 ///
 /// # Coherence
 ///
-/// The `DataTypes::`[`is_copy`][DataTypes#method.is_copy]
+/// The `DataType::`[`is_copy`][DataType#method.is_copy]
 /// super-trait method should probably return `true` as well.
 ///
 /// # See also
-/// - [`DataTypes`]
-/// - [`DataCells`]
-/// - [`DataCellsCopy`]
-pub trait DataTypesCopy: DataTypes {}
+/// - [`DataType`]
+/// - [`DataUnit`]
+/// - [`DataUnitCopy`]
+pub trait DataTypeCopy: DataType {}
 
-/// Common trait for *data cells*.
+/// Common trait for *data units*.
 ///
-/// Allows extending `DataCell*`**`With`** versions.
+/// Allows extending `DataUnit*`**`With`** versions.
 ///
 /// See also:
-/// - [`DataCellsCopy`]
-/// - [`DataTypesCopy`]
-/// - [`DataTypes`]
-pub trait DataCells: Debug {
+/// - [`DataUnitCopy`]
+/// - [`DataTypeCopy`]
+/// - [`DataType`]
+pub trait DataUnit: Debug {
     /// Whether the data type in the current variant is [`Copy`].
     fn is_copy(&self) -> bool;
 }
 
-/// Common (marker) trait for `Copy` *data cells*.
+/// Common (marker) trait for `Copy` *data units*.
 ///
-/// Allows extending `DataCell*Copy`**`With`** versions.
+/// Allows extending `DataUnit*Copy`**`With`** versions.
 ///
 /// # Coherence
 ///
-/// The `DataCells::`[`is_copy`][DataCells#method.is_copy]
+/// The `DataUnit::`[`is_copy`][DataUnit#method.is_copy]
 /// super-trait method should probably return `true` as well.
 ///
 /// # See also
-/// - [`DataCells`]
-/// - [`DataTypes`]
-/// - [`DataTypesCopy`]
-pub trait DataCellsCopy: DataCells + Copy {}
+/// - [`DataUnit`]
+/// - [`DataType`]
+/// - [`DataTypeCopy`]
+pub trait DataUnitCopy: DataUnit + Copy {}
 
-/// Common trait for *unsafe data cells*.
+/// Common trait for *unsafe data units*.
 ///
 /// # Safety
 /// TODO
 ///
 #[cfg(not(feature = "safe"))]
-pub unsafe trait DataBares {}
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+pub unsafe trait RawData {}
 
-/// Comon (marker) trait for *unsafe* `Copy` *data cells*.
+/// Comon (marker) trait for *unsafe* `Copy` *data units*.
 ///
 /// # Safety
 /// TODO
 ///
 #[cfg(not(feature = "safe"))]
-pub unsafe trait DataBaresCopy: DataBares + Copy {}
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+pub unsafe trait RawDataCopy: RawData + Copy {}

@@ -3,6 +3,7 @@
 //! A simple & modular data model.
 //
 
+// #![warn(clippy::all)] // TODO CHECK
 #![allow(non_snake_case, non_camel_case_types)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -32,18 +33,5 @@ pub mod unit;
 /// Everything is re-exported from here.
 pub mod all {
     #[doc(inline)]
-    pub use super::{
-        error::*,
-        grid::*,
-        list::all::*,
-        mem::{Direct, Storage},
-        misc::*,
-    };
-
-    #[doc(inline)]
-    #[cfg(feature = "alloc")]
-    pub use super::mem::Boxed;
-
-    #[doc(inline)]
-    pub use crate::unit::{bares::*, cells::*, traits::*, types::*};
+    pub use super::{error::*, grid::*, list::all::*, mem::*, misc::*, unit::all::*};
 }

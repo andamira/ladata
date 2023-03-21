@@ -8,14 +8,14 @@
 // - define_single_size
 //
 // - define_type
-// - define_cell
-// - define_bare
+// - define_unit
+// - define_raw
 //
 // - type_aliases
 //
-// - impl_data_types
-// - impl_data_cells
-// - impl_data_bares
+// - impl_data_type
+// - impl_data_unit
+// - impl_data_raw
 //
 // - reexport
 
@@ -820,7 +820,7 @@ macro_rules! define_all_sizes {
 }
 pub(crate) use define_all_sizes;
 
-/// for defining in one pass: DataType*, DataCell*, DataBare*
+/// for defining in one pass: DataType*, DataUnit*, RawData*
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -878,7 +878,7 @@ macro_rules! define_single_size {
                 $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
-        define_cell!{
+        define_unit!{
             c: $cname, t:$tname, b:$bname, size: $B, $b,
             copy_variants:
                 $( $cvdoc, $cvname, $cvtype ),* ;
@@ -900,7 +900,7 @@ macro_rules! define_single_size {
                 $( $vdoc_psize_dep, $vname_psize_dep, $vtype_psize_dep, $vpsize_psize_dep,
                 $vdep1_psize_dep, $vdep2_psize_dep ),* ;
         }
-        define_bare!{
+        define_raw!{
             $bname, size: $B, $b,
             copy_variants:
                 $( $cvdoc, $cvname, $cvtype ),* ;
@@ -972,7 +972,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $b bit Copy>]  "][" [<$tname $b bit Copy>] "] -With" ]
             #[doc = "- [" [<$tname $b bit>]  "][" [<$tname $b bit>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $b bit Copy With >]<T: DataTypesCopy> {
+            pub enum [< $tname $b bit Copy With >]<T: DataTypeCopy> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -1016,7 +1016,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $b bit With>] "][" [<$tname $b bit With>] "] -Copy +With" ]
             pub type [<$tname $b bit Copy>] = [< $tname $b bit Copy With>]<()>;
 
-            impl_data_types![ [< $tname $b bit Copy With >], DataTypesCopy,
+            impl_data_type![ [< $tname $b bit Copy With >], DataTypeCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1031,7 +1031,7 @@ macro_rules! define_type {
                 noncopy_variants_dep: ;
                 noncopy_variants_psize_dep: ;
             ];
-            impl<T: DataTypesCopy> DataTypesCopy for [< $tname $b bit Copy With >]<T> { }
+            impl<T: DataTypeCopy> DataTypeCopy for [< $tname $b bit Copy With >]<T> { }
 
             // ## non-copy version (DataType)
             // -----------------------------------------------------------------
@@ -1042,7 +1042,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $b bit>] "][" [<$tname $b bit>] "] -With" ]
             #[doc = "- [" [<$tname $b bit Copy>] "][" [<$tname $b bit Copy>] "] +Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            pub enum [< $tname $b bit With >]<T: DataTypes> {
+            pub enum [< $tname $b bit With >]<T: DataType> {
                 /// Represents the absence of *data type*.
                 None,
                 /// A custom *data type* extension.
@@ -1107,7 +1107,7 @@ macro_rules! define_type {
             #[doc = "- [" [<$tname $b bit Copy With>] "][" [<$tname $b bit Copy With>] "] +Copy +With" ]
             pub type [<$tname $b bit>] = [< $tname $b bit With>]<()>;
 
-            impl_data_types![ [< $tname $b bit With >], DataTypes,
+            impl_data_type![ [< $tname $b bit With >], DataType,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1131,8 +1131,8 @@ macro_rules! define_type {
 }
 pub(crate) use define_type;
 
-/// for defining enum DataCell*
-macro_rules! define_cell {
+/// for defining enum DataUnit*
+macro_rules! define_unit {
     (
         c: $cname:ident, t: $tname:ident, b: $bname:ident,
         size: $B:literal, $b:literal,
@@ -1169,17 +1169,17 @@ macro_rules! define_cell {
             $(,)* ;
     ) => {
         paste::paste!{
-            // ## copy version (DataCell)
+            // ## copy version (DataUnit)
             // -----------------------------------------------------------------
-            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (extendable) (Copy)"]
+            #[doc = $b "-bit/" $B "-Byte " "data **Unit** (extendable) (Copy)"]
             ///
             /// See also:
             #[doc = "- [" [<$cname $b bit With>] "][" [<$cname $b bit With>] "] -Copy" ]
             #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] -With" ]
             #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Copy -With" ]
             #[derive(Clone, Copy, Debug)]
-            // pub enum [<$cname $b bit Copy With>]<C: DataCellsCopy, T: DataTypesCopy> { // MAYBE
-            pub enum [<$cname $b bit Copy With>]<C: DataCellsCopy> {
+            // pub enum [<$cname $b bit Copy With>]<C: DataUnitCopy, T: DataTypeCopy> { // MAYBE
+            pub enum [<$cname $b bit Copy With>]<C: DataUnitCopy> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
@@ -1215,8 +1215,8 @@ macro_rules! define_cell {
                 )*
             }
 
-            // alias DataCell Copy
-            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (Copy)"]
+            // alias DataUnit Copy
+            #[doc = $b "-bit/" $B "-Byte " "data **Unit** (Copy)"]
             ///
             /// See also:
             #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Copy" ]
@@ -1224,9 +1224,9 @@ macro_rules! define_cell {
             #[doc = "- [" [<$cname $b bit With>] "][" [<$cname $b bit With>] "] -Copy +With" ]
             pub type [<$cname $b bit Copy>] = [< $cname $b bit With>]<()>;
 
-            impl_data_cells![
-                c: [< $cname $b bit Copy With >], DataCellsCopy,
-                t: [< $tname $b bit Copy With >], DataTypesCopy,
+            impl_data_unit![
+                c: [< $cname $b bit Copy With >], DataUnitCopy,
+                t: [< $tname $b bit Copy With >], DataTypeCopy,
                 is_copy: true,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1242,20 +1242,20 @@ macro_rules! define_cell {
                 noncopy_variants_psize_dep: ;
             ];
             // MAYBE
-            // impl<C: DataCellsCopy, T: DataTypesCopy> DataCellsCopy for [< $cname $b bit Copy With >]<C, T> { }
-            impl<C: DataCellsCopy> DataCellsCopy for [< $cname $b bit Copy With >]<C> { }
+            // impl<C: DataUnitCopy, T: DataTypeCopy> DataUnitCopy for [< $cname $b bit Copy With >]<C, T> { }
+            impl<C: DataUnitCopy> DataUnitCopy for [< $cname $b bit Copy With >]<C> { }
 
-            // ## non-copy version (DataCell)
+            // ## non-copy version (DataUnit)
             // -----------------------------------------------------------------
-            #[doc = $b "-bit/" $B "-Byte " "data **Cell** (extendable)"]
+            #[doc = $b "-bit/" $B "-Byte " "data **Unit** (extendable)"]
             ///
             /// See also:
             #[doc = "- [" [<$cname $b bit Copy With>] "][" [<$cname $b bit Copy With>] "] +Copy" ]
             #[doc = "- [" [<$cname $b bit>] "][" [<$cname $b bit>] "] -Width" ]
             #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] +Copy -Width" ]
             #[derive(Debug)]
-            // pub enum [<$cname $b bit With>]<C: DataCells, T: DataTypes> { // MAYBE
-            pub enum [<$cname $b bit With>]<C: DataCells> {
+            // pub enum [<$cname $b bit With>]<C: DataUnit, T: DataType> { // MAYBE
+            pub enum [<$cname $b bit With>]<C: DataUnit> {
                 /// Represents the absence of *data*.
                 None,
                 /// A custom *data cell* extension.
@@ -1311,8 +1311,8 @@ macro_rules! define_cell {
                 )*
             }
 
-            // alias DataCell
-            #[doc = $b "-bit/" $B "-Byte " "data **Cell**"]
+            // alias DataUnit
+            #[doc = $b "-bit/" $B "-Byte " "data **Unit**"]
             ///
             /// See also:
             #[doc = "- [" [<$cname $b bit Copy>] "][" [<$cname $b bit Copy>] "] +Copy" ]
@@ -1320,10 +1320,10 @@ macro_rules! define_cell {
             #[doc = "- [" [<$cname $b bit Copy With>] "][" [<$cname $b bit Copy With>] "] +Copy +With" ]
             pub type [<$cname $b bit>] = [< $cname $b bit With>]<()>;
 
-            // implement the DataCells trait
-            impl_data_cells![
-                c: [< $cname $b bit With >], DataCells,
-                t: [< $tname $b bit With >], DataTypes,
+            // implement the DataUnit trait
+            impl_data_unit![
+                c: [< $cname $b bit With >], DataUnit,
+                t: [< $tname $b bit With >], DataType,
                 is_copy: false,
                 copy_variants:
                     $( $cvname, $cvtype ),* ;
@@ -1343,10 +1343,10 @@ macro_rules! define_cell {
                     $vdep1_psize_dep, $vdep2_psize_dep ),* ;
             ];
 
-            // implement `TryFrom`<`DataCell`> for *contained-value*:
+            // implement `TryFrom`<`DataUnit`> for *contained-value*:
 
             $( // Copy
-                impl<C: DataCellsCopy> TryFrom<[<$cname $b bit Copy With>]<C>> for $cvtype {
+                impl<C: DataUnitCopy> TryFrom<[<$cname $b bit Copy With>]<C>> for $cvtype {
                     type Error = ();
                     fn try_from(c: [<$cname $b bit Copy With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -1359,7 +1359,7 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $cvtype_dep {
+                impl<C: DataUnit> TryFrom<[<$cname $b bit With>]<C>> for $cvtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -1371,7 +1371,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $vtype {
+                impl<C: DataUnit> TryFrom<[<$cname $b bit With>]<C>> for $vtype {
                     type Error = ();
                     fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -1384,7 +1384,7 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> TryFrom<[<$cname $b bit With>]<C>> for $vtype_dep {
+                impl<C: DataUnit> TryFrom<[<$cname $b bit With>]<C>> for $vtype_dep {
                     type Error = ();
                     fn try_from(c: [<$cname $b bit With>]<C>) -> Result<Self, Self::Error> {
                         match c {
@@ -1396,10 +1396,10 @@ macro_rules! define_cell {
                 }
             )*
 
-            // implement `From`<*contained-value*> for `DataCell`:
+            // implement `From`<*contained-value*> for `DataUnit`:
 
             $( // Copy
-                impl<C: DataCellsCopy> From<$cvtype> for [<$cname $b bit Copy With>]<C> {
+                impl<C: DataUnitCopy> From<$cvtype> for [<$cname $b bit Copy With>]<C> {
                     fn from(v: $cvtype) -> Self {
                         [<$cname $b bit Copy With>]::$cvname(v)
                     }
@@ -1408,7 +1408,7 @@ macro_rules! define_cell {
             )*
             $( // Copy feature-bound
                 #[cfg(all(feature = $cvdep1_dep, feature = $cvdep2_dep ))]
-                impl<C: DataCellsCopy> From<$cvtype_dep> for [<$cname $b bit Copy With>]<C> {
+                impl<C: DataUnitCopy> From<$cvtype_dep> for [<$cname $b bit Copy With>]<C> {
                     fn from(v: $cvtype_dep) -> Self {
                         [<$cname $b bit Copy With>]::$cvname_dep(v)
                     }
@@ -1416,7 +1416,7 @@ macro_rules! define_cell {
                 }
             )*
             $( // non-Copy
-                impl<C: DataCells> From<$vtype> for [<$cname $b bit With>]<C> {
+                impl<C: DataUnit> From<$vtype> for [<$cname $b bit With>]<C> {
                     fn from(v: $vtype) -> Self {
                         [<$cname $b bit With>]::$vname(v)
                     }
@@ -1425,7 +1425,7 @@ macro_rules! define_cell {
             )*
             $( // non-Copy feature-bound
                 #[cfg(all(feature = $vdep1_dep, feature = $vdep2_dep ))]
-                impl<C: DataCells> From<$vtype_dep> for [<$cname $b bit With>]<C> {
+                impl<C: DataUnit> From<$vtype_dep> for [<$cname $b bit With>]<C> {
                     fn from(v: $vtype_dep) -> Self {
                         [<$cname $b bit With>]::$vname_dep(v)
                     }
@@ -1433,8 +1433,8 @@ macro_rules! define_cell {
                 }
             )*
 
-            // from DataCell to DataBare
-            impl<C: DataCellsCopy> From<[<$cname $b bit Copy With>]<C>> for [<$bname $b bit Copy>] {
+            // from DataUnit to RawData
+            impl<C: DataUnitCopy> From<[<$cname $b bit Copy With>]<C>> for [<$bname $b bit Copy>] {
                 fn from(cell: [<$cname $b bit Copy With>]<C>) -> Self {
                     match cell {
                         [<$cname $b bit Copy With>]::None => Self { None: () },
@@ -1462,10 +1462,10 @@ macro_rules! define_cell {
         }
     };
 }
-pub(crate) use define_cell;
+pub(crate) use define_unit;
 
-/// for defining union DataBare*
-macro_rules! define_bare {
+/// for defining union RawData*
+macro_rules! define_raw {
     (
         $bname:ident,
         size: $B:literal, $b:literal,
@@ -1503,10 +1503,10 @@ macro_rules! define_bare {
 
     ) => {
         paste::paste!{
-            // ## copy version (DataBare)
+            // ## copy version (RawData)
             // -----------------------------------------------------------------
             #[repr(C)]
-            #[doc = $B "Byte / " $b "bit untyped *bare* data (Copy)"]
+            #[doc = $B "Byte / " $b "bit untyped *raw* data (Copy)"]
             #[derive(Copy, Clone)]
             pub union [<$bname $b bit Copy>] {
                 /// Represents the absence of *data*.
@@ -1543,7 +1543,7 @@ macro_rules! define_bare {
             }
             // type aliases:
             // TODO
-            // #[doc = $B "Byte / " $b "bit *untyped (bare)* data"]
+            // #[doc = $B "Byte / " $b "bit *untyped (raw)* data"]
             // pub type [< $bname $b bit Copy >] = [< $bname $b bit Copy >];
 
             // Debug
@@ -1553,18 +1553,18 @@ macro_rules! define_bare {
                 }
             }
 
-            impl_data_bares![
+            impl_data_raw![
                 b: [< $bname $b bit Copy >],
             ];
         }
     };
 }
-pub(crate) use define_bare;
+pub(crate) use define_raw;
 
 // -----------------------------------------------------------------------------
 
-/// implement: DataTypes trait
-macro_rules! impl_data_types {
+/// implement: DataType trait
+macro_rules! impl_data_type {
     (
         $tname:ident, $tbound:ident,
         is_copy: $is_copy:stmt,
@@ -1588,7 +1588,7 @@ macro_rules! impl_data_types {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste!{
-            impl<T: $tbound> DataTypes for $tname<T> {
+            impl<T: $tbound> DataType for $tname<T> {
                 fn data_align(&self) -> usize {
                     use $tname::*;
                     match self {
@@ -1680,10 +1680,10 @@ macro_rules! impl_data_types {
         }
     };
 }
-pub(crate) use impl_data_types;
+pub(crate) use impl_data_type;
 
-/// implement: DataCells trait
-macro_rules! impl_data_cells {
+/// implement: DataUnit trait
+macro_rules! impl_data_unit {
     (
         c: $cname:ident, $cbound:ident,
         t: $tname:ident, $tbound:ident,
@@ -1708,29 +1708,29 @@ macro_rules! impl_data_cells {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
         paste::paste! {
-            impl<C: $cbound> DataCells for $cname<C> {
+            impl<C: $cbound> DataUnit for $cname<C> {
                 fn is_copy(&self) -> bool { $is_copy }
             }
         }
     };
 }
-pub(crate) use impl_data_cells;
+pub(crate) use impl_data_unit;
 
-/// implement: DataBares trait
-macro_rules! impl_data_bares {
+/// implement: RawData trait
+macro_rules! impl_data_raw {
     (
       b: $bname:ident,
     ) => {
-        // impl DataCells for $bname {
+        // impl DataUnit for $bname {
         //     fn is_copy(&self) -> bool { true }
         // }
-        // impl DataCellsCopy for $bname {}
+        // impl DataUnitCopy for $bname {}
 
         #[cfg(not(feature = "safe"))]
-        unsafe impl DataBares for $bname {}
+        unsafe impl RawData for $bname {}
     };
 }
-pub(crate) use impl_data_bares;
+pub(crate) use impl_data_raw;
 
 /// re-exports types from public modules.
 macro_rules! reexport {
@@ -1755,16 +1755,16 @@ macro_rules! reexport {
         paste::paste!{
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
-                $crate::unit::macros::reexport![@CellType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
-                $crate::unit::macros::reexport![@Bare $path; size: $b; bitCopy ];
+                $crate::unit::macros::reexport![@UnitType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+                $crate::unit::macros::reexport![@Raw $path; size: $b; bitCopy ];
             }
         }
     };
 
     // `::cells::` reexports, single size
-    (mod_cells $path:path; $B:literal, $b:literal ) => {
+    (mod_units $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
-            $crate::unit::macros::reexport![@Cell $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            $crate::unit::macros::reexport![@Unit $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::types::` reexports, single size
@@ -1773,21 +1773,21 @@ macro_rules! reexport {
             $crate::unit::macros::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
-    // `::bares::` reexports, single size
-    (mod_bares $path:path; $B:literal, $b:literal ) => {
+    // `::raw::` reexports, single size
+    (mod_raw $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             // WIP
-            $crate::unit::macros::reexport![@Bare $path; size: $b; bitCopy ];
-            // $crate::unit::macros::reexport![@Bare $path; size: $b; bit bitWith bitCopy bitCopyWith ];
+            $crate::unit::macros::reexport![@Raw $path; size: $b; bitCopy ];
+            // $crate::unit::macros::reexport![@Raw $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
 
     // internal branches, single-type re-export
     // -------------------------------------------------------------------------
 
-    // re-exports DataCell
-    (@Cell $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::unit::macros::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+    // re-exports DataUnit
+    (@Unit $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        $crate::unit::macros::reexport![@ $path; DataUnit; size: $size ; $( $suf )+ ];
     };
 
     // re-exports DataType
@@ -1795,17 +1795,17 @@ macro_rules! reexport {
         $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
     };
 
-    // re-exports DataBare
-    (@Bare $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::unit::macros::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+    // re-exports RawData
+    (@Raw $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        $crate::unit::macros::reexport![@ $path; RawData; size: $size ; $( $suf )+ ];
     };
 
-    // re-exports both DataCell & DataType
-    (@CellType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        $crate::unit::macros::reexport![@ $path; DataCell; size: $size ; $( $suf )+ ];
+    // re-exports both DataUnit & DataType
+    (@UnitType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        $crate::unit::macros::reexport![@ $path; DataUnit; size: $size ; $( $suf )+ ];
         $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
-        // NOTE DataBare can't accept non-copy (for now) so must be treated separately
-        // $crate::unit::macros::reexport![@ $path; DataBare; size: $size ; $( $suf )+ ];
+        // NOTE RawData can't accept non-copy (for now) so must be treated separately
+        // $crate::unit::macros::reexport![@ $path; RawData; size: $size ; $( $suf )+ ];
     };
 
     // generic re-export

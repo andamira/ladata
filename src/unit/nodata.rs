@@ -6,12 +6,12 @@
 
 use core::mem::{align_of, size_of};
 
-use super::{DataCells, DataCellsCopy, DataTypes, DataTypesCopy};
+use super::{DataType, DataTypeCopy, DataUnit, DataUnitCopy};
 
 #[cfg(not(feature = "safe"))]
-use super::DataBares;
+use super::RawData;
 
-impl DataTypes for () {
+impl DataType for () {
     #[inline]
     fn data_align(&self) -> usize {
         align_of::<()>()
@@ -25,16 +25,17 @@ impl DataTypes for () {
         true
     }
 }
-impl DataCells for () {
+impl DataUnit for () {
     #[inline]
     fn is_copy(&self) -> bool {
         true
     }
 }
 
-impl DataTypesCopy for () {}
+impl DataTypeCopy for () {}
 
-impl DataCellsCopy for () {}
+impl DataUnitCopy for () {}
 
 #[cfg(not(feature = "safe"))]
-unsafe impl DataBares for () {}
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+unsafe impl RawData for () {}
