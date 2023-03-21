@@ -25,9 +25,10 @@ default = ["std", "safe", "deps_default"]
 #
 std = ["alloc", "half?/std"]
 alloc = []
-no-std = []
+no-std = [] # ± alias of not(std)
 #
 safe = []
+non-safe = [] # ± alias of not(safe)
 nightly = [] # only for docs
 
 deps_all = ["deps_numerical", "deps_categorical"]

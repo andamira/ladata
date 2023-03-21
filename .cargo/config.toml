@@ -23,10 +23,10 @@ ndo = "doc --no-deps --open --features=nightly"
 ndd = "doc --features=nightly"
 nddo = "doc --open --features=nightly"
 #
-nd_all = "doc --no-deps --features=nightly,deps_all"
-ndo_all = "doc --no-deps --open --features=nightly,deps_all"
-ndd_all = "doc --features=nightly,deps_all"
-nddo_all = "doc --open --features=nightly,deps_all"
+nd_all = "doc --no-deps --no-default-features --features=nightly,std,deps_all"
+ndo_all = "doc --no-deps --open --no-default-features --features=nightly,std,deps_all"
+ndd_all = "doc --no-default-features --features=nightly,std,deps_all"
+nddo_all = "doc --open --no-default-features --features=nightly,std,deps_all"
 # 
 
 # BUILD

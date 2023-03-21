@@ -11,6 +11,8 @@
 
 #[cfg(all(feature = "std", feature = "no-std"))]
 compile_error!("You can't enable the `std` and `no-std` features at the same time.");
+#[cfg(all(feature = "safe", feature = "non-safe"))]
+compile_error!("You can't enable the `safe` and `non-safe` features at the same time.");
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
