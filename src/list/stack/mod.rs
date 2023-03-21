@@ -5,21 +5,16 @@
 //! <https://en.wikipedia.org/wiki/Stack_(abstract_data_type)>
 //
 
-use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
+use crate::{list::Array, mem::Storage};
 
 #[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod data;
 mod impls;
 mod methods;
 
-/// An abstract Stack.
-pub trait StackAdt: CollectionAdt {
-    ///
-    fn stack_pop(&mut self) -> Result<<Self as CollectionAdt>::Element>;
-    ///
-    fn stack_push(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
-}
+pub use data::DataStack;
 
 /// A stack, backed by an [`Array`].
 pub struct Stack<T, S: Storage, const CAP: usize> {

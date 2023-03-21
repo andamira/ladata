@@ -10,7 +10,7 @@ use core::{marker::PhantomData, mem::size_of};
 use crate::mem::Boxed;
 
 use crate::{
-    all::CollectionAdt,
+    all::DataCollection,
     error::{LadataError as Error, LadataResult as Result},
     mem::Storage,
 };
@@ -22,12 +22,13 @@ mod methods;
 
 /// An abstract Array.
 ///
-/// - <https://en.wikipedia.org/wiki/ArrayAdt_(data_type)#Abstract_arrays>
-pub trait ArrayAdt: CollectionAdt {
+/// - <https://en.wikipedia.org/wiki/Array_(data_type)#Abstract_arrays>
+pub trait DataArray: DataCollection {
     ///
-    fn array_get(&self, index: usize) -> Result<&<Self as CollectionAdt>::Element>;
+    fn array_get(&self, index: usize) -> Result<&<Self as DataCollection>::Element>;
     ///
-    fn array_set(&mut self, index: usize, element: <Self as CollectionAdt>::Element) -> Result<()>;
+    fn array_set(&mut self, index: usize, element: <Self as DataCollection>::Element)
+        -> Result<()>;
 }
 
 /// An array, backed by the core primitive [`array`].
@@ -53,14 +54,20 @@ pub(crate) mod all {
     #[doc(inline)]
     pub use super::{
         bit::{BitArray, DirectBitArray},
-        Array, ArrayAdt, DirectArray,
+        Array, DataArray, DirectArray,
     };
 }
 
-impl<T, S: Storage, const LEN: usize> CollectionAdt for Array<T, S, LEN> {
+impl<T, S: Storage, const LEN: usize> DataCollection for Array<T, S, LEN> {
     type Element = T;
-    fn collection_is_empty(&self) -> bool {
-        self.is_empty()
+    fn collection_is_empty(&self) -> Option<bool> {
+        None
+    }
+    fn collection_is_full(&self) -> Option<bool> {
+        None
+    }
+    fn collection_capacity(&self) -> usize {
+        LEN
     }
     fn collection_len(&self) -> usize {
         self.len()
@@ -70,15 +77,19 @@ impl<T, S: Storage, const LEN: usize> CollectionAdt for Array<T, S, LEN> {
     }
 }
 
-impl<T, S: Storage, const LEN: usize> ArrayAdt for Array<T, S, LEN> {
-    fn array_get(&self, index: usize) -> Result<&<Self as CollectionAdt>::Element> {
+impl<T, S: Storage, const LEN: usize> DataArray for Array<T, S, LEN> {
+    fn array_get(&self, index: usize) -> Result<&<Self as DataCollection>::Element> {
         if let Some(e) = self.get(index) {
             Ok(e)
         } else {
             Err(Error::IndexOutOfBounds(index))
         }
     }
-    fn array_set(&mut self, index: usize, element: <Self as CollectionAdt>::Element) -> Result<()> {
+    fn array_set(
+        &mut self,
+        index: usize,
+        element: <Self as DataCollection>::Element,
+    ) -> Result<()> {
         if let Some(e) = self.get_mut(index) {
             *e = element;
             Ok(())

@@ -4,35 +4,16 @@
 //! either end.
 //
 
-use crate::{
-    error::LadataResult as Result,
-    list::{Array, QueueAdt},
-    mem::Storage,
-    misc::CollectionAdt,
-};
+use crate::{list::Array, mem::Storage};
 
 #[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod data;
 mod impls;
 mod methods;
 
-/// An abstract Deque.
-pub trait DequeAdt: CollectionAdt + QueueAdt {
-    ///
-    fn deque_dequeue_back(&mut self) -> Result<<Self as CollectionAdt>::Element>;
-    ///
-    fn deque_enqueue_front(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
-    //
-    ///
-    fn deque_dequeue_front(&mut self) -> Result<<Self as CollectionAdt>::Element> {
-        self.queue_dequeue()
-    }
-    ///
-    fn deque_enqueue_back(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()> {
-        self.queue_enqueue(element)
-    }
-}
+pub use data::DataDeque;
 
 /// A double-ended queue, backed by an [`Array`].
 ///

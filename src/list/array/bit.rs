@@ -1,4 +1,4 @@
-// ladata::struct::bit
+// ladata::list::array::bit
 //
 //! Bit arrays.
 //!
@@ -14,7 +14,7 @@ use {
 use core::fmt;
 
 use crate::all::{
-    Array, /* ArrayAdt, */ CollectionAdt, LadataError as Error, LadataResult as Result,
+    Array, /* DataArray, */ DataCollection, LadataError as Error, LadataResult as Result,
     Storage,
 };
 
@@ -111,10 +111,16 @@ impl<S: Storage, const LEN: usize, const U8LEN: usize> Default for BitArray<S, L
     }
 }
 
-impl<S: Storage, const LEN: usize, const U8LEN: usize> CollectionAdt for BitArray<S, LEN, U8LEN> {
+impl<S: Storage, const LEN: usize, const U8LEN: usize> DataCollection for BitArray<S, LEN, U8LEN> {
     type Element = bool;
-    fn collection_is_empty(&self) -> bool {
-        LEN == 0
+    fn collection_is_empty(&self) -> Option<bool> {
+        None
+    }
+    fn collection_is_full(&self) -> Option<bool> {
+        None
+    }
+    fn collection_capacity(&self) -> usize {
+        LEN
     }
     fn collection_len(&self) -> usize {
         LEN
@@ -125,8 +131,8 @@ impl<S: Storage, const LEN: usize, const U8LEN: usize> CollectionAdt for BitArra
 }
 
 // FIX: return ref
-// impl<S: Storage, const LEN: usize, const U8LEN: usize> ArrayAdt for BitArray<S, LEN, U8LEN> {
-//     fn array_get(&self, index: usize) -> Result<&<Self as CollectionAdt>::Element> {
+// impl<S: Storage, const LEN: usize, const U8LEN: usize> DataArray for BitArray<S, LEN, U8LEN> {
+//     fn array_get(&self, index: usize) -> Result<&<Self as DataCollection>::Element> {
 //         if index >= LEN {
 //             return Err(Error::IndexOutOfBounds(index));
 //         }
@@ -135,7 +141,7 @@ impl<S: Storage, const LEN: usize, const U8LEN: usize> CollectionAdt for BitArra
 //         let bit_mask = 1 << bit_within_byte_index;
 //         Ok(&(self.array[byte_index] & bit_mask != 0))
 //     }
-//     fn array_set(&mut self, index: usize, element: <Self as CollectionAdt>::Element) -> Result<()> {
+//     fn array_set(&mut self, index: usize, element: <Self as DataCollection>::Element) -> Result<()> {
 //         self.set_bit(index, element)
 //     }
 // }

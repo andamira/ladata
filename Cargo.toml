@@ -25,12 +25,14 @@ default = ["std", "safe", "deps_default"]
 #
 std = ["alloc", "half?/std"]
 alloc = []
-no-std = [] # ± alias of not(std)
+no-std = [] # like an alias of not(std)
 #
 safe = []
-non-safe = [] # ± alias of not(safe)
+non-safe = [] # like an alias of not(safe)
+#
 nightly = [] # only for docs
 
+deps_default = ["deps_discrete", "deps_string", "time"]
 deps_all = ["deps_numerical", "deps_categorical"]
 # deps_default = [
 #     #"deps_numerical",
@@ -42,7 +44,6 @@ deps_all = ["deps_numerical", "deps_categorical"]
 #         #"deps_datetime",
 #             "time", # !"fugit",
 # ]
-deps_default = ["deps_discrete", "half", "twofloat", "deps_string", "time"]
 
 deps_numerical= ["deps_continuous", "deps_discrete"]
 deps_continuous = ["half", "twofloat"]

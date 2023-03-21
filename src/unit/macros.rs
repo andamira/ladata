@@ -1762,7 +1762,7 @@ macro_rules! reexport {
     };
 
     // `::cells::` reexports, single size
-    (mod_units $path:path; $B:literal, $b:literal ) => {
+    (mod_unit $path:path; $B:literal, $b:literal ) => {
         paste::paste!{
             $crate::unit::macros::reexport![@Unit $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }

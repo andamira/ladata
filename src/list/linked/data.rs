@@ -3,11 +3,11 @@
 //!
 //
 
-use crate::{error::LadataResult as Result, misc::CollectionAdt};
+use crate::{error::LadataResult as Result, misc::DataCollection};
 
 /// An abstract Singly Linked List.
-pub trait SinglyLinkedListAdt: CollectionAdt {
-    type Node: SinglyLinkedListAdtNode<Data = Self::Element>;
+pub trait DataSinglyLinkedList: DataCollection {
+    type Node: DataSinglyLinkedListNode<Data = Self::Element>;
 
     ///
     fn linked_first(&mut self) -> Result<Self::Node>;
@@ -23,7 +23,7 @@ pub trait SinglyLinkedListAdt: CollectionAdt {
 }
 
 /// An abstract Singly Linked List Node.
-pub trait SinglyLinkedListAdtNode: Sized {
+pub trait DataSinglyLinkedListNode: Sized {
     type Data;
     ///
     fn linked_data(&self) -> &Self::Data;
@@ -39,7 +39,7 @@ pub trait SinglyLinkedListAdtNode: Sized {
 /* doubly */
 
 /// An abstract Doubly Linked List.
-pub trait DoublyLinkedListAdt: SinglyLinkedListAdt {
+pub trait DataDoublyLinkedList: DataSinglyLinkedList {
     ///
     fn linked_last(&mut self) -> Result<Option<Self::Node>>;
 
@@ -54,7 +54,7 @@ pub trait DoublyLinkedListAdt: SinglyLinkedListAdt {
 }
 
 /// An abstract Doubly Linked List Node.
-pub trait DoublyLinkedListAdtNode: SinglyLinkedListAdtNode {
+pub trait DataDoublyLinkedListNode: DataSinglyLinkedListNode {
     /// Returns a shared reference to the previous node.
     fn linked_prev(&self) -> Option<&Self>;
     /// Returns an exclusive reference to the previous node.
@@ -64,12 +64,12 @@ pub trait DoublyLinkedListAdtNode: SinglyLinkedListAdtNode {
 /* thirdly */
 
 // /// An abstract Thirdly Linked List.
-// pub trait ThirdlyLinkedListAdt: DoublyLinkedListAdt {
+// pub trait DataThirdlyLinkedList: DataDoublyLinkedList {
 //     fn linked_parent(&self) -> Result<Self::Node>;
 // }
 //
 // /// An abstract Thirdly Linked List Node.
-// pub trait ThirdlyLinkedListAdtNode: DoublyLinkedListAdtNode {
+// pub trait DataThirdlyLinkedListNode: DataDoublyLinkedListNode {
 //     /// Returns a shared reference to the parent node.
 //     fn linked_parent(&self) -> Option<&Self>;
 //     /// Returns an excusive reference to the parent node.

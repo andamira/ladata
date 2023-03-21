@@ -120,7 +120,7 @@
 pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
-    pub use super::{raw::*, traits::*, types::*, units::*};
+    pub use super::{raw::*, traits::*, types::*, unit::*};
 }
 
 /// *Raw* Data (only the unsafe *raw* data).
@@ -134,13 +134,13 @@ pub mod types {
     super::macros::reexport![mod_types, crate::unit::build; all_sizes];
 }
 
-/// Data *Units* (the unification of *data* and *type*).
-pub mod units {
-    super::macros::reexport![mod_units, crate::unit::build; all_sizes];
+/// Data *Unit* (*data* and *type* unified).
+pub mod unit {
+    super::macros::reexport![mod_unit, crate::unit::build; all_sizes];
 }
 
 /// Every unitary type, organized by size.
-pub mod sizes {
+pub mod size {
     super::macros::reexport![mod_size, crate::unit::build; all_sizes];
 }
 

@@ -1,11 +1,17 @@
 [alias]
+#
+# Used prefixes:
+#            : the default features: std, safe, deps_default
+# _no-std    : --no-default-features
+# _non-safe  : --no-default-features --features=std,deps_default
+# _all       : --deps_all
 
 # CHECK
 cl = "clippy"
 clq = "clippy --quiet"
 #
-cl_nostd = "clippy --no-default-features"
-cl_unsafe = "clippy --no-default-features --features=std"
+cl_no-std = "clippy --no-default-features"
+cl_non-safe = "clippy --no-default-features --features=std"
 cl_all = "clippy --features=deps_all"
 
 # CLEAN PACKAGE
@@ -17,12 +23,7 @@ d = "doc --no-deps"
 do = "doc --no-deps --open"
 dd = "doc"
 ddo = "doc --open"
-# +nightly
-nd = "doc --no-deps --features=nightly"
-ndo = "doc --no-deps --open --features=nightly"
-ndd = "doc --features=nightly"
-nddo = "doc --open --features=nightly"
-#
+# +nightly ; document everything
 nd_all = "doc --no-deps --no-default-features --features=nightly,std,deps_all"
 ndo_all = "doc --no-deps --open --no-default-features --features=nightly,std,deps_all"
 ndd_all = "doc --no-default-features --features=nightly,std,deps_all"
@@ -42,17 +43,17 @@ bre = "build --release --example"
 brqb = "build --release --quiet --bin"
 brqe = "build --release --quiet --example"
 #
-b_unsafe = "build --no-default-features --features=std"
-bb_unsafe = "build --bin --no-default-features --features=std"
-be_unsafe = "build --example --no-default-features --features=std"
-bq_unsafe = "build --quiet --no-default-features --features=std"
-br_unsafe = "build --release --no-default-features --features=std"#
+b_non-safe = "build --no-default-features --features=std"
+bb_non-safe = "build --bin --no-default-features --features=std"
+be_non-safe = "build --example --no-default-features --features=std"
+bq_non-safe = "build --quiet --no-default-features --features=std"
+br_non-safe = "build --release --no-default-features --features=std"#
 #
-b_nostd = "build --no-default-features"
-bb_nostd = "build --bin --no-default-features"
-be_nostd = "build --example --no-default-features"
-bq_nostd = "build --quiet --no-default-features"
-br_nostd = "build --release --no-default-features"
+b_no-std = "build --no-default-features"
+bb_no-std = "build --bin --no-default-features"
+be_no-std = "build --example --no-default-features"
+bq_no-std = "build --quiet --no-default-features"
+br_no-std = "build --release --no-default-features"
 #
 b_all = "build --features=deps_all"
 bb_all = "build --bin --features=deps_all"
@@ -73,17 +74,17 @@ rre = "run --release --example"
 rrqb = "run --release --quiet --bin"
 rrqe = "run --release --quiet --example"
 #
-r_unsafe = "run --no-default-features --features=std"
-rb_unsafe = "run --bin --no-default-features --features=std"
-re_unsafe = "run --no-default-features --features=std --example "
-rq_unsafe = "run --quiet --no-default-features --features=std"
-rr_unsafe = "run --release --no-default-features --features=std"
+r_non-safe = "run --no-default-features --features=std"
+rb_non-safe = "run --bin --no-default-features --features=std"
+re_non-safe = "run --no-default-features --features=std --example "
+rq_non-safe = "run --quiet --no-default-features --features=std"
+rr_non-safe = "run --release --no-default-features --features=std"
 #
-r_nostd = "run --no-default-features"
-rb_nostd = "run --no-default-features --bin "
-re_nostd = "run --no-default-features --example"
-rq_nostd = "run --quiet --no-default-features"
-rr_nostd = "run --release --no-default-features"
+r_no-std = "run --no-default-features"
+rb_no-std = "run --no-default-features --bin "
+re_no-std = "run --no-default-features --example"
+rq_no-std = "run --quiet --no-default-features"
+rr_no-std = "run --release --no-default-features"
 #
 r_all = "run --features=deps_all"
 rb_all = "run --bin --features=deps_all"
@@ -97,11 +98,11 @@ td = "test --doc"
 t_ = "test -- --nocapture"
 t_1 = "test -- --test-threads 1 --nocapture"
 #
-t_nostd = "test --no-default-features"
-td_nostd = "test --doc --no-default-features"
+t_no-std = "test --no-default-features"
+td_no-std = "test --doc --no-default-features"
 #
-t_unsafe = "test --no-default-features --features=std"
-td_unsafe = "test --doc --no-default-features --features=std"
+t_non-safe = "test --no-default-features --features=std"
+td_non-safe = "test --doc --no-default-features --features=std"
 #
 t_all = "test --features=deps_all"
 td_all = "test --doc --features=deps_all"

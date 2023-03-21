@@ -3,7 +3,7 @@
 //! Grid types.
 //
 
-use crate::{all::CollectionAdt, error::LadataResult as Result};
+use crate::{all::DataCollection, error::LadataResult as Result};
 
 #[cfg(feature = "alloc")]
 #[cfg(test)]
@@ -24,13 +24,13 @@ pub use arr2d::BoxedGrid2D;
 pub use dyn2d::DynGrid2D;
 
 /// An abstract Grid.
-pub trait GridAdt<const R: usize = 2>: CollectionAdt {
+pub trait DataGrid<const R: usize = 2>: DataCollection {
     ///
-    fn grid_get(&mut self, index: [usize; R]) -> Result<<Self as CollectionAdt>::Element>;
+    fn grid_get(&mut self, index: [usize; R]) -> Result<<Self as DataCollection>::Element>;
     ///
     fn grid_set(
         &mut self,
         index: [usize; R],
-        element: <Self as CollectionAdt>::Element,
+        element: <Self as DataCollection>::Element,
     ) -> Result<()>;
 }

@@ -1,10 +1,10 @@
-// ladata
+// ladata::lib
 //
 //! A simple & modular data model.
 //
 
-// #![warn(clippy::all)] // TODO CHECK
-#![allow(non_snake_case, non_camel_case_types)]
+#![warn(clippy::all)]
+#![allow(non_snake_case, non_camel_case_types, clippy::module_inception)]
 //
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(feature = "safe", forbid(unsafe_code))]

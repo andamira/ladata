@@ -10,9 +10,9 @@ use crate::mem::Boxed;
 // #[cfg(test)]
 // mod tests;
 
-mod adt;
-pub use adt::{
-    DoublyLinkedListAdt, DoublyLinkedListAdtNode, SinglyLinkedListAdt, SinglyLinkedListAdtNode,
+mod data;
+pub use data::{
+    DataDoublyLinkedList, DataDoublyLinkedListNode, DataSinglyLinkedList, DataSinglyLinkedListNode,
 };
 
 mod singly;

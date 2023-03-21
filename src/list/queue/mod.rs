@@ -4,19 +4,16 @@
 //! and removals are made at the opposite end.
 //
 
-use crate::{error::LadataResult as Result, list::Array, mem::Storage, misc::CollectionAdt};
+use crate::{list::Array, mem::Storage};
 
 #[cfg(feature = "alloc")]
 use crate::mem::Boxed;
 
+mod data;
 mod impls;
 mod methods;
 
-/// An abstract Queue.
-pub trait QueueAdt: CollectionAdt {
-    fn queue_dequeue(&mut self) -> Result<<Self as CollectionAdt>::Element>;
-    fn queue_enqueue(&mut self, element: <Self as CollectionAdt>::Element) -> Result<()>;
-}
+pub use data::DataQueue;
 
 /// A queue, backed by an [`Array`].
 pub struct Queue<T, S: Storage, const CAP: usize> {
