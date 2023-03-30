@@ -24,7 +24,10 @@ use core::ops;
 // pub use pool::*;
 
 mod direct;
+mod size;
+
 pub use direct::Direct;
+pub use size::Size;
 
 /// Allows to be generic in respect of the data storage.
 ///

@@ -4,7 +4,7 @@
 //! homogeneous data structures.
 //
 
-use core::{marker::PhantomData, mem::size_of};
+use core::marker::PhantomData;
 
 #[cfg(feature = "alloc")]
 use crate::mem::Boxed;
@@ -71,9 +71,6 @@ impl<T, S: Storage, const LEN: usize> DataCollection for Array<T, S, LEN> {
     }
     fn collection_len(&self) -> usize {
         self.len()
-    }
-    fn collection_byte_len(&self) -> usize {
-        self.len() * size_of::<T>()
     }
 }
 

@@ -125,9 +125,6 @@ impl<S: Storage, const LEN: usize, const U8LEN: usize> DataCollection for BitArr
     fn collection_len(&self) -> usize {
         LEN
     }
-    fn collection_byte_len(&self) -> usize {
-        U8LEN
-    }
 }
 
 // FIX: return ref

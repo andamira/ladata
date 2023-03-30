@@ -27,9 +27,6 @@ pub trait DataCollection {
 
     ///
     fn collection_len(&self) -> usize;
-
-    ///
-    fn collection_byte_len(&self) -> usize;
 }
 
 // /// An abstract dynamically-sized Collection.

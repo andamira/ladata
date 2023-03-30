@@ -29,7 +29,4 @@ impl<T, S: Storage, const CAP: usize> DataCollection for Stack<T, S, CAP> {
     fn collection_len(&self) -> usize {
         self.len()
     }
-    fn collection_byte_len(&self) -> usize {
-        todo![]
-    }
 }
