@@ -78,7 +78,7 @@ pub trait DataUnitCopy: DataUnit + Copy {}
 /// TODO
 ///
 #[cfg(not(feature = "safe"))]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe")))]
 pub unsafe trait RawData {}
 
 /// Comon (marker) trait for *unsafe* `Copy` *data units*.
@@ -87,5 +87,5 @@ pub unsafe trait RawData {}
 /// TODO
 ///
 #[cfg(not(feature = "safe"))]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe")))]
 pub unsafe trait RawDataCopy: RawData + Copy {}

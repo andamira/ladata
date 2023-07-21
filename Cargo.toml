@@ -3,12 +3,11 @@ name = "ladata"
 description = "A simple & modular data model."
 version = "0.0.27"
 edition = "2021"
-resolver = "2"
 rust-version = "1.65"
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
 repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 include = [
 	"/src/**/*.rs",
 	"/Cargo.toml",
@@ -24,11 +23,12 @@ publish = true
 default = ["std", "safe", "deps_default"]
 #
 std = ["alloc", "half?/std"]
-alloc = []
-no-std = [] # like an alias of not(std)
+alloc = [] # allocating no-std
+no-std = [] # non-allocating no-std. incompatible with "std"
 #
-safe = []
-non-safe = [] # like an alias of not(safe)
+safe = [] # disables unsafe in this crate
+safest = ["safe"] # disables unsafe in dependencies.
+unsafe = [] # enables unsafe alternatives. incompatible with "safe"
 #
 nightly = [] # only for docs
 
@@ -79,7 +79,8 @@ time = { version = "0.3.11", optional = true }
 
 
 [package.metadata.docs.rs]
-features = ["nightly", "deps_all"]
+no-default-features = true
+features = ["nightly", "std", "deps_all"]
 
 [badges]
 maintenance = { status = "experimental" }

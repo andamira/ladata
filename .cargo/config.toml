@@ -1,124 +1,101 @@
 [alias]
-#
-# Used prefixes:
-#            : the default features: std, safe, deps_default
-# _no-std    : --no-default-features
-# _non-safe  : --no-default-features --features=std,deps_default
-# _all       : --deps_all
 
 # CHECK
+c = "check"
+cb = "check --bin"
+ce = "check --example"
+cr = "check --release"
+cu = "check --no-default-features --features=std"
+cn = "check --no-default-features --features=no-std,safe"
+cnu = "check --no-default-features --features=unsafe"
+cN = "check --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+cNu = "check --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+
+# CLIPPY
 cl = "clippy"
-clq = "clippy --quiet"
+cla = "clippy --features=deps_all"
+clb = "clippy --bin"
+cle = "clippy --example"
+clr = "clippy --release"
+clu = "clippy --no-default-features --features=std,unsafe"
+cln = "clippy --no-default-features --features=no-std"
+clnu = "clippy --no-default-features --features=no-std,unsafe"
+clN = "clippy --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+clNu = "clippy --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+
+# BUILD
+b = "build"
+bb = "build --bin"
+be = "build --example"
+br = "build --release"
+brb = "build --release --bin"
+bre = "build --release --example"
 #
-cl_no-std = "clippy --no-default-features"
-cl_non-safe = "clippy --no-default-features --features=std"
-cl_all = "clippy --features=deps_all"
+ba = "build --features=deps_all"
+bu = "build --no-default-features --features=std,unsafe"
+bn = "build --no-default-features --features=no-std"
+bnu = "build --no-default-features --features=no-std,unsafe"
+bN = "build --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+bNu = "build --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+
+# RUN
+r = "run"
+rb = "run --bin"
+re = "run --example"
+rr = "run --release"
+rrb = "run --release --bin"
+rre = "run --release --example"
+ra = "run --features=deps_all"
+ru = "run --no-default-features --features=std,unsafe"
+rn = "run --no-default-features --features=no-std"
+rnu = "run --no-default-features --features=no-std,unsafe"
+rN = "run --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+rNu = "run --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+
+# TEST
+t = "test"
+ta = "test --features=deps_all"
+tu = "test --no-default-features --features=std,unsafe"
+tn = "test --no-default-features --features=no-std"
+tnu = "test --no-default-features --features=no-std,unsafe"
+tN = "test --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+tNu = "test --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+td = "test --doc"
+tda = "test --doc --features=deps_all"
+tdu = "test --doc --no-default-features --features=std,unsafe"
+tdn = "test --doc --no-default-features --features=no-std"
+tdnu = "test --doc --no-default-features --features=no-std,unsafe"
+tdN = "test --doc --target thumbv7m-none-eabi --no-default-features --features=no-std,safe"
+tdNu = "test --doc --target thumbv7m-none-eabi --no-default-features --features=no-std,unsafe"
+t_ = "test -- --nocapture"
+t_1 = "test -- --test-threads 1 --nocapture"
+
+# PUBLISH
+p = "publish --dry-run"
+pa = "publish --dry-run --allow-dirty"
+PUBLISH = "publish"
+PUBLISHa = "publish --allow-dirty"
 
 # CLEAN PACKAGE
-cp = "clean --package"
-crp = "clean --release --package"
+Cp = "clean --package"
+Crp = "clean --release --package"
 
 # DOC
 d = "doc --no-deps"
 do = "doc --no-deps --open"
 dd = "doc"
 ddo = "doc --open"
-# +nightly ; document everything
-nd_all = "doc --no-deps --no-default-features --features=nightly,std,deps_all"
-ndo_all = "doc --no-deps --open --no-default-features --features=nightly,std,deps_all"
-ndd_all = "doc --no-default-features --features=nightly,std,deps_all"
-nddo_all = "doc --open --no-default-features --features=nightly,std,deps_all"
-# 
-
-# BUILD
-b = "build"
-bb = "build --bin"
-be = "build --example"
-bq = "build --quiet"
-br = "build --release"
-bqb = "build --quiet --bin"
-bqe = "build --quiet --example"
-brb = "build --release --bin"
-bre = "build --release --example"
-brqb = "build --release --quiet --bin"
-brqe = "build --release --quiet --example"
-#
-b_non-safe = "build --no-default-features --features=std"
-bb_non-safe = "build --bin --no-default-features --features=std"
-be_non-safe = "build --example --no-default-features --features=std"
-bq_non-safe = "build --quiet --no-default-features --features=std"
-br_non-safe = "build --release --no-default-features --features=std"#
-#
-b_no-std = "build --no-default-features"
-bb_no-std = "build --bin --no-default-features"
-be_no-std = "build --example --no-default-features"
-bq_no-std = "build --quiet --no-default-features"
-br_no-std = "build --release --no-default-features"
-#
-b_all = "build --features=deps_all"
-bb_all = "build --bin --features=deps_all"
-be_all = "build --example --features=deps_all"
-bq_all = "build --quiet --features=deps_all"
-br_all = "build --release --features=deps_all"
-
-# RUN
-r = "run"
-rb = "run --bin"
-re = "run --example"
-rq = "run --quiet"
-rr = "run --release"
-rqb = "run --quiet --bin"
-rqe = "run --quiet --example"
-rrb = "run --release --bin"
-rre = "run --release --example"
-rrqb = "run --release --quiet --bin"
-rrqe = "run --release --quiet --example"
-#
-r_non-safe = "run --no-default-features --features=std"
-rb_non-safe = "run --bin --no-default-features --features=std"
-re_non-safe = "run --no-default-features --features=std --example "
-rq_non-safe = "run --quiet --no-default-features --features=std"
-rr_non-safe = "run --release --no-default-features --features=std"
-#
-r_no-std = "run --no-default-features"
-rb_no-std = "run --no-default-features --bin "
-re_no-std = "run --no-default-features --example"
-rq_no-std = "run --quiet --no-default-features"
-rr_no-std = "run --release --no-default-features"
-#
-r_all = "run --features=deps_all"
-rb_all = "run --bin --features=deps_all"
-re_all = "run --example --features=deps_all"
-rq_all = "run --quiet --features=deps_all"
-rr_all = "run --release --features=deps_all"
-
-# TEST
-t = "test"
-td = "test --doc"
-t_ = "test -- --nocapture"
-t_1 = "test -- --test-threads 1 --nocapture"
-#
-t_no-std = "test --no-default-features"
-td_no-std = "test --doc --no-default-features"
-#
-t_non-safe = "test --no-default-features --features=std"
-td_non-safe = "test --doc --no-default-features --features=std"
-#
-t_all = "test --features=deps_all"
-td_all = "test --doc --features=deps_all"
+# +nightly
+nd = "doc --no-deps --no-default-features --features=nightly,std,deps_all"
+ndo = "doc --no-deps --open --no-default-features --features=nightly,std,deps_all"
+ndda = "doc --no-default-features --features=nightly,std,deps_all"
+nddoa = "doc --open --no-default-features --features=nightly,std,deps_all"
 
 # TREE
 tr = "tree"
+tra = "tree --features=deps_all"
 trf = "tree --format {p}:{f}" # with feature list
 trr = "tree --format {p}:{r}" # with repository url
-#
-tr_all = "tree --features=deps_all"
-
-# PUBLISH
-p = "publish --dry-run"
-pa = "publish --dry-run --allow-dirty"
-pp = "publish"
-ppa = "publish --allow-dirty"
 
 # Cargo subcommands:
 ## cargo-expand
