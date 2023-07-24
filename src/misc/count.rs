@@ -7,7 +7,7 @@ use core::fmt;
 
 use crate::error::{LadataError as Error, LadataResult as Result};
 
-use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
+use devela::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
 #[rustfmt::skip]
 macro_rules! count {

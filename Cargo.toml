@@ -22,12 +22,12 @@ publish = true
 [features]
 default = ["std", "safe", "deps_default"]
 #
-std = ["alloc", "half?/std"]
-alloc = [] # allocating no-std
+std = ["alloc", "half?/std", "devela/std"]
+alloc = ["devela/alloc"] # allocating no-std
 no-std = [] # non-allocating no-std. incompatible with "std"
 #
 safe = [] # disables unsafe in this crate
-safest = ["safe"] # disables unsafe in dependencies.
+safest = ["safe", "devela/safe"] # disables unsafe in dependencies.
 unsafe = [] # enables unsafe alternatives. incompatible with "safe"
 #
 nightly = [] # only for docs
@@ -55,7 +55,7 @@ deps_string =  ["arraystring"]
 
 
 [dependencies]
-nonmax = { version = "0.5.3", default-features = false }
+devela = { version = "0.5.3", default-features = false }
 paste = "1.0.11"
 unicode-segmentation = "1.10.1"
 

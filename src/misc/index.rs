@@ -5,7 +5,7 @@
 
 use core::fmt;
 
-use nonmax::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
+use devela::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
 #[rustfmt::skip]
 macro_rules! index {

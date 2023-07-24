@@ -42,7 +42,7 @@ macro_rules! linked_list_array {
     // $B : byte size
     // $b : bit size
     // $t : inner index type
-    // $nmt: nonmax inner index type
+    // $nmt: devela::NonSpecific inner index type
     ( $name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { paste::paste! {
 
         // Node ----------------------------------------------------------------
@@ -1080,7 +1080,7 @@ macro_rules! linked_list_array {
     target_pointer_width = "64",
     target_pointer_width = "128"
 ))]
-linked_list_array![SinglyLinkedList, 1, 8, u8, nonmax::NonMaxU8];
+linked_list_array![SinglyLinkedList, 1, 8, u8, devela::NonMaxU8];
 
 // #[cfg(any(
 //     target_pointer_width = "16",
@@ -1088,11 +1088,11 @@ linked_list_array![SinglyLinkedList, 1, 8, u8, nonmax::NonMaxU8];
 //     target_pointer_width = "64",
 //     target_pointer_width = "128"
 // ))]
-// linked_list_array![SinglyLinkedList, 2, 16, u16, nonmax::NonMaxU16];
+// linked_list_array![SinglyLinkedList, 2, 16, u16, devela::NonMaxU16];
 //
 // #[cfg(any(
 //     target_pointer_width = "32",
 //     target_pointer_width = "64",
 //     target_pointer_width = "128"
 // ))]
-// linked_list_array![SinglyLinkedList, 4, 32, u32, nonmax::NonMaxU32];
+// linked_list_array![SinglyLinkedList, 4, 32, u32, devela::NonMaxU32];
