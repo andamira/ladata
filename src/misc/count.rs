@@ -17,7 +17,7 @@ macro_rules! count {
     // $t : inner count type
     // $nmt: nonmax inner count type
     // $idx: index size to convert to
-    ($name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty, $idx:ident) => { paste::paste! {
+    ($name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty, $idx:ident) => { devela::paste! {
         #[doc = "An " $b "-bit count that is known not to equal [`" $t "::MAX`]."]
         ///
         #[doc = "It can count from `0` to [`" $t "::MAX`]`-1` elements."]

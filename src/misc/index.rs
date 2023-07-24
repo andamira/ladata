@@ -14,7 +14,7 @@ macro_rules! index {
     // $b : bit size
     // $t : inner index type
     // $nmt: nonmax inner index type
-    ($name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { paste::paste! {
+    ($name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { devela::paste! {
         #[doc = "An " $b "-bit index that is known not to equal [`" $t "::MAX`]."]
         ///
         #[doc = "It can index from `0` to [`" $t "::MAX`]`-1` elements."]

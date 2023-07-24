@@ -962,7 +962,7 @@ macro_rules! define_type {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),*
             $(,)* ;
     ) =>  {
-        paste::paste!{
+        devela::paste!{
             // ## copy version (DataType)
             // -----------------------------------------------------------------
             #[doc = $b "-bit / " $B "-Byte " "data **Type** (extendable) (Copy)" ]
@@ -1168,7 +1168,7 @@ macro_rules! define_unit {
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),*
             $(,)* ;
     ) => {
-        paste::paste!{
+        devela::paste!{
             // ## copy version (DataUnit)
             // -----------------------------------------------------------------
             #[doc = $b "-bit/" $B "-Byte " "data **Unit** (extendable) (Copy)"]
@@ -1504,7 +1504,7 @@ macro_rules! define_raw {
             $(,)* ;
 
     ) => {
-        paste::paste!{
+        devela::paste!{
             // ## copy version (RawData)
             // -----------------------------------------------------------------
             #[repr(C)]
@@ -1593,7 +1593,7 @@ macro_rules! impl_data_type {
             $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
-        paste::paste!{
+        devela::paste!{
             impl<T: $tbound> DataType for $tname<T> {
                 fn data_align(&self) -> usize {
                     use $tname::*;
@@ -1713,7 +1713,7 @@ macro_rules! impl_data_unit {
             $( $vname_psize_dep:ident, $vtype_psize_dep:ty,
             $vpsize_psize_dep:meta, $vdep1_psize_dep:literal, $vdep2_psize_dep:literal ),* ;
     ) => {
-        paste::paste! {
+        devela::paste! {
             impl<C: $cbound> DataUnit for $cname<C> {
                 fn is_copy(&self) -> bool { $is_copy }
             }
@@ -1759,7 +1759,7 @@ macro_rules! reexport {
 
     // `::size::` sub-modules reexports, single size.
     (mod_size $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
+        devela::paste!{
             #[doc = $b " bit data (== " $B " Byte)" ]
             pub mod [< b $b >] {
                 $crate::unit::macros::reexport![@UnitType $path; size: $b; bit bitWith bitCopy bitCopyWith ];
@@ -1770,19 +1770,19 @@ macro_rules! reexport {
 
     // `::cells::` reexports, single size
     (mod_unit $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
+        devela::paste!{
             $crate::unit::macros::reexport![@Unit $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::types::` reexports, single size
     (mod_types $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
+        devela::paste!{
             $crate::unit::macros::reexport![@Type $path; size: $b; bit bitWith bitCopy bitCopyWith ];
         }
     };
     // `::raw::` reexports, single size
     (mod_raw $path:path; $B:literal, $b:literal ) => {
-        paste::paste!{
+        devela::paste!{
             // WIP
             $crate::unit::macros::reexport![@Raw $path; size: $b; bitCopy ];
             // $crate::unit::macros::reexport![@Raw $path; size: $b; bit bitWith bitCopy bitCopyWith ];
@@ -1818,7 +1818,7 @@ macro_rules! reexport {
 
     // generic re-export
     (@ $path:path; $type:ty; size: $size:literal; $( $suf:ident )+ ) => {
-        $( paste::paste!{
+        $( devela::paste!{
             pub use $path::[< $type $size $suf >];
         } )+
     };

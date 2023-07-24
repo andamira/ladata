@@ -43,7 +43,7 @@ macro_rules! linked_list_array {
     // $b : bit size
     // $t : inner index type
     // $nmt: devela::NonSpecific inner index type
-    ( $name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { paste::paste! {
+    ( $name:ident, $B:literal, $b:literal, $t:ty, $nmt:ty) => { devela::paste! {
 
         // Node ----------------------------------------------------------------
 

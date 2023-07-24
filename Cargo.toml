@@ -15,7 +15,7 @@ include = [
 	"/README.md",
 ]
 categories = [ "no-std", "data-structures" ]
-keywords = [ "data", "type", "cell" ] # dataframe
+keywords = [ "data", "type", "unit" ]
 publish = true
 
 
@@ -56,8 +56,9 @@ deps_string =  ["arraystring"]
 
 [dependencies]
 devela = { version = "0.5.3", default-features = false }
-paste = "1.0.11"
-unicode-segmentation = "1.10.1"
+unicode-segmentation = "1.10.1" # RETHINK
+
+#* optional dependencies *#
 
 # feature: "deps_continuous" (continuous numbers):
 half = { version = "2.2.1", optional = true, default-features = false } # F16 BF16
