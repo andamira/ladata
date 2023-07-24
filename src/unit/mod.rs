@@ -120,11 +120,17 @@
 pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
-    pub use super::{raw::*, traits::*, types::*, unit::*};
+    pub use super::{traits::*, types::*, unit::*};
+
+    #[doc(inline)]
+    #[cfg(not(feature = "safe"))]
+    #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
+    pub use super::raw::*;
 }
 
 /// *Raw* Data (only the unsafe *raw* data).
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "non-safe")))]
+#[cfg(not(feature = "safe"))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
 pub mod raw {
     super::macros::reexport![mod_raw, crate::unit::build; all_sizes];
 }

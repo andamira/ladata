@@ -1434,6 +1434,8 @@ macro_rules! define_unit {
             )*
 
             // from DataUnit to RawData
+            #[cfg(not(feature = "safe"))]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
             impl<C: DataUnitCopy> From<[<$cname $b bit Copy With>]<C>> for [<$bname $b bit Copy>] {
                 fn from(cell: [<$cname $b bit Copy With>]<C>) -> Self {
                     match cell {
@@ -1508,6 +1510,8 @@ macro_rules! define_raw {
             #[repr(C)]
             #[doc = $B "Byte / " $b "bit untyped *raw* data (Copy)"]
             #[derive(Copy, Clone)]
+            #[cfg(not(feature = "safe"))]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
             pub union [<$bname $b bit Copy>] {
                 /// Represents the absence of *data*.
                 pub None: (),
@@ -1547,12 +1551,14 @@ macro_rules! define_raw {
             // pub type [< $bname $b bit Copy >] = [< $bname $b bit Copy >];
 
             // Debug
+            #[cfg(not(feature = "safe"))]
             impl core::fmt::Debug for [<$bname $b bit Copy>] {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     write!(f, "{} {{...}}", stringify!{[< $bname $b bit Copy >]})
                 }
             }
 
+            #[cfg(not(feature = "safe"))]
             impl_data_raw![
                 b: [< $bname $b bit Copy >],
             ];
@@ -1716,7 +1722,8 @@ macro_rules! impl_data_unit {
 }
 pub(crate) use impl_data_unit;
 
-/// implement: RawData trait
+/// implement: `RawData` trait
+#[cfg(not(feature = "safe"))]
 macro_rules! impl_data_raw {
     (
       b: $bname:ident,
@@ -1726,10 +1733,10 @@ macro_rules! impl_data_raw {
         // }
         // impl DataUnitCopy for $bname {}
 
-        #[cfg(not(feature = "safe"))]
         unsafe impl RawData for $bname {}
     };
 }
+#[cfg(not(feature = "safe"))]
 pub(crate) use impl_data_raw;
 
 /// re-exports types from public modules.
@@ -1797,6 +1804,7 @@ macro_rules! reexport {
 
     // re-exports RawData
     (@Raw $path:path; size: $size:literal; $( $suf:ident )+ ) => {
+        #[cfg(not(feature = "safe"))]
         $crate::unit::macros::reexport![@ $path; RawData; size: $size ; $( $suf )+ ];
     };
 

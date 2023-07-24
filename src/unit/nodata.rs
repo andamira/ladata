@@ -37,5 +37,5 @@ impl DataTypeCopy for () {}
 impl DataUnitCopy for () {}
 
 #[cfg(not(feature = "safe"))]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe")))]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
 unsafe impl RawData for () {}
