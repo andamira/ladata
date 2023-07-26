@@ -15,8 +15,6 @@ use crate::{
     mem::Storage,
 };
 
-pub mod bit;
-
 mod impls;
 mod methods;
 
@@ -49,13 +47,10 @@ pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
     #[cfg(feature = "alloc")]
-    pub use super::{bit::BoxedBitArray, BoxedArray};
+    pub use super::BoxedArray;
 
     #[doc(inline)]
-    pub use super::{
-        bit::{BitArray, DirectBitArray},
-        Array, DataArray, DirectArray,
-    };
+    pub use super::{Array, DataArray, DirectArray};
 }
 
 impl<T, S: Storage, const LEN: usize> DataCollection for Array<T, S, LEN> {
