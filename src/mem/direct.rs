@@ -10,9 +10,9 @@ use core::{cmp, fmt, hash, ops};
 ///
 /// # Examples
 /// ```
-/// use ladata::mem::Direct;
+/// use ladata::all::Direct;
 ///
-/// let lac = Direct::new(0_u8);
+/// let byte = Direct::new(0_u8);
 /// ```
 pub struct Direct<T>(pub T);
 
@@ -134,21 +134,3 @@ impl<I: Iterator> Iterator for Direct<I> {
     //     Direct::last(self)
     // }
 }
-
-// trait Direct {
-//     type Item;
-//     fn last(self) -> Option<Self::Item>;
-// }
-//
-// impl<I: Iterator> Direct for Direct<I> {
-//     type Item = I::Item;
-//     fn last(self) -> Option<I::Item> {
-//         #[inline]
-//         fn some<T>(_: Option<T>, x: T) -> Option<T> {
-//             Some(x)
-//         }
-//
-//         self.fold(None, some)
-//     }
-// }
-//

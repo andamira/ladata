@@ -65,7 +65,16 @@ pub use size::Size;
 ///
 /// ```
 pub trait Storage {
+    /// The stored associated type.
     type Stored<T>: ops::DerefMut<Target = T> + From<T>;
+
+    /// Returns the static name of the storage implementation.
+    ///
+    /// This can be useful for debugging.
+    fn name() -> &'static str;
+
+    // MAYBE WAIT https://github.com/rust-lang/rust/issues/80437
+    // fn unstore(self) -> T;
 }
 
 /// A storage type that wraps its data in a [`Box`].
@@ -77,9 +86,17 @@ pub struct Boxed;
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 impl Storage for Boxed {
     type Stored<T> = alloc::boxed::Box<T>;
+
+    fn name() -> &'static str {
+        "Boxed"
+    }
 }
 
 /// A storage type that wraps its data in a [`Direct`].
 impl Storage for () {
     type Stored<T> = Direct<T>;
+
+    fn name() -> &'static str {
+        "Direct"
+    }
 }
