@@ -2,11 +2,11 @@
 //
 //! Memory-management types.
 //!
-//! The trait [`Storage`] allows data structure implementations to have
-//! methods (specially constructors) be specialized by storage type.
+//! The [`Storage`] trait allows the data structure implementations to have
+//! specialized methods by storage type (specially useful for constructors).
 //!
-//! It is implemented for the [`Boxed`] type and the [`()`][unit] unit type,
-//! which wraps their data in a [`Box`] and a [`Direct`], respectively.
+//! It is already implemented for the [`Boxed`] type and the [`()`][unit] unit
+//! type, which wraps their data in a [`Box`] and a [`Direct`], respectively.
 //
 
 use core::ops;
@@ -23,11 +23,8 @@ use core::ops;
 // #[doc(inline)]
 // pub use pool::*;
 
+mod bit_size;
 mod direct;
-mod size;
-
-pub use direct::Direct;
-pub use size::Size;
 
 /// Allows to be generic in respect of the data storage.
 ///
@@ -99,4 +96,14 @@ impl Storage for () {
     fn name() -> &'static str {
         "Direct"
     }
+}
+
+pub use all::*;
+pub(crate) mod all {
+    #[doc(inline)]
+    pub use super::{direct::Direct, bit_size::*, Storage};
+
+    #[doc(inline)]
+    #[cfg(feature = "alloc")]
+    pub use super::Boxed;
 }

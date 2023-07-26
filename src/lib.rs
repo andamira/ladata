@@ -33,5 +33,5 @@ pub mod unit;
 /// Everything is re-exported from here.
 pub mod all {
     #[doc(inline)]
-    pub use super::{error::*, grid::*, list::all::*, mem::*, misc::*, unit::all::*};
+    pub use super::{error::*, grid::*, list::all::*, mem::all::*, misc::*, unit::all::*};
 }

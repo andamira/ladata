@@ -13,5 +13,5 @@ pub mod stack;
 pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
-    pub use super::{bit_array::all::*, array::all::*, deque::*, linked::*, queue::*, stack::*};
+    pub use super::{array::all::*, bit_array::all::*, deque::*, linked::*, queue::*, stack::*};
 }
