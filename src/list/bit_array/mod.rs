@@ -50,14 +50,24 @@ pub type BoxedBitArray<const BITLEN: usize, const BYTECAP: usize> =
     BitArray<Boxed, BITLEN, BYTECAP>;
 
 /// An array of 8 bits stored in the heap.
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray8 = BitArray<Boxed, 8, 1>;
 /// An array of 16 bits stored in the heap.
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray16 = BitArray<Boxed, 16, 2>;
 /// An array of 32 bits stored in the heap.
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray32 = BitArray<Boxed, 32, 4>;
 /// An array of 64 bits stored in the heap.
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray64 = BitArray<Boxed, 64, 8>;
 /// An array of 128 bits stored in the heap.
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
 pub type BoxedBitArray128 = BitArray<Boxed, 128, 16>;
 
 pub use all::*;

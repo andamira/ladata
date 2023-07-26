@@ -4,35 +4,17 @@
 //! homogeneous data structures.
 //
 
-use core::marker::PhantomData;
-
 #[cfg(feature = "alloc")]
 use crate::mem::Boxed;
+use crate::mem::Storage;
 
-use crate::{
-    all::DataCollection,
-    error::{LadataError as Error, LadataResult as Result},
-    mem::Storage,
-};
-
-mod impls;
+mod core_impls;
 mod methods;
-
-/// An abstract Array.
-///
-/// - <https://en.wikipedia.org/wiki/Array_(data_type)#Abstract_arrays>
-pub trait DataArray: DataCollection {
-    ///
-    fn array_get(&self, index: usize) -> Result<&<Self as DataCollection>::Element>;
-    ///
-    fn array_set(&mut self, index: usize, element: <Self as DataCollection>::Element)
-        -> Result<()>;
-}
+mod traits;
 
 /// An array, backed by the core primitive [`array`].
 pub struct Array<T, S: Storage, const LEN: usize> {
     array: S::Stored<[T; LEN]>,
-    _phantom: PhantomData<T>,
 }
 
 /// An [`Array`] stored in the heap.
@@ -50,43 +32,5 @@ pub(crate) mod all {
     pub use super::BoxedArray;
 
     #[doc(inline)]
-    pub use super::{Array, DataArray, DirectArray};
-}
-
-impl<T, S: Storage, const LEN: usize> DataCollection for Array<T, S, LEN> {
-    type Element = T;
-    fn collection_is_empty(&self) -> Option<bool> {
-        None
-    }
-    fn collection_is_full(&self) -> Option<bool> {
-        None
-    }
-    fn collection_capacity(&self) -> usize {
-        LEN
-    }
-    fn collection_len(&self) -> usize {
-        self.len()
-    }
-}
-
-impl<T, S: Storage, const LEN: usize> DataArray for Array<T, S, LEN> {
-    fn array_get(&self, index: usize) -> Result<&<Self as DataCollection>::Element> {
-        if let Some(e) = self.get(index) {
-            Ok(e)
-        } else {
-            Err(Error::IndexOutOfBounds(index))
-        }
-    }
-    fn array_set(
-        &mut self,
-        index: usize,
-        element: <Self as DataCollection>::Element,
-    ) -> Result<()> {
-        if let Some(e) = self.get_mut(index) {
-            *e = element;
-            Ok(())
-        } else {
-            Err(Error::IndexOutOfBounds(index))
-        }
-    }
+    pub use super::{traits::DataArray, Array, DirectArray};
 }

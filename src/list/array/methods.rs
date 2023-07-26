@@ -6,8 +6,6 @@
 #[cfg(not(feature = "safe"))]
 use core::mem::{self, MaybeUninit};
 
-use core::marker::PhantomData;
-
 use crate::all::{Array, Direct, Storage};
 
 #[allow(unused)]
@@ -19,10 +17,10 @@ use {
 
 // ``
 impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
+    /// Returns an new `Array` from the given primitive `array`.
     pub fn new(array: [T; LEN]) -> Self {
         Self {
             array: array.into(),
-            _phantom: PhantomData,
         }
     }
 }
@@ -57,10 +55,7 @@ impl<T: Clone, const LEN: usize> Array<T, (), LEN> {
         #[cfg(feature = "safe")]
         let data = Direct::new(core::array::from_fn(|_| element.clone()));
 
-        Self {
-            array: data,
-            _phantom: PhantomData,
-        }
+        Self { array: data }
     }
 }
 
@@ -106,10 +101,7 @@ impl<T: Clone, const LEN: usize> Array<T, Boxed, LEN> {
             unsafe { Box::from_raw(raw_slice as *mut [T; LEN]) }
         };
 
-        Self {
-            array: data,
-            _phantom: PhantomData,
-        }
+        Self { array: data }
     }
 }
 
@@ -153,5 +145,22 @@ impl<T, S: Storage, const LEN: usize> Array<T, S, LEN> {
     /// Returns an exclusive slice containing the entire array.
     pub fn as_mut_slice(&mut self) -> &mut [T] {
         self.array.as_mut_slice()
+    }
+}
+
+// `S: Boxed`
+#[cfg(feature = "alloc")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "alloc")))]
+impl<T, const LEN: usize> Array<T, Boxed, LEN> {
+    /// Returns the inner boxed primitive array.
+    pub fn into_array(self) -> Box<[T; LEN]> {
+        self.array
+    }
+}
+// `S: ()`
+impl<T, const LEN: usize> Array<T, (), LEN> {
+    /// Returns the inner boxed primitive array.
+    pub fn into_array(self) -> [T; LEN] {
+        self.array.0
     }
 }

@@ -3,16 +3,13 @@
 //!
 //
 
+use crate::all::{Array, Direct, Storage};
 #[cfg(not(feature = "safe"))]
 use core::mem::{self, MaybeUninit};
-
 use core::{
     fmt,
-    marker::PhantomData,
     ops::{Deref, DerefMut},
 };
-
-use crate::all::{Array, Direct, Storage};
 
 #[cfg(feature = "alloc")]
 use {
@@ -43,7 +40,6 @@ where
     fn clone(&self) -> Self {
         Self {
             array: self.array.clone(),
-            _phantom: PhantomData,
         }
     }
 }
@@ -96,7 +92,6 @@ impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
 
         Array {
             array: Direct::new(data),
-            _phantom: PhantomData,
         }
     }
 }
@@ -143,10 +138,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
             unsafe { Box::from_raw(raw_slice as *mut [T; LEN]) }
         };
 
-        Array {
-            array: data,
-            _phantom: PhantomData,
-        }
+        Array { array: data }
     }
 }
 
@@ -207,7 +199,6 @@ where
 
         Array {
             array: Direct::new(data),
-            _phantom: PhantomData,
         }
     }
 }
@@ -265,9 +256,6 @@ where
             unsafe { Box::from_raw(raw_slice as *mut [T; LEN]) }
         };
 
-        Array {
-            array: data,
-            _phantom: PhantomData,
-        }
+        Array { array: data }
     }
 }
