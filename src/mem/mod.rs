@@ -101,7 +101,7 @@ impl Storage for () {
 pub use all::*;
 pub(crate) mod all {
     #[doc(inline)]
-    pub use super::{direct::Direct, bit_size::*, Storage};
+    pub use super::{bit_size::*, direct::Direct, Storage};
 
     #[doc(inline)]
     #[cfg(feature = "alloc")]

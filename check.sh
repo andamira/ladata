@@ -4,7 +4,7 @@
 
 set -e # stops on error
 
-MSRV="1.65.0"
+MSRV="1.70.0"
 RCMD="rustup -v run $MSRV"
 
 rustup override set $MSRV
