@@ -302,16 +302,7 @@ bit_size![<= 128; for Instant, SystemTime];
 
 /* impl BitSizeAtLeast for primitives */
 
-bit_size![>= 0; for (), i8, u8, bool, i16, u16, i32, u32, f32, char, i64, u64, f64, i128, u128,
-    Infallible, PhantomPinned,
-    NonZeroI8, NonZeroU8, AtomicI8, AtomicU8, AtomicBool, Ordering, cmp::Ordering,
-    NonZeroI16, NonZeroU16, AtomicI16, AtomicU16,
-    NonZeroI32, NonZeroU32, AtomicI32, AtomicU32,
-    NonZeroI64, NonZeroU64,
-    NonZeroI128, NonZeroU128, Duration
-];
-#[cfg(target_has_atomic = "64")]
-bit_size![>= 0; for AtomicI64, AtomicU64];
+impl<T> BitSizeAtLeast<0> for T {}
 bit_size![>= 8; for i8, u8, bool, i16, u16, i32, u32, f32, char, i64, u64, f64, i128, u128,
     NonZeroI8, NonZeroU8, AtomicI8, AtomicU8, AtomicBool, Ordering, cmp::Ordering,
     NonZeroI16, NonZeroU16, AtomicI16, AtomicU16,
@@ -353,35 +344,35 @@ bit_size![>= 128; for Instant, SystemTime];
 #[cfg(target_pointer_width = "8")]
 bit_size![pointer = 8];
 #[cfg(target_pointer_width = "8")]
-bit_size![pointer >= 0, 8];
+bit_size![pointer >= 8];
 #[cfg(target_pointer_width = "8")]
 bit_size![pointer <= 8, 16, 32, 64, 128];
 
 #[cfg(target_pointer_width = "16")]
 bit_size![pointer = 16];
 #[cfg(target_pointer_width = "16")]
-bit_size![pointer >= 0, 8, 16];
+bit_size![pointer >= 8, 16];
 #[cfg(target_pointer_width = "16")]
 bit_size![pointer <= 16, 32, 64, 128];
 
 #[cfg(target_pointer_width = "32")]
 bit_size![pointer = 32];
 #[cfg(target_pointer_width = "32")]
-bit_size![pointer >= 0, 8, 16, 32];
+bit_size![pointer >= 8, 16, 32];
 #[cfg(target_pointer_width = "32")]
 bit_size![pointer <= 32, 64, 128];
 
 #[cfg(target_pointer_width = "64")]
 bit_size![pointer = 64];
 #[cfg(target_pointer_width = "64")]
-bit_size![pointer >= 0, 8, 16, 32, 64];
+bit_size![pointer >= 8, 16, 32, 64];
 #[cfg(target_pointer_width = "64")]
 bit_size![pointer <= 64, 128];
 
 #[cfg(target_pointer_width = "128")]
 bit_size![pointer = 128];
 #[cfg(target_pointer_width = "128")]
-bit_size![pointer >= 0, 8, 16, 32, 64, 128];
+bit_size![pointer >= 8, 16, 32, 64, 128];
 #[cfg(target_pointer_width = "128")]
 bit_size![pointer <= 128];
 
