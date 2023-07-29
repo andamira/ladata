@@ -3,6 +3,7 @@
 //! Traits related to memory size.
 //
 
+use super::DataSize;
 #[cfg(feature = "alloc")]
 use alloc::{
     collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque},
@@ -32,7 +33,6 @@ use std::{
     sync::{Arc, Mutex},
     time::{Instant, SystemTime},
 };
-use super::DataSize;
 
 /* trait definitions */
 

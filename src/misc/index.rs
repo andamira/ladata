@@ -4,7 +4,6 @@
 //
 
 use core::fmt;
-
 use devela::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
 #[rustfmt::skip]
@@ -23,20 +22,20 @@ macro_rules! index {
         #[doc = "For example, `Option<NonMaxIndex" $b ">` is the same size as `u" $b "`."]
         ///
         #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
-        pub struct $name(Option<$nmt>);
+        pub struct $name(pub(super) Option<$nmt>);
 
         impl fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                if let Some(index) = self.0 {
-                    write!(f,  "{}", index)
-                } else {
-                    write!(f,  "_")
-                }
+                write!(f,  "NonMaxIndex{} {{ {} }}", $b, self)
             }
         }
         impl fmt::Display for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f,  "{:?}", self)
+                if let Some(index) = self.0 {
+                    write!(f,  "{index}")
+                } else {
+                    write!(f,  "_")
+                }
             }
         }
 
