@@ -20,7 +20,7 @@ macro_rules! index {
         #[doc = "It can index from `0` to [`" $t "::MAX`]`-1` elements."]
         ///
         /// This enables some memory layout optimization.
-        #[doc = "For example, `Option<Index" $b ">` is the same size as `u" $b "`."]
+        #[doc = "For example, `Option<NonMaxIndex" $b ">` is the same size as `u" $b "`."]
         ///
         #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
         pub struct $name(Option<$nmt>);
@@ -42,7 +42,7 @@ macro_rules! index {
 
         /// # constructors
         impl $name {
-            /// Returns a new `Index` pointing to `index`.
+            /// Returns a new `NonMaxIndex` pointing to `index`.
             #[doc = "or `None` if the provided `index` equals [`" $t "::MAX`]."]
             #[inline]
             pub const fn new(index: $t) -> Option<Self> {
@@ -138,18 +138,22 @@ macro_rules! index {
     }};
 }
 
-index![Index8, 1, 8, u8, NonMaxU8];
-index![Index16, 2, 16, u16, NonMaxU16];
-index![Index32, 4, 32, u32, NonMaxU32];
+index![NonMaxIndex8, 1, 8, u8, NonMaxU8];
+index![NonMaxIndex16, 2, 16, u16, NonMaxU16];
+index![NonMaxIndex32, 4, 32, u32, NonMaxU32];
 
 #[cfg(target_pointer_width = "8")]
-index![IndexUsize, 1, 8, usize, NonMaxUsize];
+#[cfg_attr(feature = "nightly", doc(cfg(target_pointer_width = "8")))]
+index![NonMaxIndexUsize, 1, 8, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "16")]
-index![IndexUsize, 2, 16, usize, NonMaxUsize];
+#[cfg_attr(feature = "nightly", doc(cfg(target_pointer_width = "16")))]
+index![NonMaxIndexUsize, 2, 16, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "32")]
-index![IndexUsize, 4, 32, usize, NonMaxUsize];
+#[cfg_attr(feature = "nightly", doc(cfg(target_pointer_width = "32")))]
+index![NonMaxIndexUsize, 4, 32, usize, NonMaxUsize];
 #[cfg(target_pointer_width = "64")]
-index![IndexUsize, 8, 64, usize, NonMaxUsize];
+#[cfg_attr(feature = "nightly", doc(cfg(target_pointer_width = "64")))]
+index![NonMaxIndexUsize, 8, 64, usize, NonMaxUsize];
 
 #[cfg(test)]
 mod tests {
@@ -158,8 +162,8 @@ mod tests {
 
     #[test]
     fn index_size() {
-        assert_eq!(1, size_of::<Index8>());
-        assert_eq!(2, size_of::<Index16>());
-        assert_eq!(4, size_of::<Index32>());
+        assert_eq!(1, size_of::<NonMaxIndex8>());
+        assert_eq!(2, size_of::<NonMaxIndex16>());
+        assert_eq!(4, size_of::<NonMaxIndex32>());
     }
 }

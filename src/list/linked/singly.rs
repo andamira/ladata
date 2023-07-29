@@ -50,7 +50,7 @@ macro_rules! linked_list_array {
         /// The list node.
         pub(super) struct [<$name$b Node>] <T> {
             /// The index of the next element, towards the back of the list.
-            next: [<Index$b>],
+            next: [<NonMaxIndex$b>],
             /// The node's data.
             data: T,
         }
@@ -89,7 +89,7 @@ macro_rules! linked_list_array {
             // /// Returns a new node, with `data`, and custom `next` index.
             // #[inline]
             // pub(super) const fn new(
-            //     next: [<Index$b>],
+            //     next: [<NonMaxIndex$b>],
             //     data: T
             // ) -> Self {
             //     Self {
@@ -102,7 +102,7 @@ macro_rules! linked_list_array {
             #[inline]
             pub(super) const fn new_unlinked(data: T) -> Self {
                 Self {
-                    next: [<Index$b>]::none(),
+                    next: [<NonMaxIndex$b>]::none(),
                     data,
                 }
             }
@@ -111,27 +111,27 @@ macro_rules! linked_list_array {
 
             /// Returns this node's next index (towards the back).
             #[inline]
-            pub(super) fn next(&self) -> [<Index$b>] {
+            pub(super) fn next(&self) -> [<NonMaxIndex$b>] {
                 self.next
             }
 
             /// Sets this node's next index (towards the back).
             #[inline]
-            pub(super) fn set_next(&mut self, index: [<Index$b>]) {
+            pub(super) fn set_next(&mut self, index: [<NonMaxIndex$b>]) {
                 self.next = index;
             }
 
             /// Unlinks the node, clearing the next index.
             #[inline]
             pub(super) fn unlink(&mut self) {
-                self.next = [<Index$b>]::none();
+                self.next = [<NonMaxIndex$b>]::none();
             }
 
             /// Sets the `data` and unlinks the node, clearing the next index.
             #[inline]
             pub(super) fn reset(&mut self, data: T) {
                 self.data = data;
-                self.next = [<Index$b>]::none();
+                self.next = [<NonMaxIndex$b>]::none();
             }
 
             //
@@ -156,7 +156,7 @@ macro_rules! linked_list_array {
 
             /// Returns the inner components (next, data).
             #[inline]
-            pub(super) fn into_components(self) -> ([<Index$b>], T) {
+            pub(super) fn into_components(self) -> ([<NonMaxIndex$b>], T) {
                 (self.next, self.data)
             }
         }
@@ -173,13 +173,13 @@ macro_rules! linked_list_array {
         /// Each node remembers the index of the next element of the list.
         pub struct [<$name$b>]<T, S: Storage, const CAP: usize> {
             /// The index of the current element at the front.
-            front: [<Index$b>],
+            front: [<NonMaxIndex$b>],
             /// The index of the current element at the back.
-            back: [<Index$b>],
+            back: [<NonMaxIndex$b>],
             /// The index of the first free element.
-            free: [<Index$b>],
+            free: [<NonMaxIndex$b>],
             /// The current counted number of nodes.
-            count: [<Count$b>],
+            count: [<NonMaxCounter$b>],
             /// The array of nodes, stored in the generic container.
             nodes: Array<[<$name$b Node>]<T>, S, CAP>,
         }
@@ -287,7 +287,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Count$b>]::default(),
+                        count: [<NonMaxCounter$b>]::default(),
                         nodes: Array::default(),
                     }
                 }
@@ -317,7 +317,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Count$b>]::default(),
+                        count: [<NonMaxCounter$b>]::default(),
                         nodes: Array::default(),
                     }
                 }
@@ -346,7 +346,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Count$b>]::new(),
+                        count: [<NonMaxCounter$b>]::new(),
                         nodes: Array::<[<$name$b Node>]<T>, (), CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
                     })
@@ -380,7 +380,7 @@ macro_rules! linked_list_array {
                         front: None.into(),
                         back: None.into(),
                         free: None.into(),
-                        count: [<Count$b>]::new(),
+                        count: [<NonMaxCounter$b>]::new(),
                         nodes: Array::<[<$name$b Node>]<T>, Boxed, CAP>::
                             with([<$name$b Node>]::new_unlinked(value)),
                     })
@@ -483,7 +483,7 @@ macro_rules! linked_list_array {
             /// # Ok(()) }
             /// ```
             pub fn clear(&mut self) {
-                self.count = [<Count$b>]::new();
+                self.count = [<NonMaxCounter$b>]::new();
                 self.front = None.into();
                 self.back = None.into();
                 self.free = None.into();
@@ -643,7 +643,7 @@ macro_rules! linked_list_array {
             // [__2nd_] [__1st_] [______] [______]
             //       n_       n0       n_       n_
             // ```
-            pub fn push_front(&mut self, value: T) -> Result<[<Index$b>]> {
+            pub fn push_front(&mut self, value: T) -> Result<[<NonMaxIndex$b>]> {
                 if self.is_full() {
                     Err(Error::NotEnoughSpace(Some(1)))
                 } else {
@@ -703,7 +703,7 @@ macro_rules! linked_list_array {
             // [__1st_] [__2nd_] [______] [______]
             //       n1       n_       n_       n_
             // ```
-            pub fn push_back(&mut self, value: T) -> Result<[<Index$b>]> {
+            pub fn push_back(&mut self, value: T) -> Result<[<NonMaxIndex$b>]> {
                 if self.is_full() {
                     Err(Error::NotEnoughSpace(Some(1)))
                 } else {
@@ -925,7 +925,7 @@ macro_rules! linked_list_array {
             pub fn reset(&mut self, value: T) {
                 self.front = None.into();
                 self.free = None.into();
-                self.count = [<Count$b>]::new();
+                self.count = [<NonMaxCounter$b>]::new();
                 self.reset_all_nodes(value);
             }
         }
@@ -936,7 +936,7 @@ macro_rules! linked_list_array {
         pub struct [<$name$b Iter>]<'s, T, S: Storage, const CAP: usize> {
             list: &'s [<$name$b>]<T, S, CAP>,
             /// The current node index.
-            current: [<Index$b>],
+            current: [<NonMaxIndex$b>],
         }
 
         impl<'a, T, S: Storage, const CAP: usize> Iterator for [<$name$b Iter>]<'a, T, S, CAP> {
@@ -1033,7 +1033,7 @@ macro_rules! linked_list_array {
         #[allow(dead_code)]
         impl<T, S: Storage, const CAP: usize> [<$name$b>]<T, S, CAP> {
             /// Returns the index of the first free node.
-            fn first_free_index(&self) -> [<Index$b>] {
+            fn first_free_index(&self) -> [<NonMaxIndex$b>] {
                 if self.free.is_some() {
                     self.free
                 } else {

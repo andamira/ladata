@@ -23,14 +23,14 @@ macro_rules! count {
         #[doc = "It can count from `0` to [`" $t "::MAX`]`-1` elements."]
         ///
         /// This enables some memory layout optimization.
-        #[doc = "For example, `Option<Count" $b ">` is the same size as `u" $b "`."]
+        #[doc = "For example, `Option<NonMaxCounter" $b ">` is the same size as `u" $b "`."]
         ///
         #[derive(Clone, Copy, Default, PartialEq, Eq, PartialOrd, Ord)]
         pub struct $name($nmt);
 
         impl fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f,  "Count {{ {} }}", self.0)
+                write!(f,  "NonMaxCounter {{ {} }}", self.0)
             }
         }
         impl fmt::Display for $name {
@@ -41,7 +41,7 @@ macro_rules! count {
 
         /// # constructors
         impl $name {
-            /// Returns a new `Count` at 0.
+            /// Returns a new `NonMaxCounter` at 0.
             #[inline]
             pub fn new() -> Self {
                 Self($nmt::new(0).unwrap())
@@ -131,18 +131,18 @@ macro_rules! count {
     }};
 }
 
-count![Count8, 1, 8, u8, NonMaxU8, Index8];
-count![Count16, 2, 16, u16, NonMaxU16, Index16];
-count![Count32, 4, 32, u32, NonMaxU32, Index32];
+count![NonMaxCounter8, 1, 8, u8, NonMaxU8, NonMaxIndex8];
+count![NonMaxCounter16, 2, 16, u16, NonMaxU16, NonMaxIndex16];
+count![NonMaxCounter32, 4, 32, u32, NonMaxU32, NonMaxIndex32];
 
 #[cfg(target_pointer_width = "8")]
-count![CountUsize, 1, 8, usize, NonMaxUsize, IndexUsize];
+count![NonMaxCounterUsize, 1, 8, usize, NonMaxUsize, NonMaxIndexUsize];
 #[cfg(target_pointer_width = "16")]
-count![CountUsize, 2, 16, usize, NonMaxUsize, IndexUsize];
+count![NonMaxCounterUsize, 2, 16, usize, NonMaxUsize, NonMaxIndexUsize];
 #[cfg(target_pointer_width = "32")]
-count![CountUsize, 4, 32, usize, NonMaxUsize, IndexUsize];
+count![NonMaxCounterUsize, 4, 32, usize, NonMaxUsize, NonMaxIndexUsize];
 #[cfg(target_pointer_width = "64")]
-count![CountUsize, 8, 64, usize, NonMaxUsize, IndexUsize];
+count![NonMaxCounterUsize, 8, 64, usize, NonMaxUsize, NonMaxIndexUsize];
 
 #[cfg(test)]
 mod tests {
@@ -151,8 +151,8 @@ mod tests {
 
     #[test]
     fn count_size() {
-        assert_eq!(1, size_of::<Count8>());
-        assert_eq!(2, size_of::<Count16>());
-        assert_eq!(4, size_of::<Count32>());
+        assert_eq!(1, size_of::<NonMaxCounter8>());
+        assert_eq!(2, size_of::<NonMaxCounter16>());
+        assert_eq!(4, size_of::<NonMaxCounter32>());
     }
 }
