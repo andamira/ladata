@@ -1,8 +1,5 @@
 // ladata::lib
-//
-//! A simple & modular data model.
-//
-
+#![doc = include_str!("./Lib.md")]
 #![warn(clippy::all)]
 #![allow(non_snake_case, non_camel_case_types, clippy::module_inception)]
 //
