@@ -70,7 +70,7 @@ jobs:
         env:
           RUSTDOCFLAGS: --cfg docsrs
 
-  # 4. MSRV
+  # 4. minimum supported Rust version
   msrv:
     name: "ubuntu / ${{ matrix.msrv }}"
     runs-on: ubuntu-latest
@@ -78,8 +78,7 @@ jobs:
     # https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
     strategy:
       matrix:
-        # NOTE: custom
-        msrv: [1.70.0]
+        msrv: [1.72.0] # MSRV in sync with ../../Cargo.toml & ../../check.sh
     steps:
       - name: "checkout"
         uses: actions/checkout@v3

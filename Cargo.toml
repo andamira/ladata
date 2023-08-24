@@ -3,7 +3,7 @@ name = "ladata"
 description = "A simple & modular data model."
 version = "0.0.28"
 edition = "2021"
-rust-version = "1.70"
+rust-version = "1.72.0" # in sync with ./check.sh & .github/workflows/check.yml
 authors = ["José Luis Cruz <joseluis@andamira.net>"]
 repository = "https://github.com/andamira/ladata"
 documentation = "https://docs.rs/ladata"
@@ -25,11 +25,12 @@ default = ["std", "safe", "deps_default"]
 std = ["alloc", "half?/std", "devela/std"]
 alloc = ["devela/alloc"] # allocating no-std
 no-std = [] # non-allocating no-std. incompatible with "std"
-#
-safe = [] # disables unsafe in this crate
-safest = ["safe", "devela/safe"] # disables unsafe in dependencies.
-unsafe = [] # enables unsafe alternatives. incompatible with "safe"
-#
+
+safe = [] # forbid unsafe in this crate
+safest = ["safe", "devela/safe"] # forbid unsafe in dependencies.
+unsafe = ["unsafe_constructors"] # enables usage of unchecked constructors
+unsafe_constructors = ["devela/unsafe_non_specific"]
+
 nightly = [] # only for docs
 
 deps_default = ["deps_discrete", "deps_string", "time"]
@@ -55,7 +56,7 @@ deps_string =  ["arraystring"]
 
 
 [dependencies]
-devela = { version = "0.5.3", default-features = false }
+devela = { version = "0.6.0", default-features = false }
 unicode-segmentation = "1.10.1" # RETHINK
 
 #* optional dependencies *#
@@ -67,7 +68,7 @@ twofloat = { version = "0.6.1", optional = true, default-features = false } # F1
 # feature: "deps_discrete" (discrete numbers):
 num-rational = { version = "0.4.1", optional = true } # Ratio
 num-bigint = { version = "0.4.3", optional = true } # BigInt
-rust_decimal = { version = "1.25.0", optional = true } # Decimal
+rust_decimal = { version = "1.31.0", optional = true } # Decimal
 
 # feature: "deps_string" (strings):
 arraystring = { version = "0.3.0", optional = true } # ArrayString*

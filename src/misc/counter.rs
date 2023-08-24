@@ -5,7 +5,7 @@
 
 use crate::error::{LadataError as Error, LadataResult as Result};
 use core::fmt;
-use devela::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
+use devela::num::{NonMaxU16, NonMaxU32, NonMaxU8, NonMaxUsize};
 
 #[rustfmt::skip]
 macro_rules! count {
@@ -65,7 +65,7 @@ macro_rules! count {
             ///
             /// If the current count is `0`, the index will point to `None`.
             pub const fn as_current_index(&self) -> super::$idx {
-                #[cfg(feature = "safe")]
+                #[cfg(not(feature = "devela_unsafe"))]
                 match self.0 {
                     0 => super::$idx::none(),
                     _ => {
@@ -79,8 +79,8 @@ macro_rules! count {
                     }
                 }
 
+                #[cfg(feature = "devela_unsafe")]
                 // SAFETY: the value can't ever be the maximum
-                #[cfg(not(feature = "safe"))]
                 match self.0 {
                     0 => super::$idx::none(),
                     _ => super::$idx(Some(unsafe { [<NonMax$T>]::new_unchecked(self.0 - 1) }) )
@@ -91,7 +91,7 @@ macro_rules! count {
             ///
             #[doc = "If the current count is [`" $t "::MAX`], the index will point to `None`."]
             pub const fn as_next_index(&self) -> super::$idx {
-                #[cfg(feature = "safe")]
+                #[cfg(not(feature = "devela_unsafe"))]
                 match self.0 {
                     $t::MAX => super::$idx::none(),
                     _ => {
@@ -105,8 +105,8 @@ macro_rules! count {
                     }
                 }
 
+                #[cfg(feature = "devela_unsafe")]
                 // SAFETY: the value can't ever be the maximum
-                #[cfg(not(feature = "safe"))]
                 match self.0 {
                     $t::MAX => super::$idx::none(),
                     _ => super::$idx(Some(unsafe { [<NonMax$T>]::new_unchecked(self.0) }) )

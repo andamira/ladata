@@ -1,5 +1,6 @@
 // ladata::lib
 #![doc = include_str!("./Lib.md")]
+//
 #![warn(clippy::all)]
 #![allow(non_snake_case, non_camel_case_types, clippy::module_inception)]
 //
@@ -9,8 +10,11 @@
 
 #[cfg(all(feature = "std", feature = "no-std"))]
 compile_error!("You can't enable the `std` and `no-std` features at the same time.");
-#[cfg(all(feature = "safe", feature = "unsafe"))]
-compile_error!("You can't enable the `safe` and `unsafe` features at the same time.");
+#[cfg(all(
+    feature = "safe",
+    any(feature = "unsafe", feature = "unsafe_constructors",)
+))]
+compile_error!("You can't enable the `safe` and `unsafe*` features at the same time.");
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
