@@ -10,59 +10,80 @@ documentation = "https://docs.rs/ladata"
 license = "MIT OR Apache-2.0"
 include = [
 	"/src/**/*.rs",
+	"/src/**/*.md",
 	"/Cargo.toml",
 	"/LICENSE-*",
 	"/README.md",
 ]
-categories = [ "no-std", "data-structures" ]
+categories = [ "data-structures", "no-std::no-alloc" ]
 keywords = [ "data", "type", "unit" ]
 publish = true
 
 
 [features]
-default = ["std", "safe", "deps_default"]
-#
-std = ["alloc", "half?/std", "devela/std"]
-alloc = ["devela/alloc"] # allocating no-std
-no-std = [] # non-allocating no-std. incompatible with "std"
+default = ["std", "deps_default"]
 
-safe = [] # forbid unsafe in this crate
-safest = ["safe", "devela/safe"] # forbid unsafe in dependencies.
-unsafe = ["unsafe_constructors"] # enables usage of unchecked constructors
-unsafe_constructors = ["devela/unsafe_non_specific"]
+# environment features
+# (not enabling "std" declares the library as "no_std")
+std = [ # features that depend on the standard library
+	"alloc",
+	"half?/std",
+	"devela/std"
+]
+alloc = ["devela/alloc"] # features that depend on allocation
+no_std = ["devela/no_std"] # features incompatible with the standard library
 
+# safety features
+safe = [] # forbid unsafe at the crate level
+safest = ["safe", "devela/safest"] # forbid unsafe recursively
+unsafe = [ # enables all the unsafe features
+	"unsafe_constructors"
+]
+unsafe_constructors = ["devela/unsafe_num"] # enables unchecked constructors
+unsafest = ["unsafe", "devela/unsafest"]
+
+# nightly features
 nightly = [] # only for docs
+nightly_docs = [
+	"nightly",
+	"std",
+	"deps_all",
+	"devela/nightly_docs"
+]
 
-deps_default = ["deps_discrete", "deps_string", "time"]
+# deprecated features
+no-std = ["no_std"]
+
+# other features
+deps_default = [
+    # "deps_numerical",
+        "deps_discrete",
+        # "deps_continuous",
+            # "half", "twofloat",
+    # "deps_categorical",
+        "deps_string",
+        # "deps_datetime",
+            "time", # !"fugit",
+]
 deps_all = ["deps_numerical", "deps_categorical"]
-# deps_default = [
-#     #"deps_numerical",
-#         "deps_discrete",
-#         #"deps_continuous",
-#             "half", "twofloat",
-#     #"deps_categorical",
-#         "deps_string",
-#         #"deps_datetime",
-#             "time", # !"fugit",
-# ]
-
+#
 deps_numerical= ["deps_continuous", "deps_discrete"]
-deps_continuous = ["half", "twofloat"]
-deps_discrete = ["num-rational", "num-bigint", "rust_decimal"]
-
+	deps_continuous = ["half", "twofloat"]
+	deps_discrete = ["num-rational", "num-bigint", "rust_decimal"]
+#
 deps_categorical = ["deps_datetime", "deps_string"]
-deps_datetime = ["fugit", "time"]
-deps_string =  ["arraystring"]
+	deps_datetime = ["fugit", "time"]
+	deps_string =  ["arraystring"]
 
 
 [dependencies]
-devela = { version = "0.6.0", default-features = false }
+devela = { version = "0.8.0", default-features = false }
 unicode-segmentation = "1.10.1" # RETHINK
 
 #* optional dependencies *#
 
 # feature: "deps_continuous" (continuous numbers):
-half = { version = "2.2.1", optional = true, default-features = false } # F16 BF16
+half = { version = "2.3", optional = true, default-features = false } # F16 BF16
 twofloat = { version = "0.6.1", optional = true, default-features = false } # F128
 
 # feature: "deps_discrete" (discrete numbers):
@@ -82,7 +103,7 @@ time = { version = "0.3.11", optional = true }
 
 [package.metadata.docs.rs]
 no-default-features = true
-features = ["nightly", "std", "deps_all"]
+features = ["nightly_docs"]
 
 [badges]
 maintenance = { status = "experimental" }
