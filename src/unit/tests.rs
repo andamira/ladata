@@ -42,14 +42,14 @@ fn test_sizes_without() {
 }
 
 #[test]
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_unit")]
 fn test_unsafe_sizes_without() {
-    assert_eq![1, size_of::<RawData8bitCopy>()];
-    assert_eq![2, size_of::<RawData16bitCopy>()];
-    assert_eq![4, size_of::<RawData32bitCopy>()];
-    assert_eq![8, size_of::<RawData64bitCopy>()];
-    assert_eq![16, size_of::<RawData128bitCopy>()];
-    assert_eq![32, size_of::<RawData256bitCopy>()];
-    assert_eq![64, size_of::<RawData512bitCopy>()];
-    assert_eq![128, size_of::<RawData1024bitCopy>()];
+    assert_eq![1, size_of::<DataRaw8bitCopy>()];
+    assert_eq![2, size_of::<DataRaw16bitCopy>()];
+    assert_eq![4, size_of::<DataRaw32bitCopy>()];
+    assert_eq![8, size_of::<DataRaw64bitCopy>()];
+    assert_eq![16, size_of::<DataRaw128bitCopy>()];
+    assert_eq![32, size_of::<DataRaw256bitCopy>()];
+    assert_eq![64, size_of::<DataRaw512bitCopy>()];
+    assert_eq![128, size_of::<DataRaw1024bitCopy>()];
 }

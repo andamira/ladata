@@ -820,7 +820,7 @@ macro_rules! define_all_sizes {
 }
 pub(crate) use define_all_sizes;
 
-/// for defining in one pass: DataType*, DataUnit*, RawData*
+/// for defining in one pass: DataType*, DataUnit*, DataRaw*
 macro_rules! define_single_size {
     (
         $tname:ident, $cname:ident, $bname:ident,
@@ -1433,9 +1433,9 @@ macro_rules! define_unit {
                 }
             )*
 
-            // from DataUnit to RawData
-            #[cfg(not(feature = "safe"))]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
+            // from DataUnit to DataRaw
+            #[cfg(feature = "unsafe_unit")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe_unit")))]
             impl<C: DataUnitCopy> From<[<$cname $b bit Copy With>]<C>> for [<$bname $b bit Copy>] {
                 fn from(cell: [<$cname $b bit Copy With>]<C>) -> Self {
                     match cell {
@@ -1466,7 +1466,7 @@ macro_rules! define_unit {
 }
 pub(crate) use define_unit;
 
-/// for defining union RawData*
+/// for defining union DataRaw*
 macro_rules! define_raw {
     (
         $bname:ident,
@@ -1505,13 +1505,13 @@ macro_rules! define_raw {
 
     ) => {
         devela::paste!{
-            // ## copy version (RawData)
+            // ## copy version (DataRaw)
             // -----------------------------------------------------------------
             #[repr(C)]
             #[doc = $B "Byte / " $b "bit untyped *raw* data (Copy)"]
             #[derive(Copy, Clone)]
-            #[cfg(not(feature = "safe"))]
-            #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
+            #[cfg(feature = "unsafe_unit")]
+            #[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe_unit")))]
             pub union [<$bname $b bit Copy>] {
                 /// Represents the absence of *data*.
                 pub None: (),
@@ -1551,14 +1551,14 @@ macro_rules! define_raw {
             // pub type [< $bname $b bit Copy >] = [< $bname $b bit Copy >];
 
             // Debug
-            #[cfg(not(feature = "safe"))]
+            #[cfg(feature = "unsafe_unit")]
             impl core::fmt::Debug for [<$bname $b bit Copy>] {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     write!(f, "{} {{...}}", stringify!{[< $bname $b bit Copy >]})
                 }
             }
 
-            #[cfg(not(feature = "safe"))]
+            #[cfg(feature = "unsafe_unit")]
             impl_data_raw![
                 b: [< $bname $b bit Copy >],
             ];
@@ -1722,8 +1722,8 @@ macro_rules! impl_data_unit {
 }
 pub(crate) use impl_data_unit;
 
-/// implement: `RawData` trait
-#[cfg(not(feature = "safe"))]
+/// implement: `DataRaw` trait
+#[cfg(feature = "unsafe_unit")]
 macro_rules! impl_data_raw {
     (
       b: $bname:ident,
@@ -1733,10 +1733,10 @@ macro_rules! impl_data_raw {
         // }
         // impl DataUnitCopy for $bname {}
 
-        unsafe impl RawData for $bname {}
+        unsafe impl DataRaw for $bname {}
     };
 }
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_unit")]
 pub(crate) use impl_data_raw;
 
 /// re-exports types from public modules.
@@ -1802,18 +1802,18 @@ macro_rules! reexport {
         $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
     };
 
-    // re-exports RawData
+    // re-exports DataRaw
     (@Raw $path:path; size: $size:literal; $( $suf:ident )+ ) => {
-        #[cfg(not(feature = "safe"))]
-        $crate::unit::macros::reexport![@ $path; RawData; size: $size ; $( $suf )+ ];
+        #[cfg(feature = "unsafe_unit")]
+        $crate::unit::macros::reexport![@ $path; DataRaw; size: $size ; $( $suf )+ ];
     };
 
     // re-exports both DataUnit & DataType
     (@UnitType $path:path; size: $size:literal; $( $suf:ident )+ ) => {
         $crate::unit::macros::reexport![@ $path; DataUnit; size: $size ; $( $suf )+ ];
         $crate::unit::macros::reexport![@ $path; DataType; size: $size ; $( $suf )+ ];
-        // NOTE RawData can't accept non-copy (for now) so must be treated separately
-        // $crate::unit::macros::reexport![@ $path; RawData; size: $size ; $( $suf )+ ];
+        // NOTE DataRaw can't accept non-copy (for now) so must be treated separately
+        // $crate::unit::macros::reexport![@ $path; DataRaw; size: $size ; $( $suf )+ ];
     };
 
     // generic re-export

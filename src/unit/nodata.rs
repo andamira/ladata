@@ -8,8 +8,8 @@ use core::mem::{align_of, size_of};
 
 use super::{DataType, DataTypeCopy, DataUnit, DataUnitCopy};
 
-#[cfg(not(feature = "safe"))]
-use super::RawData;
+#[cfg(feature = "unsafe_unit")]
+use super::DataRaw;
 
 impl DataType for () {
     #[inline]
@@ -36,6 +36,6 @@ impl DataTypeCopy for () {}
 
 impl DataUnitCopy for () {}
 
-#[cfg(not(feature = "safe"))]
-#[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
-unsafe impl RawData for () {}
+#[cfg(feature = "unsafe_unit")]
+#[cfg_attr(feature = "nightly", doc(cfg(feature = "unsafe_unit")))]
+unsafe impl DataRaw for () {}

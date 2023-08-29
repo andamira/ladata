@@ -19,11 +19,15 @@ extern crate alloc;
 compile_error!("You can't enable the `std` and `no-std` features at the same time.");
 #[cfg(all(
     feature = "safe",
-    any(feature = "unsafe", feature = "unsafe_constructors",)
+    any(
+        feature = "unsafe",
+        feature = "unsafe_constructors",
+        feature = "unsafe_unit",
+    )
 ))]
 compile_error!("You can't enable the `safe` and `unsafe*` features at the same time.");
 // deprecated
-devela::deprecate_feature![old: "no-std", new: "no_std", since: "0.8.0"];
+devela::deprecate_feature![old: "no-std", new: "no_std", since: "0.0.29"];
 
 pub mod error;
 pub mod grid;

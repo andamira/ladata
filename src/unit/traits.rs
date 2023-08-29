@@ -6,7 +6,7 @@
 // - DataTypeCopy
 // - DataUnit
 // - DataUnitCopy
-// - RawData
+// - DataRaw
 
 use core::fmt::Debug;
 
@@ -77,15 +77,15 @@ pub trait DataUnitCopy: DataUnit + Copy {}
 /// # Safety
 /// TODO
 ///
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_unit")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
-pub unsafe trait RawData {}
+pub unsafe trait DataRaw {}
 
 /// Comon (marker) trait for *unsafe* `Copy` *data units*.
 ///
 /// # Safety
 /// TODO
 ///
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_unit")]
 #[cfg_attr(feature = "nightly", doc(cfg(feature = "not(safe)")))]
-pub unsafe trait RawDataCopy: RawData + Copy {}
+pub unsafe trait DataRawCopy: DataRaw + Copy {}

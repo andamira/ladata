@@ -9,6 +9,9 @@ A simple & modular data model.
 
 ---
 
-- `safe`: forbids all `unsafe` code at the crate level.
-- `unsafe`: meta feature enabling every specific unsafe feature:
+- `safe`: forbid unsafe at the crate level.
+- `safest`: forbid unsafe recursively.
+- `unsafe`: enables all the unsafe features:
   - `unsafe_constructors`: enables usage of unchecked constructors.
+  - `unsafe_unit`: enables the `unit::DataRaw` union.
+- `unsafest`: enable unsafe recursively.

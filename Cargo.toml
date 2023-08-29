@@ -28,7 +28,7 @@ default = ["std", "deps_default"]
 std = [ # features that depend on the standard library
 	"alloc",
 	"half?/std",
-	"devela/std"
+	"devela/std",
 ]
 alloc = ["devela/alloc"] # features that depend on allocation
 no_std = ["devela/no_std"] # features incompatible with the standard library
@@ -37,18 +37,21 @@ no_std = ["devela/no_std"] # features incompatible with the standard library
 safe = [] # forbid unsafe at the crate level
 safest = ["safe", "devela/safest"] # forbid unsafe recursively
 unsafe = [ # enables all the unsafe features
-	"unsafe_constructors"
+	"unsafe_constructors",
+	"unsafe_unit",
 ]
 unsafe_constructors = ["devela/unsafe_num"] # enables unchecked constructors
-unsafest = ["unsafe", "devela/unsafest"]
+unsafe_unit = [] # enables `unit::DataRaw`
+unsafest = ["unsafe", "devela/unsafest"] # enables unsafe recursively.
 
 # nightly features
 nightly = [] # only for docs
 nightly_docs = [
 	"nightly",
 	"std",
+	"unsafe",
 	"deps_all",
-	"devela/nightly_docs"
+	"devela/nightly_docs",
 ]
 
 # deprecated features
@@ -66,11 +69,9 @@ deps_default = [
             "time", # !"fugit",
 ]
 deps_all = ["deps_numerical", "deps_categorical"]
-#
 deps_numerical= ["deps_continuous", "deps_discrete"]
 	deps_continuous = ["half", "twofloat"]
 	deps_discrete = ["num-rational", "num-bigint", "rust_decimal"]
-#
 deps_categorical = ["deps_datetime", "deps_string"]
 	deps_datetime = ["fugit", "time"]
 	deps_string =  ["arraystring"]

@@ -15,8 +15,8 @@ use super::{DataType, DataTypeCopy, DataUnit, DataUnitCopy};
 
 use crate::all::BitArray;
 
-#[cfg(not(feature = "safe"))]
-use super::RawData;
+#[cfg(feature = "unsafe_unit")]
+use super::DataRaw;
 
 // 1. Mockups for substituting unused dependencies
 // -----------------------------------------------------------------------------
@@ -100,7 +100,8 @@ mod time {
 // rules. The macro must be updated in the necessary places, by adding or
 // removing commas as needed. See for example the `NOTE:missing-commas` tags.
 define_all_sizes! {
-    DataType, DataUnit, RawData,
+    // NOTE: order matters
+    DataType, DataUnit, DataRaw,
 
     // -------------------------------------------------------- 1-B / 8-b
     copy_variants_1B:

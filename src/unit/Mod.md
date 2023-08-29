@@ -3,9 +3,9 @@
 The fundamental unitary abstractions are:
 - `DataUnit…` enums that contain both the data, and the type of the data.
 - `DataType…` enums that only contain the type of data, not the data itself.
-- `RawData…` unions that only contain the raw data, not the type of the data.
+- `DataRaw…` unions that only contain the raw data, not the type of the data.
 
-They implement the [`DataUnit`], [`DataType`] and [`RawData`] traits.
+They implement the [`DataUnit`], [`DataType`] and [`DataRaw`] traits.
 
 Each one has many concrete implementations differentiated by:
 - the maximum `size` of the represented data.
@@ -44,7 +44,7 @@ All _`DataUnit*`s_ must implement the [`DataUnit`] trait, and
 [`DataUnitCopy`] trait.
 
 - `Raw` indicates the encapsulation of data without the type information.
-All *`RawData`s* implements the (marker) [`RawData`] trait.
+All *`DataRaw`s* implements the (marker) [`DataRaw`] trait.
 
 ### `[Copy]`
 
@@ -80,7 +80,7 @@ corresponding `With` version (having the same size and `Copy` semantics),
 using the zero-sized [`()`] unit type. E.g.:
 [`DataType256bit`][crate::all::DataType256bit]
 
-Note that `RawData…`s are more space-efficient than `DataUnit…`s but
+Note that `DataRaw…`s are more space-efficient than `DataUnit…`s but
 not as convenient to use and also unsafe to read, because they're unions.
 They are mostly intended to be used from collections that can store their
 corresponding `DataType…`s separately. At the moment they only support
@@ -112,5 +112,5 @@ example on how to use custom data types.
 [`DataTypeCopy`]: DataTypeCopy
 [`DataUnit`]: DataUnit
 [`DataUnitCopy`]: DataUnitCopy
-[`RawData`]: RawData
-[`RawDataCopy`]: RawDataCopy
+[`DataRaw`]: DataRaw
+[`DataRawCopy`]: DataRawCopy
