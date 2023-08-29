@@ -3,7 +3,7 @@
 //! Queues.
 //
 
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_init")]
 use core::{
     mem::{self, MaybeUninit},
     ptr,
@@ -395,7 +395,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(not(feature = "safe"))]
+    #[cfg(feature = "unsafe_pop")]
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
@@ -411,7 +411,7 @@ impl<T, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     }
     /// Alias of [`pop`][Self::pop].
     #[inline(always)]
-    #[cfg(not(feature = "safe"))]
+    #[cfg(feature = "unsafe_pop")]
     pub fn dequeue(&mut self) -> Result<T> {
         self.pop()
     }
@@ -439,7 +439,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(feature = "safe")]
+    #[cfg(not(feature = "unsafe_pop"))]
     // safe-only version that depends on T: Clone
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
@@ -453,7 +453,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
     }
     /// Alias of [`pop`][Self::pop].
     #[inline(always)]
-    #[cfg(feature = "safe")]
+    #[cfg(not(feature = "unsafe_pop"))]
     pub fn dequeue(&mut self) -> Result<T> {
         self.pop()
     }
@@ -519,7 +519,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
         if self.is_empty() || LEN > self.len() || LEN == 0 {
             None
         } else {
-            #[cfg(not(feature = "safe"))]
+            #[cfg(feature = "unsafe_init")]
             let arr = {
                 let mut unarr: [MaybeUninit<T>; LEN] =
                     unsafe { MaybeUninit::uninit().assume_init() };
@@ -536,7 +536,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Queue<T, S, CAP> {
                 unsafe { mem::transmute_copy::<_, [T; LEN]>(&unarr) }
             };
 
-            #[cfg(feature = "safe")]
+            #[cfg(not(feature = "unsafe_init"))]
             let arr = core::array::from_fn(|n| {
                 let index = (self.front + n) % CAP;
                 self.array[index].clone()

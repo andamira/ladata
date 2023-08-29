@@ -4,7 +4,7 @@
 //
 
 use crate::all::{Array, Direct, Storage};
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_init")]
 use core::mem::{self, MaybeUninit};
 use core::{
     fmt,
@@ -78,7 +78,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
     /// Returns an empty array, allocated in the stack,
     /// using the default value to fill the remaining free data.
     fn default() -> Self {
-        #[cfg(not(feature = "safe"))]
+        #[cfg(feature = "unsafe_init")]
         let data = {
             let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
             for i in &mut arr[..] {
@@ -87,7 +87,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, (), LEN> {
             unsafe { mem::transmute_copy::<_, [T; LEN]>(&arr) }
         };
 
-        #[cfg(feature = "safe")]
+        #[cfg(not(feature = "unsafe_init"))]
         let data = core::array::from_fn(|_| T::default());
 
         Array {
@@ -110,7 +110,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
     /// let mut s = BoxedArray::<i32, 100>::default();
     /// ```
     fn default() -> Self {
-        #[cfg(feature = "safe")]
+        #[cfg(not(feature = "unsafe_init"))]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -124,7 +124,7 @@ impl<T: Default, const LEN: usize> Default for Array<T, Boxed, LEN> {
             array
         };
 
-        #[cfg(not(feature = "safe"))]
+        #[cfg(feature = "unsafe_init")]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -175,7 +175,7 @@ where
     fn from(iterator: I) -> Array<T, (), LEN> {
         let mut iterator = iterator.into_iter();
 
-        #[cfg(not(feature = "safe"))]
+        #[cfg(feature = "unsafe_init")]
         let data = {
             let mut arr: [MaybeUninit<T>; LEN] = unsafe { MaybeUninit::uninit().assume_init() };
             for i in &mut arr[..] {
@@ -188,7 +188,7 @@ where
             unsafe { mem::transmute_copy::<_, [T; LEN]>(&arr) }
         };
 
-        #[cfg(feature = "safe")]
+        #[cfg(not(feature = "unsafe_init"))]
         let data = core::array::from_fn(|_| {
             if let Some(e) = iterator.next() {
                 e
@@ -222,7 +222,7 @@ where
     fn from(iterator: I) -> Array<T, Boxed, LEN> {
         let mut iterator = iterator.into_iter();
 
-        #[cfg(feature = "safe")]
+        #[cfg(not(feature = "unsafe_init"))]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 
@@ -239,7 +239,7 @@ where
             array
         };
 
-        #[cfg(not(feature = "safe"))]
+        #[cfg(feature = "unsafe_init")]
         let data = {
             let mut v = Vec::<T>::with_capacity(LEN);
 

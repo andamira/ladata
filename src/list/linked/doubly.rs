@@ -367,7 +367,7 @@ macro_rules! linked_list_array {
             /// assert![s.pop_front().is_err()];
             /// # Ok(()) }
             /// ```
-            #[cfg(feature = "safe")]
+            #[cfg(not(feature = "unsafe_pop"))]
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
@@ -416,7 +416,7 @@ macro_rules! linked_list_array {
             /// assert![s.pop_back().is_err()];
             /// # Ok(()) }
             /// ```
-            #[cfg(feature = "safe")]
+            #[cfg(not(feature = "unsafe_pop"))]
             pub fn pop_back(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
@@ -847,7 +847,7 @@ macro_rules! linked_list_array {
             /// assert![s.pop_front().is_err()];
             /// # Ok(()) }
             /// ```
-            #[cfg(not(feature = "safe"))]
+            #[cfg(feature = "unsafe_pop")]
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
@@ -900,7 +900,7 @@ macro_rules! linked_list_array {
             /// assert![s.pop_back().is_err()];
             /// # Ok(()) }
             /// ```
-            #[cfg(not(feature = "safe"))]
+            #[cfg(feature = "unsafe_pop")]
             pub fn pop_back(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))
@@ -944,9 +944,9 @@ macro_rules! linked_list_array {
             fn increment_len(&mut self) -> Result<()> {
                 if let Some(i) = self.len.get().checked_add(1) {
                     // MAYBE
-                    // #[cfg(feature = "safe")]
+                    // #[cfg(not(feature = "unsafe"))]
                     { self.len = $nmt::new(i).unwrap(); }
-                    // #[cfg(not(feature = "safe"))]
+                    // #[cfg(feature = "unsafe")]
                     // unsafe { self.len = $nmt::new_unchecked(i); }
                     Ok(())
                 } else {
@@ -957,9 +957,9 @@ macro_rules! linked_list_array {
             fn decrement_len(&mut self) -> Result<()> {
                 if let Some(i) = self.len.get().checked_sub(1) {
                     // MAYBE
-                    // #[cfg(feature = "safe")]
+                    // #[cfg(not(feature = "unsafe"))]
                     { self.len = $nmt::new(i).unwrap(); }
-                    // #[cfg(not(feature = "safe"))]
+                    // #[cfg(feature = "unsafe")]
                     // unsafe { self.len = $nmt::new_unchecked(i); }
                     Ok(())
                 } else {

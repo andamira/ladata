@@ -755,7 +755,7 @@ macro_rules! linked_list_array {
             // [______] [______] [______] [______]
             //       n_       n_       n_       n_
             // ```
-            // #[cfg(feature = "safe")] // IMPROVE: unsafe version not depending on Clone
+            // #[cfg(not(feature = "unsafe"))] // IMPROVE: unsafe version not depending on Clone
             pub fn pop_front(&mut self) -> Result<T> {
                 if self.is_empty() {
                     Err(Error::NotEnoughElements(1))

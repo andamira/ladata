@@ -3,7 +3,7 @@
 //! Stacks.
 //
 
-#[cfg(not(feature = "safe"))]
+#[cfg(feature = "unsafe_pop")]
 use core::ptr;
 
 use super::{Stack, StackIter};
@@ -621,7 +621,7 @@ impl<T, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(not(feature = "safe"))]
+    #[cfg(feature = "unsafe_pop")]
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {
             Err(Error::NotEnoughElements(1))
@@ -656,7 +656,7 @@ impl<T: Clone, S: Storage, const CAP: usize> Stack<T, S, CAP> {
     /// # Ok(()) }
     /// ```
     #[inline]
-    #[cfg(feature = "safe")]
+    #[cfg(not(feature = "unsafe_pop"))]
     // safe-only version that depends on T: Clone
     pub fn pop(&mut self) -> Result<T> {
         if self.is_empty() {

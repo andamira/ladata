@@ -38,10 +38,14 @@ safe = [] # forbid unsafe at the crate level
 safest = ["safe", "devela/safest"] # forbid unsafe recursively
 unsafe = [ # enables all the unsafe features
 	"unsafe_constructors",
+	"unsafe_init",
+	"unsafe_pop",
 	"unsafe_unit",
 ]
 unsafe_constructors = ["devela/unsafe_num"] # enables unchecked constructors
-unsafe_unit = [] # enables `unit::DataRaw`
+unsafe_init = [] # enable fast array initialization
+unsafe_pop = [] # enable pop methods not depending on T: Clone
+unsafe_unit = [] # enable `unit::DataRaw`
 unsafest = ["unsafe", "devela/unsafest"] # enables unsafe recursively.
 
 # nightly features
