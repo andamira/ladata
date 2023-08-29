@@ -7,6 +7,31 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## [0.0.29] - 2023-08-29
+
+### Added
+- new features: `nightly_docs`, `unsafest`, `unsafe_constructors`, `unsafe_init`, `unsafe_pop`, `unsafe_unit`.
+- add changelog.
+
+### Changes
+- update MSRV to `v1.72.0`
+- rename `RawData` to `DataRaw`.
+- define `DataRaw` only when `unsafe_unit` is enabled.
+- deprecate and rename `no-std` feature to `no_std`
+- remove `safe` from default features.
+- rename `Index*` to `NonMaxIndex*`
+  - improve `NonMaxIndex` fmt traits.
+- improve `Counter`
+  - delete `From` impl.
+  - allow it to count max values.
+  - new const copy incrementers and decrementers.
+  - new const converters to `NonMaxIndex*`: `as_current_index`, `as_next_index`.
+
+### Fixes
+- update categories, dependencies, documentation, CI.
+- constify a few methods.
+- separate lengthy module level docs into markdown files
+
 ## [0.0.28] - 2023-07-26
 
 ## [0.0.27] - 2023-03-02
@@ -70,7 +95,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 ## [0.0.0] - 2021-09-04
 > https://github.com/andamira/ladata/commit/78c2b5c05f8b7b34f0be83d5570d40e8d2abdebc
 
-[unreleased]: https://github.com/andamira/ladata/compare/v0.0.28...HEAD
+[unreleased]: https://github.com/andamira/ladata/compare/v0.0.29...HEAD
+[0.0.29]: https://github.com/andamira/ladata/releases/tag/v0.0.29
 [0.0.28]: https://github.com/andamira/ladata/releases/tag/v0.0.28
 [0.0.27]: https://github.com/andamira/ladata/releases/tag/v0.0.27
 [0.0.26]: https://github.com/andamira/ladata/releases/tag/v0.0.26
