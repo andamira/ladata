@@ -19,38 +19,39 @@ categories = [ "data-structures", "no-std::no-alloc" ]
 keywords = [ "data", "type", "unit" ]
 publish = true
 
+# ------------------------------------------------------------------------------
 
 [features]
 default = ["std", "deps_default"]
 
-# environment features
+#* environment features *#
 # (not enabling "std" declares the library as "no_std")
-std = [ # features that depend on the standard library
+std = [ # enables functionality that depend on the standard library
 	"alloc",
 	"half?/std",
 	"devela/std",
 ]
-alloc = ["devela/alloc"] # features that depend on allocation
-no_std = ["devela/no_std"] # features incompatible with the standard library
+alloc = ["devela/alloc"] # enables functionality that depend on allocation
+no_std = ["devela/no_std"] # enables functionality incompatible with the standard library
 
-# safety features
-safe = [] # forbid unsafe at the crate level
-safest = ["safe", "devela/safest"] # forbid unsafe recursively
+#* safety features *#
+safe = [] # forbids unsafe at the crate level
+safest = ["safe", "devela/safest"] # forbids unsafe recursively
 unsafe = [ # enables all the unsafe features
 	"unsafe_constructors",
 	"unsafe_init",
 	"unsafe_pop",
 	"unsafe_unit",
 ]
-unsafe_constructors = ["devela/unsafe_num"] # enables unchecked constructors
-unsafe_init = [] # enable fast array initialization
-unsafe_pop = [] # enable pop methods not depending on T: Clone
-unsafe_unit = [] # enable `unit::DataRaw`
+unsafe_constructors = ["devela/unsafe_num"] # enables using unchecked constructors
+unsafe_init = [] # enables fast array initialization
+unsafe_pop = [] # enables pop methods not depending on T: Clone
+unsafe_unit = [] # enables `unit::DataRaw`
 unsafest = ["unsafe", "devela/unsafest"] # enables unsafe recursively.
 
-# nightly features
-nightly = [] # only for docs
-nightly_docs = [
+#* nightly features *#
+nightly = [] # enables nightly features.
+nightly_docs = [ # enables features for docs.rs.
 	"nightly",
 	"std",
 	"unsafe",
@@ -58,10 +59,10 @@ nightly_docs = [
 	"devela/nightly_docs",
 ]
 
-# deprecated features
+#* deprecated features *#
 no-std = ["no_std"]
 
-# other features
+#* other features *#
 deps_default = [
     # "deps_numerical",
         "deps_discrete",
@@ -80,6 +81,7 @@ deps_categorical = ["deps_datetime", "deps_string"]
 	deps_datetime = ["fugit", "time"]
 	deps_string =  ["arraystring"]
 
+# ------------------------------------------------------------------------------
 
 [dependencies]
 devela = { version = "0.8.0", default-features = false }
@@ -105,6 +107,7 @@ time = { version = "0.3.11", optional = true }
 
 [dev-dependencies]
 
+# ------------------------------------------------------------------------------
 
 [package.metadata.docs.rs]
 no-default-features = true

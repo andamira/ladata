@@ -22,6 +22,8 @@ compile_error!("You can't enable the `std` and `no-std` features at the same tim
     any(
         feature = "unsafe",
         feature = "unsafe_constructors",
+        feature = "unsafe_init",
+        feature = "unsafe_pop",
         feature = "unsafe_unit",
     )
 ))]

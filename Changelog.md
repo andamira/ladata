@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+## Fixed
+- fix features safeguarding.
+- improve documentation.
+
 ## [0.0.29] - 2023-08-29
 
 ### Added
